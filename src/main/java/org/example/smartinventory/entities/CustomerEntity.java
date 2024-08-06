@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Table(name="customers")
 @Entity
@@ -29,12 +31,16 @@ public class CustomerEntity {
 
     private LocalDate dateAdded;
 
-    public CustomerEntity(int customerId, String customerName, String customerEmail, String customerPhone, String customerAddress, LocalDate dateAdded) {
+    @OneToMany(mappedBy="customer", cascade=CascadeType.ALL, orphanRemoval = true)
+    private Collection<OrderEntity> orders = new ArrayList<>();
+
+    public CustomerEntity(int customerId, String customerName, String customerEmail, String customerPhone, String customerAddress, LocalDate dateAdded, Collection<OrderEntity> orders) {
         this.customerId = customerId;
         this.customerName = customerName;
         this.customerEmail = customerEmail;
         this.customerPhone = customerPhone;
         this.customerAddress = customerAddress;
         this.dateAdded = dateAdded;
+        this.orders = orders;
     }
 }

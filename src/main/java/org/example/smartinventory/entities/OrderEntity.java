@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.smartinventory.model.OrderStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,13 +37,15 @@ public class OrderEntity
     @JoinColumn(name="notesId")
     private InventoryNotesEntity inventoryNotes;
 
+    private BigDecimal totalAmount;
+
     private String billingAddress;
     private String shippingAddress;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public OrderEntity(int orderId, UserEntity createdByUser, String orderNumber, LocalDateTime orderDate, OrderStatus orderStatus, CustomerEntity customer, InventoryNotesEntity inventoryNotes, String billingAddress, String shippingAddress, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public OrderEntity(int orderId, UserEntity createdByUser, String orderNumber, LocalDateTime orderDate, OrderStatus orderStatus, CustomerEntity customer, InventoryNotesEntity inventoryNotes, BigDecimal totalAmount, String billingAddress, String shippingAddress, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.orderId = orderId;
         this.createdByUser = createdByUser;
         this.orderNumber = orderNumber;
@@ -50,6 +53,7 @@ public class OrderEntity
         this.orderStatus = orderStatus;
         this.customer = customer;
         this.inventoryNotes = inventoryNotes;
+        this.totalAmount = totalAmount;
         this.billingAddress = billingAddress;
         this.shippingAddress = shippingAddress;
         this.createdAt = createdAt;
