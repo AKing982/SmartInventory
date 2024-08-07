@@ -5,6 +5,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import LoginForm from "./components/LoginForm";
 import RegistrationForm from "./components/RegistrationForm";
+import ForgotPasswordForm from "./components/ForgotPasswordForm";
+import HomePage from "./components/HomePage";
+import AddInventoryPage from "./components/AddInventoryPage";
 
 const theme = createTheme({
     palette: {
@@ -29,6 +32,9 @@ function App() {
                       <Routes>
                           <Route path="/" element={<LoginForm/>}/>
                           <Route path="/register" element={<RegistrationForm />}/>
+                          <Route path="/forgot-password" element={<ForgotPasswordForm />}/>
+                          <Route path="/home" element={<HomePage />}/>
+                          <Route path="/addInventory" element={<AddInventoryPage /> }/>
                       </Routes>
                   </div>
               </Router>

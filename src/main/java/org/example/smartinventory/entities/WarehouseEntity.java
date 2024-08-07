@@ -42,8 +42,8 @@ public class WarehouseEntity {
 
     private LocalDate establishmentDate;
 
-    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Collection<InventoryEntity> inventoryEntityCollections;
+//    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Collection<InventoryEntity> inventoryEntityCollections;
 
     @ManyToMany
     private Set<SupplierEntity> supplierEntityCollections;
@@ -60,7 +60,6 @@ public class WarehouseEntity {
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.establishmentDate = establishmentDate;
-        this.inventoryEntityCollections = inventoryEntityCollections;
         this.supplierEntityCollections = supplierEntityCollections;
     }
 }
