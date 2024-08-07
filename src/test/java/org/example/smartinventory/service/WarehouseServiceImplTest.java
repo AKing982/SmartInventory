@@ -3,6 +3,7 @@ package org.example.smartinventory.service;
 import org.example.smartinventory.repository.WarehouseRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -25,6 +26,11 @@ class WarehouseServiceImplTest {
         service = new WarehouseServiceImpl(repository);
     }
 
+    @Test
+    public void testFindAll()
+    {
+        fail();
+    }
 
 
     @AfterEach
