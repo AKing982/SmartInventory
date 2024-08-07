@@ -26,9 +26,9 @@ jobs:
           --health-retries 5
 
     env:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/test_db
-      SPRING_DATASOURCE_USERNAME: test_user
-      SPRING_DATASOURCE_PASSWORD: test_password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/SmartInventoryDB
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: pass
 
     steps:
     - uses: actions/checkout@v3
