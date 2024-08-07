@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,8 +64,8 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long>
     @Query("SELECT o.orderStatus, COUNT(o) as statusCount FROM OrderEntity o GROUP BY o.orderStatus ORDER BY statusCount DESC")
     List<Object[]> getMostCommonOrderStatus(Pageable pageable);
 
-    @Query("SELECT o FROM OrderEntity o WHERE DATE(o.createdAt) = CURRENT_DATE")
-    List<OrderEntity> findOrdersCreatedToday();
+    @Query("SELECT o FROM OrderEntity o WHERE o.createdAt =:date")
+    List<OrderEntity> findOrdersCreatedToday(@Param("date")Date date);
 
     @Query("SELECT o FROM OrderEntity o WHERE o.createdAt >= :weekStart AND o.createdAt < :weekEnd")
     List<OrderEntity> findOrdersCreatedThisWeek(@Param("weekStart") LocalDateTime weekStart, @Param("weekEnd") LocalDateTime weekEnd);
