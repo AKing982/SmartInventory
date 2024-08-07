@@ -19,10 +19,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build and test Spring Boot application
+      - name: Build and test Java application
         run: |
-          cd src/main
+          if [ -f "./mvnw" ]; then
           ./mvnw clean install
+          else
+            mvn clean install
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
