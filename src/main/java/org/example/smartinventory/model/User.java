@@ -1,10 +1,12 @@
 package org.example.smartinventory.model;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@Builder
 public class User
 {
     private int userId;

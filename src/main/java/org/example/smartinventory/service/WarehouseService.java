@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public interface WarehouseService extends ServiceModel<WarehouseEntity>
     WarehouseEntity updateUsedCapacity(int warehouseId, double newUsedCapacity);
 
     // Inventory Management
-    List<InventoryEntity> getWarehouseInventory(int warehouseId);
+    Collection<InventoryEntity> getWarehouseInventory(int warehouseId);
     WarehouseEntity addInventoryItem(int warehouseId, InventoryEntity item);
     WarehouseEntity removeInventoryItem(int warehouseId, int inventoryItemId);
     WarehouseEntity updateInventoryItemQuantity(int warehouseId, int inventoryItemId, int newQuantity);
