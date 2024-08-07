@@ -25,8 +25,6 @@ class WarehouseServiceImplTest {
         service = new WarehouseServiceImpl(repository);
     }
 
-
-
     @AfterEach
     void tearDown() {
     }
