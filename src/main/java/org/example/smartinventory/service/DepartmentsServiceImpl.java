@@ -25,25 +25,29 @@ public class DepartmentsServiceImpl implements DepartmentsService
         this.departmentRepository = departmentRepository;
     }
 
-
     @Override
     public Collection<DepartmentEntity> findAll() {
-        return List.of();
+        return departmentRepository.findAll();
     }
 
     @Override
     public void save(DepartmentEntity departmentEntity) {
-
+        departmentRepository.save(departmentEntity);
     }
 
     @Override
     public void delete(DepartmentEntity departmentEntity) {
-
+        departmentRepository.delete(departmentEntity);
     }
 
     @Override
     public Optional<DepartmentEntity> findById(Long id) {
-        return Optional.empty();
+        return departmentRepository.findById(Math.toIntExact(id));
+    }
+
+    @Override
+    public Optional<DepartmentEntity> findById(Integer id) {
+        return departmentRepository.findById(id);
     }
 
     @Override
@@ -53,67 +57,67 @@ public class DepartmentsServiceImpl implements DepartmentsService
 
     @Override
     public Optional<DepartmentEntity> findByDepartmentName(String name) {
-        return Optional.empty();
+        return departmentRepository.findByDepartmentName(name);
     }
 
     @Override
     public List<DepartmentEntity> findAllActiveDepartments() {
-        return List.of();
+        return departmentRepository.findAllActiveDepartments();
     }
 
     @Override
     public List<DepartmentEntity> findByManagerId(int managerId) {
-        return List.of();
+        return departmentRepository.findByManagerId(managerId);
     }
 
     @Override
     public List<DepartmentEntity> findDepartmentsCreatedAfter(LocalDateTime date) {
-        return List.of();
+        return departmentRepository.findDepartmentsCreatedAfter(date);
     }
 
     @Override
     public List<DepartmentEntity> findDepartmentsUpdatedAfter(LocalDateTime date) {
-        return List.of();
+        return departmentRepository.findDepartmentsUpdatedAfter(date);
     }
 
     @Override
     public List<DepartmentEntity> searchDepartments(String keyword) {
-        return List.of();
+        return departmentRepository.searchDepartments(keyword);
     }
 
     @Override
     public long countEmployeesInDepartment(int departmentId) {
-        return 0;
+        return departmentRepository.countEmployeesInDepartment(departmentId);
     }
 
     @Override
     public List<DepartmentEntity> findDepartmentsWithMoreThanXEmployees(int count) {
-        return List.of();
+        return departmentRepository.findDepartmentsWithMoreThanXEmployees(count);
     }
 
     @Override
     public List<DepartmentEntity> findDepartmentsWithNoEmployees() {
-        return List.of();
+        return departmentRepository.findDepartmentsWithNoEmployees();
     }
 
     @Override
-    public boolean updateDepartmentStatus(int id, boolean status) {
-        return false;
+    public int updateDepartmentStatus(int id, boolean status) {
+        return departmentRepository.updateDepartmentStatus(id, status);
     }
 
     @Override
-    public boolean updateDepartmentManager(int id, int managerId) {
-        return false;
+    public int updateDepartmentManager(int id, int managerId) {
+        return departmentRepository.updateDepartmentManager(id, managerId);
     }
 
     @Override
     public int deleteInactiveDepartments() {
-        return 0;
+        return departmentRepository.deleteInactiveDepartments();
     }
 
     @Override
     public List<DepartmentEntity> findByAddress(String address) {
-        return List.of();
+        return departmentRepository.findByAddress(address);
     }
 
     @Override
@@ -128,22 +132,22 @@ public class DepartmentsServiceImpl implements DepartmentsService
 
     @Override
     public List<DepartmentEntity> findDepartmentsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate) {
-        return List.of();
+        return departmentRepository.findDepartmentsCreatedBetween(startDate, endDate);
     }
 
     @Override
     public List<DepartmentEntity> findUpdatedDepartments() {
-        return List.of();
+        return departmentRepository.findUpdatedDepartments();
     }
 
     @Override
     public List<DepartmentEntity> findDepartmentsByCustomCriteria(String name, Boolean isActive, Integer managerId) {
-        return List.of();
+        return departmentRepository.findDepartmentsByCustomCriteria(name, isActive, managerId);
     }
 
     @Override
     public int bulkUpdateDepartmentAddresses(String oldAddress, String newAddress) {
-        return 0;
+        return departmentRepository.bulkUpdateDepartmentAddresses(oldAddress, newAddress);
     }
 
     @Override
@@ -152,13 +156,13 @@ public class DepartmentsServiceImpl implements DepartmentsService
     }
 
     @Override
-    public Optional<DepartmentEntity> updateDepartment(int id, DepartmentEntity updatedDepartment) {
-        return Optional.empty();
+    public int updateDepartment(int id, DepartmentEntity updatedDepartment) {
+        return departmentRepository.updateDepartment(id, updatedDepartment);
     }
 
     @Override
-    public boolean deleteDepartment(int id) {
-        return false;
+    public int deleteDepartment(int id) {
+        return departmentRepository.deleteDepartmentById(id);
     }
 
     @Override
@@ -166,40 +170,12 @@ public class DepartmentsServiceImpl implements DepartmentsService
         return null;
     }
 
-    @Override
-    public List<DepartmentEntity> findDepartmentsWithEmployeeCountGreaterThan(int count) {
-        return List.of();
-    }
-
-    @Override
-    public double getAverageDepartmentSize() {
-        return 0;
-    }
-
-    @Override
-    public List<DepartmentEntity> findTopNLargestDepartments(int n) {
-        return List.of();
-    }
 
     @Override
     public boolean isDepartmentNameUnique(String name) {
         return false;
     }
 
-    @Override
-    public List<DepartmentEntity> findDepartmentsWithoutManager() {
-        return List.of();
-    }
-
-    @Override
-    public Map<String, Long> getDepartmentEmployeeDistribution() {
-        return Map.of();
-    }
-
-    @Override
-    public List<DepartmentEntity> findDepartmentsByEmployeeSkill(String skill) {
-        return List.of();
-    }
 
     @Override
     public Optional<DepartmentEntity> assignEmployeeToDepartment(int employeeId, int departmentId) {
@@ -212,17 +188,7 @@ public class DepartmentsServiceImpl implements DepartmentsService
     }
 
     @Override
-    public List<DepartmentEntity> findDepartmentsWithBudgetGreaterThan(BigDecimal budget) {
-        return List.of();
-    }
-
-    @Override
     public Optional<BigDecimal> getTotalBudgetForAllDepartments() {
         return Optional.empty();
-    }
-
-    @Override
-    public List<DepartmentEntity> findDepartmentsWithProjectCount(int count) {
-        return List.of();
     }
 }

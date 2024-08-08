@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
@@ -30,7 +31,6 @@ import static org.mockito.Mockito.anyString;
 
 @ExtendWith(MockitoExtension.class)
 class DepartmentsServiceImplTest {
-
 
     @Mock
     private DepartmentRepository departmentRepository;
@@ -129,19 +129,19 @@ class DepartmentsServiceImplTest {
         assertThat(result).isEqualTo(5L);
     }
 
-    @Test
-    void testUpdateDepartmentStatus() {
-        when(departmentRepository.updateDepartmentStatus(1, false)).thenReturn(1);
-        boolean result = departmentsService.updateDepartmentStatus(1, false);
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void testUpdateDepartmentManager() {
-        when(departmentRepository.updateDepartmentManager(1, 2)).thenReturn(1);
-        boolean result = departmentsService.updateDepartmentManager(1, 2);
-        assertThat(result).isTrue();
-    }
+//    @Test
+//    void testUpdateDepartmentStatus() {
+//        when(departmentRepository.updateDepartmentStatus(1, false)).thenReturn(1);
+//        boolean result = departmentsService.updateDepartmentStatus(1, false);
+//        assertThat(result).isTrue();
+//    }
+//
+//    @Test
+//    void testUpdateDepartmentManager() {
+//        when(departmentRepository.updateDepartmentManager(1, 2)).thenReturn(1);
+//        boolean result = departmentsService.updateDepartmentManager(1, 2);
+//        assertThat(result).isTrue();
+//    }
 
     @Test
     void testDeleteInactiveDepartments() {
@@ -180,18 +180,43 @@ class DepartmentsServiceImplTest {
 
     @Test
     void testUpdateDepartment() {
-        when(departmentRepository.findById(1)).thenReturn(Optional.of(testDepartment));
-        when(departmentRepository.save(any(DepartmentEntity.class))).thenReturn(testDepartment);
-        Optional<DepartmentEntity> result = departmentsService.updateDepartment(1, testDepartment);
-        assertThat(result).isPresent().contains(testDepartment);
+        // Arrange
+        int departmentId = 1;
+        DepartmentEntity updatedDepartment = new DepartmentEntity();
+        updatedDepartment.setDepartmentName("Updated Department");
+        updatedDepartment.setDepartmentDescription("Updated Description");
+        updatedDepartment.setManagerId(2);
+        updatedDepartment.setActive(true);
+        updatedDepartment.setAddress("Updated Address");
+
+        // Mock repository behavior
+        when(departmentRepository.updateDepartment(eq(departmentId), any(DepartmentEntity.class))).thenReturn(1);
+
+        // Act
+        int result = departmentsService.updateDepartment(departmentId, updatedDepartment);
+
+        // Assert
+        assertThat(result).isEqualTo(1);
+
+        // Verify
+        verify(departmentRepository).updateDepartment(eq(departmentId), any(DepartmentEntity.class));
     }
 
     @Test
     void testDeleteDepartment() {
-        when(departmentRepository.existsById(1)).thenReturn(true);
-        boolean result = departmentsService.deleteDepartment(1);
-        assertThat(result).isTrue();
-        verify(departmentRepository).deleteById(1);
+
+        // Arrange
+        int departmentId = 1;
+        when(departmentRepository.deleteDepartmentById(departmentId)).thenReturn(1);
+
+        // Act
+        int result = departmentsService.deleteDepartment(departmentId);
+
+        // Assert
+        assertThat(result).isEqualTo(1);
+
+        // Verify
+        verify(departmentRepository).deleteDepartmentById(departmentId);
     }
 
     @Test

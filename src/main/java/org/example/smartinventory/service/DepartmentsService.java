@@ -17,7 +17,7 @@ public interface DepartmentsService extends ServiceModel<DepartmentEntity>
 
     void delete(DepartmentEntity departmentEntity);
 
-    Optional<DepartmentEntity> findById(Long id);
+    Optional<DepartmentEntity> findById(Integer id);
 
     Optional<DepartmentEntity> findByDepartmentName(String name);
 
@@ -37,9 +37,9 @@ public interface DepartmentsService extends ServiceModel<DepartmentEntity>
 
     List<DepartmentEntity> findDepartmentsWithNoEmployees();
 
-    boolean updateDepartmentStatus(int id, boolean status);
+    int updateDepartmentStatus(int id, boolean status);
 
-    boolean updateDepartmentManager(int id, int managerId);
+    int updateDepartmentManager(int id, int managerId);
 
     int deleteInactiveDepartments();
 
@@ -59,33 +59,18 @@ public interface DepartmentsService extends ServiceModel<DepartmentEntity>
 
     DepartmentEntity createDepartment(DepartmentEntity department);
 
-    Optional<DepartmentEntity> updateDepartment(int id, DepartmentEntity updatedDepartment);
+    int updateDepartment(int id, DepartmentEntity updatedDepartment);
 
-    boolean deleteDepartment(int id);
+    int deleteDepartment(int id);
 
     Page<DepartmentEntity> findAllPaginated(Pageable pageable);
 
-    List<DepartmentEntity> findDepartmentsWithEmployeeCountGreaterThan(int count);
-
-    double getAverageDepartmentSize();
-
-    List<DepartmentEntity> findTopNLargestDepartments(int n);
-
     boolean isDepartmentNameUnique(String name);
-
-    List<DepartmentEntity> findDepartmentsWithoutManager();
-
-    Map<String, Long> getDepartmentEmployeeDistribution();
-
-    List<DepartmentEntity> findDepartmentsByEmployeeSkill(String skill);
 
     Optional<DepartmentEntity> assignEmployeeToDepartment(int employeeId, int departmentId);
 
     Optional<DepartmentEntity> removeEmployeeFromDepartment(int employeeId, int departmentId);
 
-    List<DepartmentEntity> findDepartmentsWithBudgetGreaterThan(BigDecimal budget);
-
     Optional<BigDecimal> getTotalBudgetForAllDepartments();
 
-    List<DepartmentEntity> findDepartmentsWithProjectCount(int count);
 }
