@@ -49,7 +49,7 @@ const AddInventoryPage: React.FC = () => {
     });
 
     const [errors, setErrors] = useState<Partial<InventoryItem>>({});
-    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
