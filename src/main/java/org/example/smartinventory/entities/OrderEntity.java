@@ -59,4 +59,17 @@ public class OrderEntity
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public OrderEntity(int orderId, LocalDateTime createdAt, BigDecimal totalAmount, CustomerEntity customer) {
+        this.orderId = orderId;
+        this.createdAt = createdAt;
+        this.totalAmount = totalAmount;
+        this.customer = customer;
+    }
+
+    public OrderEntity(int orderId, LocalDateTime createdAt, BigDecimal totalAmount) {
+        this.orderId = orderId;
+        this.createdAt = createdAt;
+        this.totalAmount = totalAmount;
+    }
 }

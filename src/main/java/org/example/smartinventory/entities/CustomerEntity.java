@@ -21,6 +21,7 @@ public class CustomerEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int customerId;
 
+    @Column(name="customer_name", nullable=false)
     private String customerName;
 
     private String customerEmail;
