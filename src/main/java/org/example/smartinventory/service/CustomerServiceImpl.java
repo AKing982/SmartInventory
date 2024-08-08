@@ -5,10 +5,13 @@ import org.example.smartinventory.entities.OrderEntity;
 import org.example.smartinventory.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -26,87 +29,87 @@ public class CustomerServiceImpl implements CustomerService
 
     @Override
     public Collection<CustomerEntity> findAll() {
-        return List.of();
+        return customerRepository.findAll();
     }
 
     @Override
     public void save(CustomerEntity customerEntity) {
-
+        customerRepository.save(customerEntity);
     }
 
     @Override
     public void delete(CustomerEntity customerEntity) {
-
+        customerRepository.delete(customerEntity);
     }
 
     @Override
     public Optional<CustomerEntity> findById(Long id) {
-        return Optional.empty();
+        return customerRepository.findById(id);
     }
 
     @Override
     public Collection<CustomerEntity> findAllById(Iterable<Long> ids) {
-        return List.of();
+        return customerRepository.findAllById(ids);
     }
 
     @Override
-    public CustomerEntity createCustomer(CustomerEntity customer) {
-        return null;
+    public void createCustomer(CustomerEntity customer) {
+        customerRepository.save(customer);
     }
 
     @Override
-    public List<CustomerEntity> createCustomers(List<CustomerEntity> customers) {
-        return List.of();
+    public void createCustomers(List<CustomerEntity> customers) {
+        customers.forEach(this::createCustomer);
     }
 
     @Override
     public Page<CustomerEntity> getAllCustomersPaginated(Pageable pageable) {
-        return null;
+        return customerRepository.findAll(pageable);
     }
 
     @Override
     public Optional<CustomerEntity> getCustomerByEmail(String email) {
-        return Optional.empty();
+        return customerRepository.findByCustomerEmail(email);
     }
 
     @Override
     public List<CustomerEntity> getCustomersByName(String name) {
-        return List.of();
+        return customerRepository.findCustomerByName(name);
     }
 
     @Override
     public List<CustomerEntity> getCustomersAddedAfterDate(LocalDate date) {
-        return List.of();
+        return customerRepository.getCustomersAddedAfterDate(date);
     }
 
     @Override
-    public Optional<CustomerEntity> updateCustomer(CustomerEntity customer) {
-        return Optional.empty();
+    public int updateCustomer(CustomerEntity customer) {
+        return 0;
     }
 
     @Override
-    public Optional<CustomerEntity> updateCustomerEmail(int customerId, String newEmail) {
-        return Optional.empty();
+    public int updateCustomerEmail(int customerId, String newEmail) {
+        return customerRepository.updateCustomerEmail(customerId, newEmail);
     }
 
     @Override
-    public Optional<CustomerEntity> updateCustomerPhone(int customerId, String newPhone) {
-        return Optional.empty();
+    public int updateCustomerPhone(int customerId, String newPhone) {
+        return customerRepository.updateCustomerPhone(customerId, newPhone);
     }
 
     @Override
-    public Optional<CustomerEntity> updateCustomerAddress(int customerId, String newAddress) {
-        return Optional.empty();
+    public int updateCustomerAddress(int customerId, String newAddress) {
+        return customerRepository.updateCustomerAddress(customerId, newAddress);
     }
 
     @Override
     public void deleteCustomer(int customerId) {
-
+        customerRepository.deleteCustomerById(customerId);
     }
 
     @Override
     public void deleteCustomers(List<Integer> customerIds) {
-
+        customerIds.forEach(this::deleteCustomer);
     }
 
     @Override
@@ -116,7 +119,7 @@ public class CustomerServiceImpl implements CustomerService
 
     @Override
     public long getCustomerCount() {
-        return 0;
+        return customerRepository.countCustomers();
     }
 
     @Override
@@ -131,7 +134,7 @@ public class CustomerServiceImpl implements CustomerService
 
     @Override
     public List<OrderEntity> getCustomerOrders(int customerId) {
-        return List.of();
+        return customerRepository.findCustomerOrders(customerId);
     }
 
     @Override
@@ -145,18 +148,19 @@ public class CustomerServiceImpl implements CustomerService
     }
 
     @Override
-    public double getTotalOrderValueForCustomer(int customerId) {
-        return 0;
+    public BigDecimal getTotalOrderValueForCustomer(int customerId) {
+        return customerRepository.findTotalOrderValueForCustomer(customerId);
     }
 
     @Override
     public int getOrderCountForCustomer(int customerId) {
-        return 0;
+        return customerRepository.countOrdersByCustomerId(customerId);
     }
 
     @Override
     public List<CustomerEntity> getTopCustomersByOrderValue(int limit) {
-        return List.of();
+        Pageable pageable = PageRequest.of(0, limit);
+        return customerRepository.findTopCustomersByOrderValue(pageable);
     }
 
     @Override
@@ -171,12 +175,12 @@ public class CustomerServiceImpl implements CustomerService
 
     @Override
     public List<CustomerEntity> getCustomersWithNoOrders() {
-        return List.of();
+        return customerRepository.findCustomersWithNoOrders();
     }
 
     @Override
-    public List<CustomerEntity> getCustomersWithOrdersInLastMonth() {
-        return List.of();
+    public List<CustomerEntity> getCustomersWithOrdersInLastMonth(LocalDateTime lastMonth) {
+        return customerRepository.findCustomersWithOrdersInLastMonth(lastMonth);
     }
 
     @Override

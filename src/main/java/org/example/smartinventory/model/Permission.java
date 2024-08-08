@@ -1,0 +1,16 @@
+package org.example.smartinventory.model;
+
+public enum Permission
+{
+    VIEW_INVENTORY,
+    UPDATE_INVENTORY,
+    GENERATE_REPORTS,
+    RESERVE_ITEMS,
+    CREATE_PURCHASE_ORDERS,
+    MANAGE_SUPPLIERS,
+    VIEW_FINANCIALS,
+    VIEW_ANALYTICS,
+    MANAGE_USERS,
+    CONFIGURE_SYSTEM,
+    VIEW_OWN_INVENTORY,
+}

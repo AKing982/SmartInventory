@@ -5,15 +5,17 @@ import org.example.smartinventory.entities.OrderEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface CustomerService extends ServiceModel<CustomerEntity>
 {
     // Create
-    CustomerEntity createCustomer(CustomerEntity customer);
-    List<CustomerEntity> createCustomers(List<CustomerEntity> customers);
+    void createCustomer(CustomerEntity customer);
+    void createCustomers(List<CustomerEntity> customers);
 
     // Read
     Page<CustomerEntity> getAllCustomersPaginated(Pageable pageable);
@@ -22,10 +24,10 @@ public interface CustomerService extends ServiceModel<CustomerEntity>
     List<CustomerEntity> getCustomersAddedAfterDate(LocalDate date);
 
     // Update
-    Optional<CustomerEntity> updateCustomer(CustomerEntity customer);
-    Optional<CustomerEntity> updateCustomerEmail(int customerId, String newEmail);
-    Optional<CustomerEntity> updateCustomerPhone(int customerId, String newPhone);
-    Optional<CustomerEntity> updateCustomerAddress(int customerId, String newAddress);
+    int updateCustomer(CustomerEntity customer);
+    int updateCustomerEmail(int customerId, String newEmail);
+    int updateCustomerPhone(int customerId, String newPhone);
+    int updateCustomerAddress(int customerId, String newAddress);
 
     // Delete
     void deleteCustomer(int customerId);
@@ -47,7 +49,7 @@ public interface CustomerService extends ServiceModel<CustomerEntity>
     Optional<CustomerEntity> removeOrderFromCustomer(int customerId, int orderId);
 
     // Statistics
-    double getTotalOrderValueForCustomer(int customerId);
+    BigDecimal getTotalOrderValueForCustomer(int customerId);
     int getOrderCountForCustomer(int customerId);
     List<CustomerEntity> getTopCustomersByOrderValue(int limit);
 
@@ -59,7 +61,7 @@ public interface CustomerService extends ServiceModel<CustomerEntity>
 
     // Custom queries
     List<CustomerEntity> getCustomersWithNoOrders();
-    List<CustomerEntity> getCustomersWithOrdersInLastMonth();
+    List<CustomerEntity> getCustomersWithOrdersInLastMonth(LocalDateTime lastMonth);
 
     // Sorting
     List<CustomerEntity> getAllCustomersSorted(String sortBy, String sortOrder);

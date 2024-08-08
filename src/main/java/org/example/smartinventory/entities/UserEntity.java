@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.smartinventory.model.Permission;
 
 @Table(name="users")
 @Entity
@@ -38,4 +39,6 @@ public class UserEntity
         this.password = password;
         this.isActive = isActive;
     }
+
+
 }
