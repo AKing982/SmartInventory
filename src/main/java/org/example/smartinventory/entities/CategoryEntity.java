@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 
@@ -24,7 +23,6 @@ public class CategoryEntity implements Serializable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int categoryId;
 
-    @NotBlank(message="Category Name is required")
     private String name;
 
     private String description;

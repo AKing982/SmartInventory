@@ -6,12 +6,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,7 +32,7 @@ public class ProductEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int productId;
 
-    @NotBlank(message="Product Name cannot be blank")
+    @NotBlank(message="Product Name cannot be null")
     private String productName;
 
     @NotBlank(message="Product description cannot be blank")
@@ -41,11 +41,9 @@ public class ProductEntity implements Serializable {
     @NotBlank(message="Product SKU cannot be blank")
     private String productSKU;
 
-    @NotNull
     @Size(min=1)
     private BigDecimal productPrice;
 
-    @Size(min=1)
     private int productQuantity;
 
     @ManyToOne(fetch = FetchType.EAGER)
