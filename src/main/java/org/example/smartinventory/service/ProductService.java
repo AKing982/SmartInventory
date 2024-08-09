@@ -14,13 +14,11 @@ public interface ProductService extends ServiceModel<ProductEntity>
 {
     // Added methods
     List<ProductEntity> getAllProducts();
-    Optional<ProductEntity> assignCategory(Long productId, String category);
     boolean validateProduct(ProductEntity product);
 
     // Modified methods
     void deleteProduct(Long productId);
-    void deleteProducts(List<Long> productIds);
-    int updateProductPrice(Long productId, BigDecimal newPrice);
-    int updateProductQuantity(Long productId, int newQuantity);
-    int updateProductCategory(Long productId, CategoryEntity newCategory);
+    Optional<ProductEntity> updateProductPrice(Long productId, BigDecimal newPrice);
+    Optional<ProductEntity> updateProductQuantity(int productId, int newQuantity);
+    Optional<ProductEntity> updateProductCategory(Long productId, CategoryEntity newCategory);
 }

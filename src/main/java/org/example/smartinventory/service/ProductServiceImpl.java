@@ -4,6 +4,8 @@ import org.example.smartinventory.entities.CategoryEntity;
 import org.example.smartinventory.entities.ProductEntity;
 import org.example.smartinventory.repository.CategoryRepository;
 import org.example.smartinventory.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,29 +18,27 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService
 {
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
+    private final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository,
-                              CategoryRepository categoryRepository)
+    public ProductServiceImpl(ProductRepository productRepository)
     {
         this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public List<ProductEntity> getAllProducts() {
+        List<ProductEntity> products = productRepository.findAll();
+        LOGGER.debug(products.toString());
         return productRepository.findAll();
     }
 
-    @Override
-    public Optional<ProductEntity> assignCategory(Long productId, String category) {
-        return Optional.empty();
-    }
 
     @Override
     public boolean validateProduct(ProductEntity product) {
-        return false;
+        Long productId = (long) product.getProductId();
+        Optional<ProductEntity> productEntity = productRepository.findById(productId);
+        return productEntity.isPresent();
     }
 
     @Override
@@ -47,22 +47,17 @@ public class ProductServiceImpl implements ProductService
     }
 
     @Override
-    public void deleteProducts(List<Long> productIds) {
-        productIds.forEach(productRepository::deleteById);
-    }
-
-    @Override
-    public int updateProductPrice(Long productId, BigDecimal newPrice) {
+    public Optional<ProductEntity> updateProductPrice(Long productId, BigDecimal newPrice) {
         return productRepository.updateProductPrice(productId, newPrice);
     }
 
     @Override
-    public int updateProductQuantity(Long productId, int newQuantity) {
+    public Optional<ProductEntity> updateProductQuantity(int productId, int newQuantity) {
         return productRepository.updateProductQuantity(productId, newQuantity);
     }
 
     @Override
-    public int updateProductCategory(Long productId, CategoryEntity newCategory) {
+    public Optional<ProductEntity> updateProductCategory(Long productId, CategoryEntity newCategory) {
         return productRepository.updateProductCategory(productId, newCategory);
     }
 

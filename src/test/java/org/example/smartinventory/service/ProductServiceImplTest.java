@@ -2,6 +2,7 @@ package org.example.smartinventory.service;
 
 import org.example.smartinventory.entities.CategoryEntity;
 import org.example.smartinventory.entities.ProductEntity;
+import org.example.smartinventory.model.Product;
 import org.example.smartinventory.repository.CategoryRepository;
 import org.example.smartinventory.repository.ProductRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -38,15 +40,15 @@ class ProductServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        productService = new ProductServiceImpl(productRepository, categoryRepository);
+        productService = new ProductServiceImpl(productRepository);
     }
 
     @Test
     void getAllProducts_shouldReturnAllProducts() {
         // Arrange
         List<ProductEntity> expectedProducts = List.of(
-                new ProductEntity(1, "Product1", "Desc1", "SKU1", BigDecimal.TEN, 5, null, LocalDateTime.now()),
-                new ProductEntity(2, "Product2", "Desc2", "SKU2", BigDecimal.ONE, 10, null, LocalDateTime.now())
+                new ProductEntity(1, "Product1", "Desc1", "SKU1", BigDecimal.TEN, 5, null, LocalDate.now()),
+                new ProductEntity(2, "Product2", "Desc2", "SKU2", BigDecimal.ONE, 10, null, LocalDate.now())
         );
         when(productRepository.findAll()).thenReturn(expectedProducts);
 
@@ -58,34 +60,12 @@ class ProductServiceImplTest {
         verify(productRepository).findAll();
     }
 
-    @Test
-    void assignCategory_shouldAssignCategoryToProduct() {
-        // Arrange
-        Long productId = 1L;
-        String categoryName = "Electronics";
-        ProductEntity product = new ProductEntity(1, "Product1", "Desc1", "SKU1", BigDecimal.TEN, 5, null, LocalDateTime.now());
-        CategoryEntity category = new CategoryEntity();
-        category.setName(categoryName);
-
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(categoryRepository.findByName(categoryName)).thenReturn(Optional.of(category));
-        when(productRepository.save(any(ProductEntity.class))).thenReturn(product);
-
-        // Act
-        Optional<ProductEntity> result = productService.assignCategory(productId, categoryName);
-
-        // Assert
-        assertTrue(result.isPresent());
-        assertEquals(category, result.get().getProductCategory());
-        verify(productRepository).findById(productId);
-        verify(categoryRepository).findByName(categoryName);
-        verify(productRepository).save(product);
-    }
 
     @Test
     void validateProduct_shouldReturnTrueForValidProduct() {
         // Arrange
-        ProductEntity validProduct = new ProductEntity(1, "Valid Product", "Valid Desc", "VALID-SKU", new BigDecimal("9.99"), 10, null, LocalDateTime.now());
+        ProductEntity validProduct = new ProductEntity(1, "Valid Product", "Valid Desc", "VALID-SKU", new BigDecimal("9.99"), 10, null, LocalDate.now());
+        when(productRepository.findById(1L)).thenReturn(Optional.of(validProduct));
 
         // Act
         boolean isValid = productService.validateProduct(validProduct);
@@ -99,35 +79,63 @@ class ProductServiceImplTest {
         // Arrange
         Long productId = 1L;
         BigDecimal newPrice = new BigDecimal("15.99");
-        ProductEntity product = new ProductEntity(1, "Product1", "Desc1", "SKU1", BigDecimal.TEN, 5, null, LocalDateTime.now());
-
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(productRepository.save(any(ProductEntity.class))).thenReturn(product);
+        ProductEntity updatedProduct = new ProductEntity(1, "Product1", "Desc1", "SKU1", newPrice, 5, null, LocalDate.now());
+        when(productRepository.updateProductPrice(1L, newPrice)).thenReturn(Optional.of(updatedProduct));
 
         // Act
-        int result = productService.updateProductPrice(productId, newPrice);
+
+        Optional<ProductEntity> result = productService.updateProductPrice(productId, newPrice);
 
         // Assert
-        assertEquals(1, result);
-        assertEquals(newPrice, product.getProductPrice());
-        verify(productRepository).findById(productId);
-        verify(productRepository).save(product);
+        assertEquals(updatedProduct, result.get());
+        assertEquals(newPrice, updatedProduct.getProductPrice());
+        verify(productRepository).updateProductPrice(1L, newPrice);
     }
 
     @Test
     void deleteProduct_shouldDeleteProductSuccessfully() {
         // Arrange
         Long productId = 1L;
-        ProductEntity product = new ProductEntity(1, "Product1", "Desc1", "SKU1", BigDecimal.TEN, 5, null, LocalDateTime.now());
-
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        ProductEntity product = new ProductEntity(1, "Product1", "Desc1", "SKU1", BigDecimal.TEN, 5, null, LocalDate.now());
 
         // Act
         productService.deleteProduct(productId);
 
         // Assert
-        verify(productRepository).findById(productId);
-        verify(productRepository).delete(product);
+        verify(productRepository).deleteById(productId);
+    }
+
+
+
+    @Test
+    void updateProduct_shouldUpdateProductQuantity()
+    {
+        // Arrange
+        int productId = 1;
+        int newQuantity = 10;
+        ProductEntity product = new ProductEntity(productId, "Product1", "Desc1", "SKU1", BigDecimal.ONE, newQuantity, null, LocalDate.now());
+
+        // Act
+        when(productRepository.updateProductQuantity(productId, newQuantity)).thenReturn(Optional.of(product));
+
+        Optional<ProductEntity> actual = productService.updateProductQuantity(productId, newQuantity);
+        assertTrue(actual.isPresent());
+        assertEquals(newQuantity, actual.get().getProductQuantity());
+    }
+
+    @Test
+    void updateProduct_shouldUpdateProductCategory()
+    {
+        Long productId = 1L;
+        CategoryEntity newCategory = new CategoryEntity();
+        ProductEntity updatedProduct = new ProductEntity(1, "Product1", "Desc1", "SKU1", BigDecimal.TEN, 5, newCategory, LocalDate.now());
+        when(productRepository.updateProductCategory(1L, newCategory)).thenReturn(Optional.of(updatedProduct));
+
+        Optional<ProductEntity> result = productService.updateProductCategory(productId, newCategory);
+
+        assertEquals(updatedProduct, result.get());
+        assertEquals(newCategory, updatedProduct.getProductCategory());
+        verify(productRepository).updateProductCategory(1L, newCategory);
     }
 
     @AfterEach

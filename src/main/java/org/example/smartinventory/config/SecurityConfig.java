@@ -20,15 +20,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
         http
-                .cors(Customizer.withDefaults())
-                .csrf(Customizer.withDefaults())
+//                .cors(Customizer.withDefaults())
+//                .csrf(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers("/api/auth/login").permitAll()
                                 .requestMatchers("/api/accounts/{user}").permitAll()
                                 .requestMatchers("/api/profile/data/{user}").permitAll()
                                 .requestMatchers("/AeroBankApp/dasboard/**").permitAll()
                                 .requestMatchers("/ws/**").permitAll()
-                                .anyRequest().authenticated()// Require authentication for /home
+                                .anyRequest().permitAll()// Require authentication for /home
                         )
                         .exceptionHandling(exceptions -> exceptions
                                 .authenticationEntryPoint((request, response, authException) -> {
