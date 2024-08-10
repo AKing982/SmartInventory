@@ -1,5 +1,6 @@
 package org.example.smartinventory.service;
 
+import org.example.smartinventory.dto.RegistrationDTO;
 import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,18 @@ public class UserServiceImpl implements UserService
             return userRepository.findByEmail(email);
         }
         return userRepository.findByUsername(userName);
+    }
+
+    @Override
+    public UserEntity createUserFromRegistration(RegistrationDTO user) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail(user.email());
+        userEntity.setPassword(user.password());
+        userEntity.setFirstName(user.firstName());
+        userEntity.setLastName(user.lastName());
+        userEntity.setUsername(user.username());
+        userEntity.setPassword(user.password());
+        return userRepository.save(userEntity);
     }
 
     @Override
