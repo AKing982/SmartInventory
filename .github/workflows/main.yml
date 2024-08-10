@@ -68,6 +68,11 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    - name: Debug AWS Configuration
+      run: |
+          aws sts get-caller-identity
+          aws configure list   
+
     - name: Deploy to AWS Amplify
       env:
           AMPLIFY_APP_ID: ${{ secrets.AMPLIFY_APP_ID }}
