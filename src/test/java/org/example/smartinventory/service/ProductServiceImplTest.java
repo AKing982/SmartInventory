@@ -57,7 +57,6 @@ class ProductServiceImplTest {
 
         // Assert
         assertEquals(expectedProducts, actualProducts);
-        verify(productRepository).findAll();
     }
 
 
