@@ -26,7 +26,7 @@ class RegistrationServiceTest {
         registrationDTO = new RegistrationDTO("first", "last", "test@test.com", "testUser", "testPassword", "testJob", "testRole", "testCompany");
     }
 
-    
+
     @AfterEach
     void tearDown() {
     }
