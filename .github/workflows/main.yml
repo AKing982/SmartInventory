@@ -55,7 +55,6 @@ jobs:
       run: |
         cd src/main/webapps
         npm ci
-        npm update react-scripts  # Update react-scripts
         npm run build
         npm test
 
