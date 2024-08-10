@@ -55,7 +55,7 @@ jobs:
       run: |
         cd src/main/webapps
         npm ci
-        npm ci --legacy-peer-deps
+        npm install --legacy-peer-deps
         npm run build
         npm test
 
