@@ -1,0 +1,47 @@
+logging:
+  config: classpath:logback.xml
+
+logback:
+  scan: true
+  scan-period: 10 seconds
+
+  include:
+    - org/springframework/boot/logging/logback/defaults.xml
+    - org/springframework/boot/logging/logback/console-appender.xml
+
+  properties:
+    LOGS_HOME: ${catalina.base}/logs/
+
+  appenders:
+    ConsoleAppender:
+      class: ch.qos.logback.core.ConsoleAppender
+      encoder:
+        pattern: "%-4relative [%thread] %-5level %logger{35} - %msg%n"
+
+    RollingFileAppender:
+      class: ch.qos.logback.core.rolling.RollingFileAppender
+      file: ${LOGS_HOME}/inventory.log
+      encoder:
+        pattern: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+      rollingPolicy:
+        class: ch.qos.logback.core.rolling.TimeBasedRollingPolicy
+        fileNamePattern: ${LOGS_HOME}/inventory.%d{yyyy-MM-dd}.%i.log
+        timeBasedFileNamingAndTriggeringPolicy:
+          class: ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP
+          maxFileSize: 100MB
+
+  root-level: INFO
+  root-appenders:
+    - ConsoleAppender
+    - RollingFileAppender
+
+  loggers:
+    org.springframework.web:
+      level: DEBUG
+      appenders:
+        - ConsoleAppender
+
+    org.example:
+      level: DEBUG
+      appenders:
+        - ConsoleAppender

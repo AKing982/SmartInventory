@@ -13,8 +13,8 @@ import java.util.Optional;
 public interface OrderService extends ServiceModel<OrderEntity>
 {
     // Create
-    OrderEntity createOrder(OrderEntity order);
-    List<OrderEntity> createOrders(List<OrderEntity> orders);
+    void createOrder(OrderEntity order);
+    void createOrders(List<OrderEntity> orders);
 
     // Read
     Optional<OrderEntity> getOrderById(int orderId);
@@ -23,10 +23,10 @@ public interface OrderService extends ServiceModel<OrderEntity>
     Page<OrderEntity> getAllOrdersPaginated(Pageable pageable);
 
     // Update
-    Optional<OrderEntity> updateOrder(OrderEntity order);
-    Optional<OrderEntity> updateOrderStatus(int orderId, OrderStatus newStatus);
-    Optional<OrderEntity> updateOrderShippingAddress(int orderId, String newShippingAddress);
-    Optional<OrderEntity> updateOrderBillingAddress(int orderId, String newBillingAddress);
+    int updateOrder(OrderEntity order);
+    int updateOrderStatus(int orderId, OrderStatus newStatus);
+    int updateOrderShippingAddress(int orderId, String newShippingAddress);
+    int updateOrderBillingAddress(int orderId, String newBillingAddress);
 
     // Delete
     void deleteOrder(int orderId);

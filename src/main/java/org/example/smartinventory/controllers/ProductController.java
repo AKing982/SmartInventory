@@ -1,9 +1,13 @@
 package org.example.smartinventory.controllers;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.smartinventory.entities.ProductEntity;
 import org.example.smartinventory.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,30 +26,48 @@ public class ProductController
         this.productService = productService;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<Collection<ProductEntity>> getAllProducts()
+    @GetMapping(value="/", produces= MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getAllProducts()
     {
-        return null;
+        Collection<ProductEntity> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Optional<ProductEntity>> getProductById(@PathVariable("id") Long id){
-        return null;
+    @GetMapping(value="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> getProductById(@PathVariable("id") Long id){
+        Optional<ProductEntity> productEntity = productService.findById(id);
+        if(productEntity.isPresent())
+        {
+            ProductEntity product = productEntity.get();
+            return ResponseEntity.ok(product);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/")
     public ResponseEntity<?> addProduct(@RequestBody ProductEntity product){
-        return null;
+        try
+        {
+            productService.save(product);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        }catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @RequestBody ProductEntity product){
-        return null;
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id){
-        return null;
+
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok().build();
+        }catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

@@ -34,6 +34,10 @@ public class WarehouseEntity {
     @Enumerated(EnumType.STRING)
     private WarehouseType warehouseType;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name="managerId")
+    private ManagerEntity managerEntity;
+
     private String managerName;
 
     private LocalTime openingTime;
@@ -48,7 +52,7 @@ public class WarehouseEntity {
     @ManyToMany
     private Set<SupplierEntity> supplierEntityCollections;
 
-    public WarehouseEntity(int warehouseId, String warehouseName, String warehouseAddress, String emailAddress, double totalCapacity, double usedCapacity, WarehouseType warehouseType, String managerName, LocalTime openingTime, LocalTime closingTime, LocalDate establishmentDate, Collection<InventoryEntity> inventoryEntityCollections, Set<SupplierEntity> supplierEntityCollections) {
+    public WarehouseEntity(int warehouseId, String warehouseName, String warehouseAddress, String emailAddress, double totalCapacity, double usedCapacity, WarehouseType warehouseType, ManagerEntity managerEntity, LocalTime openingTime, LocalTime closingTime, LocalDate establishmentDate, Set<SupplierEntity> supplierEntityCollections) {
         this.warehouseId = warehouseId;
         this.warehouseName = warehouseName;
         this.warehouseAddress = warehouseAddress;
@@ -56,7 +60,7 @@ public class WarehouseEntity {
         this.totalCapacity = totalCapacity;
         this.usedCapacity = usedCapacity;
         this.warehouseType = warehouseType;
-        this.managerName = managerName;
+        this.managerEntity = managerEntity;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.establishmentDate = establishmentDate;

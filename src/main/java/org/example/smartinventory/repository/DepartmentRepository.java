@@ -54,6 +54,17 @@ public interface DepartmentRepository extends JpaRepository<DepartmentEntity, In
     @Query("UPDATE DepartmentEntity d SET d.isActive = :status WHERE d.departmentId = :id")
     int updateDepartmentStatus(@Param("id") int id, @Param("status") boolean status);
 
+    @Modifying
+    @Query("UPDATE DepartmentEntity d SET " +
+            "d.departmentName = CASE WHEN :#{#updatedDepartment.departmentName} IS NULL THEN d.departmentName ELSE :#{#updatedDepartment.departmentName} END, " +
+            "d.departmentDescription = CASE WHEN :#{#updatedDepartment.departmentDescription} IS NULL THEN d.departmentDescription ELSE :#{#updatedDepartment.departmentDescription} END, " +
+            "d.managerId = CASE WHEN :#{#updatedDepartment.managerId} IS NULL THEN d.managerId ELSE :#{#updatedDepartment.managerId} END, " +
+            "d.isActive = :#{#updatedDepartment.isActive}, " +
+            "d.address = CASE WHEN :#{#updatedDepartment.address} IS NULL THEN d.address ELSE :#{#updatedDepartment.address} END, " +
+            "d.updatedAt = CURRENT_TIMESTAMP " +
+            "WHERE d.departmentId = :id")
+    int updateDepartment(@Param("id") int id, @Param("updatedDepartment") DepartmentEntity updatedDepartment);
+
     // Update department manager
     @Modifying
     @Query("UPDATE DepartmentEntity d SET d.managerId = :managerId WHERE d.departmentId = :id")
@@ -63,6 +74,10 @@ public interface DepartmentRepository extends JpaRepository<DepartmentEntity, In
     @Modifying
     @Query("DELETE FROM DepartmentEntity d WHERE d.isActive = false")
     int deleteInactiveDepartments();
+
+    @Modifying
+    @Query("DELETE FROM DepartmentEntity d WHERE d.departmentId =:id")
+    int deleteDepartmentById(@Param("id") int id);
 
     // Find departments by address
     @Query("SELECT d FROM DepartmentEntity d WHERE d.address LIKE %:address%")

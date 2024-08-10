@@ -27,22 +27,22 @@ public class OrderServiceImpl implements OrderService
 
     @Override
     public Collection<OrderEntity> findAll() {
-        return List.of();
+        return orderRepository.findAll();
     }
 
     @Override
     public void save(OrderEntity orderEntity) {
-
+        orderRepository.save(orderEntity);
     }
 
     @Override
     public void delete(OrderEntity orderEntity) {
-
+        orderRepository.delete(orderEntity);
     }
 
     @Override
     public Optional<OrderEntity> findById(Long id) {
-        return Optional.empty();
+        return orderRepository.findById(id);
     }
 
     @Override
@@ -51,18 +51,18 @@ public class OrderServiceImpl implements OrderService
     }
 
     @Override
-    public OrderEntity createOrder(OrderEntity order) {
-        return null;
+    public void createOrder(OrderEntity order) {
+        orderRepository.save(order);
     }
 
     @Override
-    public List<OrderEntity> createOrders(List<OrderEntity> orders) {
-        return List.of();
+    public void createOrders(List<OrderEntity> orders) {
+
     }
 
     @Override
     public Optional<OrderEntity> getOrderById(int orderId) {
-        return Optional.empty();
+        return orderRepository.findById((long) orderId);
     }
 
     @Override
@@ -81,23 +81,23 @@ public class OrderServiceImpl implements OrderService
     }
 
     @Override
-    public Optional<OrderEntity> updateOrder(OrderEntity order) {
-        return Optional.empty();
+    public int updateOrder(OrderEntity order) {
+        return 0;
     }
 
     @Override
-    public Optional<OrderEntity> updateOrderStatus(int orderId, OrderStatus newStatus) {
-        return Optional.empty();
+    public int updateOrderStatus(int orderId, OrderStatus newStatus) {
+        return 0;
     }
 
     @Override
-    public Optional<OrderEntity> updateOrderShippingAddress(int orderId, String newShippingAddress) {
-        return Optional.empty();
+    public int updateOrderShippingAddress(int orderId, String newShippingAddress) {
+        return 0;
     }
 
     @Override
-    public Optional<OrderEntity> updateOrderBillingAddress(int orderId, String newBillingAddress) {
-        return Optional.empty();
+    public int updateOrderBillingAddress(int orderId, String newBillingAddress) {
+        return 0;
     }
 
     @Override

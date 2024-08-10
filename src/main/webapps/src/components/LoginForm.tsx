@@ -11,30 +11,32 @@ import {
     Typography
 } from "@mui/material";
 import React, {useState} from "react"
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import {authenticateUser, LoginCredentials, AuthenticationResponse} from '../api/LoginApiService';
 
 interface LoginFormData
 {
-    email: string;
+    usernameOrEmail: string;
     password: string;
 }
 
 interface FormErrors{
-    email?: string;
+    usernameOrEmail?: string;
     password?: string;
 }
 
 const LoginForm: React.FC = () => {
-    const [formData, setFormData] = useState<LoginFormData>({
-        email: '',
+    const [formData, setFormData] = useState<LoginCredentials>({
+        usernameOrEmail: '',
         password: ''
     });
     const [errors, setErrors] = useState<FormErrors>({});
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const navigate = useNavigate();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -52,10 +54,8 @@ const LoginForm: React.FC = () => {
     // Validation
     const validateForm = (): boolean => {
         const newErrors: FormErrors = {};
-        if (!formData.email) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email is invalid';
+        if (!formData.usernameOrEmail) {
+            newErrors.usernameOrEmail = 'Email is required';
         }
         if (!formData.password) {
             newErrors.password = 'Password is required';
@@ -71,11 +71,19 @@ const LoginForm: React.FC = () => {
         e.preventDefault();
         if (validateForm()) {
             try {
+
+                console.log('Authenticating Username: ', formData.usernameOrEmail);
+                const response = await authenticateUser(formData);
+                console.log('Authentication Successful: ', response);
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('user', response.username);
                 // Simulating API call
                 console.log('Logging in with:', formData);
                 // Here you would typically make an API call to your backend
                 // await loginUser(formData.email, formData.password);
                 setSubmitError(null);
+
+                navigate('/home');
                 // Handle successful login (e.g., redirect)
             } catch (err) {
                 handleLoginError(err);
@@ -85,8 +93,21 @@ const LoginForm: React.FC = () => {
 
     // Error handling
     const handleLoginError = (err: any) => {
-        setSubmitError('Login failed. Please try again.');
-        console.error(err);
+        console.error('Login error:', err);
+
+        const userErrorMessage = 'Invalid username or password. Please try again.';
+
+        if (err.response) {
+            if (err.response.status === 401) {
+                setSubmitError(userErrorMessage);
+            } else {
+                setSubmitError('An unexpected error occurred. Please try again later.');
+            }
+        } else if (err.request) {
+            setSubmitError('Unable to reach the server. Please check your internet connection and try again.');
+        } else {
+            setSubmitError('An unexpected error occurred. Please try again later.');
+        }
     };
 
 
@@ -109,15 +130,15 @@ const LoginForm: React.FC = () => {
                         margin="normal"
                         required
                         fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
+                        id="usernameOrEmail"
+                        label="Username or Email"
+                        name="usernameOrEmail"
+                        autoComplete="username email"
                         autoFocus
-                        value={formData.email}
+                        value={formData.usernameOrEmail}
                         onChange={handleInputChange}
-                        error={!!errors.email}
-                        helperText={errors.email}
+                        error={!!errors.usernameOrEmail}
+                        helperText={errors.usernameOrEmail}
                     />
                     <TextField
                         margin="normal"
