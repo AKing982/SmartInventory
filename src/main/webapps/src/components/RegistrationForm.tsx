@@ -6,8 +6,9 @@ import { MenuItem } from "@mui/material";
 import { Grid } from "@mui/material";
 import {Box, TextField} from "@mui/material";
 import {Typography} from "@mui/material";
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 import { useState } from "react";
+import {registerUser, Registration} from '../api/RegistrationApiService';
 
 
 interface RegistrationFormData {
@@ -15,6 +16,7 @@ interface RegistrationFormData {
     lastName: string;
     email: string;
     password: string;
+    username: string;
     confirmPassword: string;
     companyName: string;
     jobTitle: string;
@@ -23,7 +25,7 @@ interface RegistrationFormData {
 }
 
 const RegistrationForm: React.FC = () => {
-    const [formData, setFormData] = useState<RegistrationFormData>({
+    const [formData, setFormData] = useState<Registration>({
         firstName: '',
         lastName: '',
         email: '',
@@ -31,12 +33,13 @@ const RegistrationForm: React.FC = () => {
         confirmPassword: '',
         companyName: '',
         jobTitle: '',
+        username: '',
         role: '',
         agreeToTerms: false,
     });
 
     const [errors, setErrors] = useState<Partial<RegistrationFormData>>({});
-
+    const navigate = useNavigate();
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, checked } = e.target;
         setFormData(prevData => ({
@@ -67,11 +70,21 @@ const RegistrationForm: React.FC = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (validateForm()) {
-            // Here you would typically send the registration data to your backend
-            console.log('Registration data:', formData);
+            try
+            {
+                // Here you would typically send the registration data to your backend
+                const response = await registerUser(formData);
+                console.log('Response: ', response);
+                console.log('Registration data:', formData);
+                navigate('/');
+
+            }catch(error)
+            {
+                console.error('Error: ', error);
+            }
             // Handle successful registration (e.g., redirect to login page or dashboard)
         }
     };
@@ -119,6 +132,18 @@ const RegistrationForm: React.FC = () => {
                                 onChange={handleInputChange}
                                 error={!!errors.email}
                                 helperText={errors.email}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                required
+                                fullWidth
+                                label="Username"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleInputChange}
+                                error={!!errors.username}
+                                helperText={errors.username}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>

@@ -59,6 +59,6 @@ public class UserDetailsLoginService implements UserDetailsService
 
     private User getUserDetails(UserEntity user)
     {
-        return new User(user.getEmail(), user.getPassword(), new ArrayList<>());
+        return new User(user.getUsername(), user.getPassword(), new ArrayList<>());
     }
 }

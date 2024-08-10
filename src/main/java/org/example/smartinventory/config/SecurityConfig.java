@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers("/api/auth/login").permitAll()
+                                .requestMatchers("/api/register/").permitAll()
                                 .requestMatchers("/api/accounts/{user}").permitAll()
                                 .requestMatchers("/api/profile/data/{user}").permitAll()
                                 .requestMatchers("/AeroBankApp/dasboard/**").permitAll()
