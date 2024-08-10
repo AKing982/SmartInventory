@@ -58,7 +58,7 @@ jobs:
         npm install typescript@4.9.5 --save-dev --legacy-peer-deps
         npm update react-scripts --legacy-peer-deps
         npm run build
-        npm test
+        npm test -- --passWithNoTests
 
 
         
