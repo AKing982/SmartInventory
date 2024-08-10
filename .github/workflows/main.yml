@@ -61,6 +61,18 @@ jobs:
         npm run build
         npm test -- --passWithNoTests
 
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
-        
-   
+    - name: Deploy to AWS Amplify
+      env:
+          AMPLIFY_APP_ID: ${{ secrets.AMPLIFY_APP_ID }}
+          AMPLIFY_BRANCH: ${{ secrets.AMPLIFY_BRANCH }}
+      run: |
+          npm install -g @aws-amplify/cli
+          amplify pull --appId $AMPLIFY_APP_ID --envName $AMPLIFY_BRANCH --yes
+          amplify publish --yes

@@ -1,0 +1,27 @@
+version: 1
+applications:
+  - frontend:
+      phases:
+        preBuild:
+          commands:
+            - cd src/main/webapps
+            - npm ci
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: src/main/webapps/build
+        files:
+          - '**/*'
+  - backend:
+      phases:
+        build:
+          commands:
+            - echo Building backend Docker image
+            - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+            - docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$AMPLIFY_JOB_ID .
+            - docker push $ECR_REGISTRY/$ECR_REPOSITORY:$AMPLIFY_JOB_ID
+        postBuild:
+          commands:
+            - echo Updating ECS service
+            - aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment

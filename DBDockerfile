@@ -1,0 +1,7 @@
+FROM postgres:12
+
+ENV POSTGRES_DB=smartinventorydb
+ENV POSTGRES_USER=postgres
+ENv POSTGRES_PASSWORD=pass
+
+COPY ./init.sql /docker-entrypoint-initdb.d/
