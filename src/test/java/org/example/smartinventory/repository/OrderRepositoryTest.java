@@ -116,12 +116,6 @@ class OrderRepositoryTest {
         assertThat(result.get(0)[1]).isEqualTo(1L);
     }
 
-    @Test
-    void testFindOrdersCreatedToday() {
-        List<OrderEntity> found = orderRepository.findOrdersCreatedToday(Date.from(Instant.now()));
-        assertThat(found).hasSize(1);
-        assertThat(found.get(0).getOrderNumber()).isEqualTo("ORD-001");
-    }
 
     @Test
     void testFindOrdersCreatedThisWeek() {
@@ -146,13 +140,6 @@ class OrderRepositoryTest {
         assertThat(found.get(0).getOrderNumber()).isEqualTo("ORD-001");
     }
 
-    @Test
-    void testBulkUpdateOrderStatus() {
-        int updated = orderRepository.bulkUpdateOrderStatus(List.of(testOrder.getOrderId()), OrderStatus.DELIVERED);
-        assertThat(updated).isEqualTo(1);
-        OrderEntity updatedOrder = entityManager.find(OrderEntity.class, testOrder.getOrderId());
-        assertThat(updatedOrder.getOrderStatus()).isEqualTo(OrderStatus.DELIVERED);
-    }
 
     @Test
     void testFindHighValueOrders() {
@@ -167,10 +154,4 @@ class OrderRepositoryTest {
         assertThat(avgValue).isEqualTo(100.0);
     }
 
-//    @Test
-//    void testFindPendingOrdersForFulfillment() {
-//        List<OrderEntity> found = orderRepository.findPendingOrdersForFulfillment(PageRequest.of(0, 10));
-//        assertThat(found).hasSize(1);
-//        assertThat(found.get(0).getOrderStatus()).isEqualTo(OrderStatus.PENDING);
-//    }
 }

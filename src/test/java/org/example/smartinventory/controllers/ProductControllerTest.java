@@ -1,6 +1,7 @@
 package org.example.smartinventory.controllers;
 
 import org.example.smartinventory.config.JpaConfig;
+import org.example.smartinventory.entities.CategoryEntity;
 import org.example.smartinventory.entities.ProductEntity;
 import org.example.smartinventory.service.ProductService;
 import org.hamcrest.Matchers;
@@ -22,18 +23,24 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = ProductController.class)
+@WebMvcTest(value = ProductController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @Import({JpaConfig.class})
 @RunWith(SpringRunner.class)
-
 class ProductControllerTest {
 
     @Autowired
@@ -54,12 +61,12 @@ class ProductControllerTest {
         List<ProductEntity> products = new ArrayList<>();
         products.add(new ProductEntity());
         products.add(new ProductEntity());
-        Mockito.when(productService.getAllProducts()).thenReturn(products);
+        when(productService.getAllProducts()).thenReturn(products);
 
         mvc.perform(get("/api/products/")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)));
     }
 
     @Test
@@ -67,10 +74,89 @@ class ProductControllerTest {
     void testGetProductById() throws Exception {
         ProductEntity p = new ProductEntity();
 
-        Mockito.when(productService.findById(Mockito.anyLong())).thenReturn(Optional.of(p));
+        when(productService.findById(Mockito.anyLong())).thenReturn(Optional.of(p));
 
         mvc.perform(get("/api/products/" + testId))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testAddProduct() throws Exception {
+        ProductEntity p = new ProductEntity();
+        p.setProductId(1);
+
+        CategoryEntity categoryEntity = new CategoryEntity();
+        categoryEntity.setCategoryId(1);
+        categoryEntity.setName("Electronics");
+        categoryEntity.setDescription("Electronics");
+        p.setProductCategory(categoryEntity);
+        p.setProductPrice(BigDecimal.TEN);
+        p.setProductSKU("1919191919");
+        p.setProductDescription("Electronics");
+        p.setDateAdded(LocalDate.now());
+
+        mvc.perform(post("/api/products/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(p)))
+                .andExpect(status().isCreated());
+
+        verify(productService, times(1)).save(any(ProductEntity.class));
+    }
+
+    @Test
+    void testDeleteProductById() throws Exception {
+        ProductEntity p = createProduct();
+        int id = p.getProductId();
+
+        mvc.perform(delete("/api/products/" + id))
+                .andExpect(status().isOk());
+
+    }
+
+    private ProductEntity updatedProduct(BigDecimal price)
+    {
+        ProductEntity p = new ProductEntity();
+        p.setProductId(1);
+
+        CategoryEntity categoryEntity = new CategoryEntity();
+        categoryEntity.setCategoryId(1);
+        categoryEntity.setName("Electronics");
+        categoryEntity.setDescription("Electronics");
+        p.setProductCategory(categoryEntity);
+        p.setProductPrice(price);
+        p.setProductSKU("1919191919");
+        p.setProductDescription("Electronics");
+        p.setDateAdded(LocalDate.now());
+        return p;
+    }
+
+    private ProductEntity createProduct() {
+        ProductEntity p = new ProductEntity();
+        p.setProductId(1);
+
+        CategoryEntity categoryEntity = new CategoryEntity();
+        categoryEntity.setCategoryId(1);
+        categoryEntity.setName("Electronics");
+        categoryEntity.setDescription("Electronics");
+        p.setProductCategory(categoryEntity);
+        p.setProductPrice(BigDecimal.TEN);
+        p.setProductSKU("1919191919");
+        p.setProductDescription("Electronics");
+        p.setDateAdded(LocalDate.now());
+        return p;
+    }
+
+    private static String asJsonString(final Object obj)
+    {
+        try
+        {
+            return new ObjectMapper().writeValueAsString(obj);
+
+        }catch(Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterEach

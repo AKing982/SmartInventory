@@ -18,6 +18,8 @@ public interface ProductService extends ServiceModel<ProductEntity>
 
     // Modified methods
     void deleteProduct(Long productId);
+
+    ProductEntity updateProduct(ProductEntity product, int productId);
     Optional<ProductEntity> updateProductPrice(Long productId, BigDecimal newPrice);
     Optional<ProductEntity> updateProductQuantity(int productId, int newQuantity);
     Optional<ProductEntity> updateProductCategory(Long productId, CategoryEntity newCategory);

@@ -5,6 +5,7 @@ import org.example.smartinventory.entities.ProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -21,4 +22,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>
 
     @Query("UPDATE ProductEntity p SET p.productCategory =:category WHERE p.productId =:id")
     Optional<ProductEntity> updateProductCategory(@Param("id") Long id, @Param("category") CategoryEntity category);
+
+    @Query("UPDATE ProductEntity p SET p=:new WHERE p.productId =:id")
+    Optional<ProductEntity> updateProduct(@Param("id") int id, @Param("new") ProductEntity newProduct);
 }

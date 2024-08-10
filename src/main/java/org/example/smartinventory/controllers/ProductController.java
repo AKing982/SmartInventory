@@ -1,5 +1,6 @@
 package org.example.smartinventory.controllers;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.smartinventory.entities.ProductEntity;
 import org.example.smartinventory.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,17 +48,26 @@ public class ProductController
 
     @PostMapping("/")
     public ResponseEntity<?> addProduct(@RequestBody ProductEntity product){
-        return null;
+        try
+        {
+            productService.save(product);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        }catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @RequestBody ProductEntity product){
-        return null;
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id){
-        return null;
+
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok().build();
+        }catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

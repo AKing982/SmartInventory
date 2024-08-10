@@ -24,132 +24,47 @@ public class UserServiceImpl implements UserService
 
     @Override
     public Optional<UserEntity> findByUserNameOrEmail(String userName, String email) {
-        return Optional.empty();
-    }
-
-    @Override
-    public void createUser(UserEntity user) {
-
+        if(userName.isEmpty())
+        {
+            return userRepository.findByEmail(email);
+        }
+        return userRepository.findByUsername(userName);
     }
 
     @Override
     public Optional<UserEntity> getUserByUsername(String username) {
-        return Optional.empty();
+        return userRepository.findByUsername(username);
     }
 
     @Override
     public Optional<UserEntity> getUserByEmail(String email) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Page<UserEntity> getAllUsersPaginated(Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public int updateUser(UserEntity user) {
-        return 0;
-    }
-
-    @Override
-    public int updateUserPassword(int userId, String newPassword) {
-        return 0;
-    }
-
-    @Override
-    public int updateUserActiveStatus(int userId, boolean isActive) {
-        return 0;
-    }
-
-    @Override
-    public void deleteUser(int userId) {
-
-    }
-
-    @Override
-    public List<UserEntity> searchUsers(String keyword) {
-        return List.of();
-    }
-
-    @Override
-    public List<UserEntity> getActiveUsers() {
-        return List.of();
-    }
-
-    @Override
-    public long getUserCount() {
-        return 0;
-    }
-
-    @Override
-    public boolean isUsernameUnique(String username) {
-        return false;
-    }
-
-    @Override
-    public boolean isEmailUnique(String email) {
-        return false;
-    }
-
-    @Override
-    public Optional<UserEntity> authenticateUser(String username, String password) {
-        return Optional.empty();
-    }
-
-    @Override
-    public void logoutUser(int userId) {
-
-    }
-
-    @Override
-    public Optional<UserEntity> getUserProfile(int userId) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<UserEntity> updateUserProfile(int userId, UserEntity updatedProfile) {
-        return Optional.empty();
-    }
-
-    @Override
-    public void assignRoleToUser(int userId, String roleName) {
-
-    }
-
-    @Override
-    public List<String> getUserRoles(int userId) {
-        return List.of();
-    }
-
-    @Override
-    public boolean hasPermission(int userId, String permission) {
-        return false;
+        return userRepository.findByEmail(email);
     }
 
 
     @Override
     public Collection<UserEntity> findAll() {
-        return List.of();
+        return userRepository.findAll();
     }
 
     @Override
     public void save(UserEntity userEntity) {
-
+        userRepository.save(userEntity);
     }
 
     @Override
     public void delete(UserEntity userEntity) {
-
+        // NOT IMPLEMENTED
     }
+
 
     @Override
     public Optional<UserEntity> findById(Long id) {
-        return Optional.empty();
+        return userRepository.findById(id);
     }
 
     @Override
     public Collection<UserEntity> findAllById(Iterable<Long> ids) {
-        return List.of();
+        return userRepository.findAllById(ids);
     }
 }

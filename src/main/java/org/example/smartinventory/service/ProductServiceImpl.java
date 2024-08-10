@@ -47,6 +47,12 @@ public class ProductServiceImpl implements ProductService
     }
 
     @Override
+    public ProductEntity updateProduct(ProductEntity product, int productId) {
+        return productRepository.updateProduct(productId, product)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+    }
+
+    @Override
     public Optional<ProductEntity> updateProductPrice(Long productId, BigDecimal newPrice) {
         return productRepository.updateProductPrice(productId, newPrice);
     }

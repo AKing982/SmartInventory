@@ -1,6 +1,7 @@
 package org.example.smartinventory.config;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.smartinventory.workbench.security.EmailPasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -22,6 +23,7 @@ public class SecurityConfig {
         http
 //                .cors(Customizer.withDefaults())
 //                .csrf(Customizer.withDefaults())
+                .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers("/api/auth/login").permitAll()
                                 .requestMatchers("/api/accounts/{user}").permitAll()
