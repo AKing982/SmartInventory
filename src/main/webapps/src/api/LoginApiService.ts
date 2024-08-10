@@ -1,3 +1,5 @@
+import apiUrl from "../config/api";
+
 export interface AuthenticationResponse {
     token: string;
     tokenType: string;
@@ -17,7 +19,7 @@ export async function authenticateUser(credentials: LoginCredentials) : Promise<
 
     try
     {
-        const response = await fetch('http://localhost:8080/api/auth/login',
+        const response = await fetch(`${apiUrl}/api/auth/login`,
             {
                 method: 'POST',
                 headers: {

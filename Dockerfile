@@ -1,7 +1,16 @@
-FROM openjdk:17-jdk-slim as build
-LABEL maintainer="alex@utahkings.com"
-VOLUME /tmp
+# Build stage
+FROM maven:3.8.4-openjdk-17-slim AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Run stage
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+RUN apt-get update && apt-get install -y postgresql-client
+COPY wait-for-it.sh .
+RUN chmod +x wait-for-it.sh
 EXPOSE 8080
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
