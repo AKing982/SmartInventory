@@ -49,7 +49,7 @@ class UserDetailsLoginServiceTest {
         UserDetails userDetails = userDetailsLoginService.loadUserByUsername(TEST_USERNAME);
 
         assertNotNull(userDetails);
-        assertEquals(TEST_EMAIL, userDetails.getUsername());
+        assertEquals(TEST_USERNAME, userDetails.getUsername());
         assertTrue(new BCryptPasswordEncoder().matches(TEST_PASSWORD, userDetails.getPassword()));
         assertTrue(userDetails.getAuthorities().isEmpty());
 
@@ -64,7 +64,7 @@ class UserDetailsLoginServiceTest {
         UserDetails userDetails = userDetailsLoginService.loadUserByUsername(TEST_EMAIL);
 
         assertNotNull(userDetails);
-        assertEquals(TEST_EMAIL, userDetails.getUsername());
+        assertEquals(TEST_USERNAME, userDetails.getUsername());
         assertTrue(new BCryptPasswordEncoder().matches(TEST_PASSWORD, userDetails.getPassword()));
         assertTrue(userDetails.getAuthorities().isEmpty());
 
