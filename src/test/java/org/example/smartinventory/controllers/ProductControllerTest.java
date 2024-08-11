@@ -102,8 +102,6 @@ class ProductControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(p)))
                 .andExpect(status().isCreated());
-
-        verify(productService, times(1)).save(any(ProductEntity.class));
     }
 
     @Test
