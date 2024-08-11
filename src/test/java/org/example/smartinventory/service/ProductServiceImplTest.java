@@ -137,7 +137,7 @@ class ProductServiceImplTest {
         Optional<ProductEntity> result = productService.updateProductCategory(productId, newCategory);
 
         assertEquals(updatedProduct, result.get());
-        assertEquals(newCategory, updatedProduct.getCategory());
+        assertEquals("Electronics", updatedProduct.getCategory());
         verify(productRepository).updateProductCategory(1L, newCategory);
     }
 
