@@ -14,15 +14,15 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long>
 {
-    @Query("UPDATE ProductEntity p SET p.productQuantity =:quantity WHERE p.productId =:id")
+    @Query("UPDATE ProductEntity p SET p.quantity =:quantity WHERE p.id =:id")
     Optional<ProductEntity> updateProductQuantity(@Param("id") int id, @Param("quantity") Integer quantity);
 
-    @Query("UPDATE ProductEntity p SET p.productPrice =:price WHERE p.productId =:id")
+    @Query("UPDATE ProductEntity p SET p.price =:price WHERE p.id =:id")
     Optional<ProductEntity> updateProductPrice(@Param("id") Long id, @Param("price") BigDecimal price);
 
-    @Query("UPDATE ProductEntity p SET p.productCategory =:category WHERE p.productId =:id")
+    @Query("UPDATE ProductEntity p SET p.category =:category WHERE p.id =:id")
     Optional<ProductEntity> updateProductCategory(@Param("id") Long id, @Param("category") CategoryEntity category);
 
-    @Query("UPDATE ProductEntity p SET p=:new WHERE p.productId =:id")
+    @Query("UPDATE ProductEntity p SET p=:new WHERE p.id =:id")
     Optional<ProductEntity> updateProduct(@Param("id") int id, @Param("new") ProductEntity newProduct);
 }

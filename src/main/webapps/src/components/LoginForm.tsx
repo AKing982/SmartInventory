@@ -1,12 +1,12 @@
 import {
     Alert,
     Box,
-    Button,
-    Container,
+    Button, Checkbox, CircularProgress,
+    Container, FormControlLabel,
     Grid,
     IconButton,
     InputAdornment,
-    Link, Paper,
+    Link, MenuItem, Paper, styled,
     TextField,
     Typography
 } from "@mui/material";
@@ -16,6 +16,11 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {authenticateUser, LoginCredentials, AuthenticationResponse} from '../api/LoginApiService';
+import backgroundImage from '../images/pexels-tiger-lily-4483610.jpg';
+import EmailIcon from "@mui/icons-material/Email";
+import ForgotPasswordForm from "./ForgotPasswordForm";
+import RegistrationForm from "./RegistrationForm";
+import {registerUser} from "../api/RegistrationApiService";
 
 interface LoginFormData
 {
@@ -28,15 +33,81 @@ interface FormErrors{
     password?: string;
 }
 
+const BackgroundContainer = styled('div')({
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+});
+
+type ViewType = 'login' | 'forgotPassword' | 'register';
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Semi-transparent white
+    padding: theme.spacing(4),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backdropFilter: 'blur(10px)', // Add a blur effect
+}));
+
+interface FormData {
+    usernameOrEmail: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    username: string;
+    confirmPassword: string;
+    companyName: string;
+    jobTitle: string;
+    role: string;
+    agreeToTerms: boolean;
+}
+
+export interface Registration{
+    firstName: string;
+    lastName: string;
+    email?: string;
+    password: string;
+    confirmPassword: string;
+    companyName?: string;
+    jobTitle: string;
+    username: string;
+    role: string;
+    agreeToTerms: false;
+}
+
+
+
 const LoginForm: React.FC = () => {
-    const [formData, setFormData] = useState<LoginCredentials>({
+    const [formData, setFormData] = useState<FormData>({
         usernameOrEmail: '',
-        password: ''
+        password: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        username: '',
+        confirmPassword: '',
+        companyName: '',
+        jobTitle: '',
+        role: '',
+        agreeToTerms: false,
     });
-    const [errors, setErrors] = useState<FormErrors>({});
+    const [errors, setErrors] = useState<Partial<FormData>>({});
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const navigate = useNavigate();
+
+    const [showForgotPassword, setShowForgotPassword] = useState<boolean>(false);
+    const [email, setEmail] = useState('');
+    const [forgotPasswordError, setForgotPasswordError] = useState<string>('');
+    const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [view, setView] = useState<ViewType>('login');
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -66,29 +137,84 @@ const LoginForm: React.FC = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    // Form submission
+    // Update the handleSubmit function
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (validateForm()) {
             try {
-
-                console.log('Authenticating Username: ', formData.usernameOrEmail);
-                const response = await authenticateUser(formData);
-                console.log('Authentication Successful: ', response);
-                localStorage.setItem('token', response.token);
-                localStorage.setItem('user', response.username);
-                // Simulating API call
-                console.log('Logging in with:', formData);
-                // Here you would typically make an API call to your backend
-                // await loginUser(formData.email, formData.password);
+                if (view === 'login') {
+                    const loginData: LoginCredentials = {
+                        usernameOrEmail: formData.usernameOrEmail,
+                        password: formData.password
+                    };
+                    const response = await authenticateUser(loginData);
+                    console.log('Authentication Successful: ', response);
+                    localStorage.setItem('token', response.token);
+                    localStorage.setItem('user', response.username);
+                    navigate('/home');
+                } else if (view === 'forgotPassword') {
+                    setIsLoading(true);
+                    // Implement forgot password logic
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    setForgotPasswordSuccess(true);
+                    setIsLoading(false);
+                } else if (view === 'register') {
+                    const registrationData: Registration = {
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        email: formData.email,
+                        username: formData.username,
+                        password: formData.password,
+                        confirmPassword: formData.confirmPassword,
+                        companyName: formData.companyName,
+                        jobTitle: formData.jobTitle,
+                        role: formData.role,
+                        agreeToTerms: false
+                    };
+                    const response = await registerUser(registrationData);
+                    console.log('Registration successful:', response);
+                    setView('login');
+                }
                 setSubmitError(null);
-
-                navigate('/home');
-                // Handle successful login (e.g., redirect)
             } catch (err) {
-                handleLoginError(err);
+                console.error(err);
             }
         }
+    };
+
+    // Form submission
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     if (validateForm()) {
+    //         try {
+    //
+    //             console.log('Authenticating Username: ', formData.usernameOrEmail);
+    //             const response = await authenticateUser(formData);
+    //             console.log('Authentication Successful: ', response);
+    //             localStorage.setItem('token', response.token);
+    //             localStorage.setItem('user', response.username);
+    //             // Simulating API call
+    //             console.log('Logging in with:', formData);
+    //             // Here you would typically make an API call to your backend
+    //             // await loginUser(formData.email, formData.password);
+    //             setSubmitError(null);
+    //
+    //             navigate('/home');
+    //             // Handle successful login (e.g., redirect)
+    //         } catch (err) {
+    //             handleLoginError(err);
+    //         }
+    //     }
+    // };
+
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value);
+        setForgotPasswordError('');
+    };
+
+    const validateEmail = (email: string): boolean => {
+        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return re.test(email);
     };
 
     // Error handling
@@ -111,92 +237,416 @@ const LoginForm: React.FC = () => {
     };
 
 
+    const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!email) {
+            setForgotPasswordError('Email is required');
+            return;
+        }
+        if (!validateEmail(email)) {
+            setForgotPasswordError('Please enter a valid email address');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            setForgotPasswordSuccess(true);
+            setEmail('');
+        } catch (err) {
+            setForgotPasswordError('An error occurred. Please try again later.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const toggleForgotPassword = () => {
+        setShowForgotPassword(!showForgotPassword);
+        setForgotPasswordError('');
+        setForgotPasswordSuccess(false);
+        setEmail('');
+    };
+
+
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
 
+    const renderLoginForm = () => (
+        <>
+            <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="usernameOrEmail"
+                label="Username or Email"
+                name="usernameOrEmail"
+                autoComplete="username email"
+                autoFocus
+                value={formData.usernameOrEmail}
+                onChange={handleInputChange}
+                error={!!errors.usernameOrEmail}
+                helperText={errors.usernameOrEmail}
+            />
+            <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                autoComplete="current-password"
+                value={formData.password}
+                onChange={handleInputChange}
+                error={!!errors.password}
+                helperText={errors.password}
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={() => setShowPassword(!showPassword)}
+                                edge="end"
+                            >
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                        </InputAdornment>
+                    )
+                }}
+            />
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+            >
+                Sign In
+            </Button>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                <Link component="button" variant="body2" onClick={() => setView('forgotPassword')}>
+                    Forgot password?
+                </Link>
+                <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setView('register')}
+                >
+                    Create Account
+                </Button>
+            </Box>
+        </>
+    );
+
+
+
+    const renderForgotPasswordForm = () => (
+        <>
+            <Typography variant="body2" sx={{ mt: 1, mb: 3, textAlign: 'center' }}>
+                Enter your email address and we'll send you instructions to reset your password.
+            </Typography>
+            <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                value={formData.email}
+                onChange={handleInputChange}
+                error={!!errors.email}
+                helperText={errors.email}
+                disabled={isLoading}
+            />
+            {forgotPasswordSuccess && (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                    If an account exists for {formData.email}, you will receive password reset instructions.
+                </Alert>
+            )}
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                disabled={isLoading}
+            >
+                {isLoading ? <CircularProgress size={24} /> : 'Reset Password'}
+            </Button>
+            <Link component="button" variant="body2" onClick={() => setView('login')}>
+                Back to Login
+            </Link>
+        </>
+    );
+
+    const renderRegistrationForm = () => (
+        <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    required
+                    fullWidth
+                    label="First Name"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    error={!!errors.firstName}
+                    helperText={errors.firstName}
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    required
+                    fullWidth
+                    label="Last Name"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    error={!!errors.lastName}
+                    helperText={errors.lastName}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <TextField
+                    required
+                    fullWidth
+                    label="Email Address"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <TextField
+                    required
+                    fullWidth
+                    label="Username"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    error={!!errors.username}
+                    helperText={errors.username}
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    required
+                    fullWidth
+                    label="Password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    error={!!errors.password}
+                    helperText={errors.password}
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    required
+                    fullWidth
+                    label="Confirm Password"
+                    name="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <TextField
+                    required
+                    fullWidth
+                    label="Company Name"
+                    name="companyName"
+                    value={formData.companyName}
+                    onChange={handleInputChange}
+                    error={!!errors.companyName}
+                    helperText={errors.companyName}
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    required
+                    fullWidth
+                    label="Job Title"
+                    name="jobTitle"
+                    value={formData.jobTitle}
+                    onChange={handleInputChange}
+                    error={!!errors.jobTitle}
+                    helperText={errors.jobTitle}
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    select
+                    required
+                    fullWidth
+                    label="Role"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleInputChange}
+                    error={!!errors.role}
+                    helperText={errors.role}
+                >
+                    <MenuItem value="admin">Administrator</MenuItem>
+                    <MenuItem value="manager">Inventory Manager</MenuItem>
+                    <MenuItem value="user">Regular User</MenuItem>
+                </TextField>
+            </Grid>
+            <Grid item xs={12}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            name="agreeToTerms"
+                            checked={formData.agreeToTerms}
+                            onChange={handleInputChange}
+                            color="primary"
+                        />
+                    }
+                    label="I agree to the terms and conditions"
+                />
+                {errors.agreeToTerms && (
+                    <Typography color="error" variant="caption" display="block">
+                        {errors.agreeToTerms}
+                    </Typography>
+                )}
+            </Grid>
+            <Grid item xs={12}>
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                >
+                    Register
+                </Button>
+            </Grid>
+            <Grid item xs={12}>
+                <Link component="button" variant="body2" onClick={() => setView('login')}>
+                    Already have an account? Sign in
+                </Link>
+            </Grid>
+        </Grid>
+    );
+
     return (
-        <Container component="main" maxWidth="xs">
-            <Paper elevation={6} sx={{ marginTop: 8, padding: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <InventoryIcon sx={{ fontSize: 50, color: 'primary.main', mb: 2 }} />
-                <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-                    Welcome to SmartInventory Management System
-                </Typography>
-                <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                    Sign in to your account
-                </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="usernameOrEmail"
-                        label="Username or Email"
-                        name="usernameOrEmail"
-                        autoComplete="username email"
-                        autoFocus
-                        value={formData.usernameOrEmail}
-                        onChange={handleInputChange}
-                        error={!!errors.usernameOrEmail}
-                        helperText={errors.usernameOrEmail}
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type={showPassword ? 'text' : 'password'}
-                        id="password"
-                        autoComplete="current-password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        error={!!errors.password}
-                        helperText={errors.password}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                    />
+        <BackgroundContainer>
+            <Container component="main" maxWidth="sm">
+                <StyledPaper elevation={6}>
+                    <InventoryIcon sx={{ fontSize: 50, color: 'primary.main', mb: 2 }} />
+                    <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+                        {view === 'login' && 'Welcome to SmartInventory Management System'}
+                        {view === 'forgotPassword' && 'Forgot Password'}
+                        {view === 'register' && 'Create an Account'}
+                    </Typography>
+                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
+                        {view === 'login' && renderLoginForm()}
+                        {view === 'forgotPassword' && renderForgotPasswordForm()}
+                        {view === 'register' && renderRegistrationForm() }
+                    </Box>
                     {submitError && (
-                        <Alert severity="error" sx={{ mt: 2 }}>
+                        <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
                             {submitError}
                         </Alert>
                     )}
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                    >
-                        Sign In
-                    </Button>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                        <Link component={RouterLink} to="/forgot-password" variant="body2">
-                            Forgot password?
-                        </Link>
-                        <Button
-                            component={RouterLink}
-                            to="/register"
-                            variant="outlined"
-                            size="small"
-                        >
-                            Create Account
-                        </Button>
-                    </Box>
-                </Box>
-            </Paper>
-        </Container>
+                </StyledPaper>
+            </Container>
+        </BackgroundContainer>
     );
+
+    //
+    // return (
+    //     <BackgroundContainer>
+    //         <Container component="main" maxWidth="sm">
+    //             {view === 'login' ? (
+    //                 <StyledPaper elevation={6}>
+    //                     <InventoryIcon sx={{ fontSize: 50, color: 'primary.main', mb: 2 }} />
+    //                     <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+    //                         Welcome to SmartInventory Management System
+    //                     </Typography>
+    //                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
+    //                         <TextField
+    //                             margin="normal"
+    //                             required
+    //                             fullWidth
+    //                             id="usernameOrEmail"
+    //                             label="Username or Email"
+    //                             name="usernameOrEmail"
+    //                             autoComplete="username email"
+    //                             autoFocus
+    //                             value={formData.usernameOrEmail}
+    //                             onChange={handleInputChange}
+    //                             error={!!errors.usernameOrEmail}
+    //                             helperText={errors.usernameOrEmail}
+    //                         />
+    //                         <TextField
+    //                             margin="normal"
+    //                             required
+    //                             fullWidth
+    //                             name="password"
+    //                             label="Password"
+    //                             type={showPassword ? 'text' : 'password'}
+    //                             id="password"
+    //                             autoComplete="current-password"
+    //                             value={formData.password}
+    //                             onChange={handleInputChange}
+    //                             error={!!errors.password}
+    //                             helperText={errors.password}
+    //                             InputProps={{
+    //                                 endAdornment: (
+    //                                     <InputAdornment position="end">
+    //                                         <IconButton
+    //                                             aria-label="toggle password visibility"
+    //                                             onClick={() => setShowPassword(!showPassword)}
+    //                                             edge="end"
+    //                                         >
+    //                                             {showPassword ? <VisibilityOff /> : <Visibility />}
+    //                                         </IconButton>
+    //                                     </InputAdornment>
+    //                                 )
+    //                             }}
+    //                         />
+    //                         {submitError && (
+    //                             <Alert severity="error" sx={{ mt: 2 }}>
+    //                                 {submitError}
+    //                             </Alert>
+    //                         )}
+    //                         <Button
+    //                             type="submit"
+    //                             fullWidth
+    //                             variant="contained"
+    //                             sx={{ mt: 3, mb: 2 }}
+    //                         >
+    //                             Sign In
+    //                         </Button>
+    //                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+    //                             <Link component="button" variant="body2" onClick={() => setView('forgotPassword')}>
+    //                                 Forgot password?
+    //                             </Link>
+    //                             <Button
+    //                                 variant="outlined"
+    //                                 size="small"
+    //                                 onClick={() => setView('register')}
+    //                             >
+    //                                 Create Account
+    //                             </Button>
+    //                         </Box>
+    //                     </Box>
+    //                 </StyledPaper>
+    //             ) : view === 'forgotPassword' ? (
+    //                 <ForgotPasswordForm />
+    //             ) : (
+    //                 <RegistrationForm />
+    //             )}
+    //         </Container>
+    //     </BackgroundContainer>
+    // );
 };
 
 export default LoginForm;

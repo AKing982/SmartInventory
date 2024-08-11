@@ -10,7 +10,7 @@ import {
     Box,
     Card,
     CardContent,
-    CardActions,
+    CardActions, styled,
 } from '@mui/material';
 import {
     Inventory as InventoryIcon,
@@ -20,6 +20,25 @@ import {
     ExitToApp as LogoutIcon,
 } from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
+import backgroundImage from '../images/pexels-tiger-lily-4483610.jpg';
+
+
+const BackgroundContainer = styled('div')({
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    background: 'linear-gradient(120deg, #f6f7f9 0%, #e3e6ec 100%)',
+});
+
+// Styled component for the content area
+const ContentContainer = styled(Box)({
+    flexGrow: 1,
+    padding: '24px 0',
+});
+
+
+// Styled component for the content area
+
 
 const HomePage: React.FC = () => {
     const navigate = useNavigate();
@@ -43,7 +62,7 @@ const HomePage: React.FC = () => {
 
 
     return (
-        <Box sx={{ flexGrow: 1 }}>
+        <BackgroundContainer>
             <AppBar position="static">
                 <Toolbar>
                     <InventoryIcon sx={{ mr: 2 }} />
@@ -96,15 +115,7 @@ const HomePage: React.FC = () => {
                     ))}
                 </Grid>
             </Container>
-
-            <Box component="footer" sx={{ bgcolor: 'background.paper', py: 6 }}>
-                <Container maxWidth="lg">
-                    <Typography variant="body2" color="text.secondary" align="center">
-                        © {new Date().getFullYear()} SmartInventory. All rights reserved.
-                    </Typography>
-                </Container>
-            </Box>
-        </Box>
+        </BackgroundContainer>
     );
     // return (
     //     <Box sx={{ flexGrow: 1 }}>

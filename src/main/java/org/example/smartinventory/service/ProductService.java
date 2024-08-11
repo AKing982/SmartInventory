@@ -1,5 +1,6 @@
 package org.example.smartinventory.service;
 
+import org.example.smartinventory.dto.ProductDTO;
 import org.example.smartinventory.entities.CategoryEntity;
 import org.example.smartinventory.entities.ProductEntity;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,9 @@ import java.util.Optional;
 public interface ProductService extends ServiceModel<ProductEntity>
 {
     // Added methods
+
+    void addProductDTO(ProductDTO productDTO);
+
     List<ProductEntity> getAllProducts();
     boolean validateProduct(ProductEntity product);
 

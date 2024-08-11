@@ -5,6 +5,7 @@ import org.example.smartinventory.entities.ProductEntity;
 import org.example.smartinventory.model.Product;
 import org.example.smartinventory.repository.CategoryRepository;
 import org.example.smartinventory.repository.ProductRepository;
+import org.example.smartinventory.workbench.converter.ProductDTOConverter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,9 @@ class ProductServiceImplTest {
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private ProductDTOConverter productDTOConverter;
+
     @InjectMocks
     private ProductServiceImpl productService;
 
@@ -40,7 +44,7 @@ class ProductServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        productService = new ProductServiceImpl(productRepository);
+        productService = new ProductServiceImpl(productRepository,  categoryRepository);
     }
 
     @Test
@@ -87,7 +91,7 @@ class ProductServiceImplTest {
 
         // Assert
         assertEquals(updatedProduct, result.get());
-        assertEquals(newPrice, updatedProduct.getProductPrice());
+        assertEquals(newPrice, updatedProduct.getPrice());
         verify(productRepository).updateProductPrice(1L, newPrice);
     }
 
@@ -119,7 +123,7 @@ class ProductServiceImplTest {
 
         Optional<ProductEntity> actual = productService.updateProductQuantity(productId, newQuantity);
         assertTrue(actual.isPresent());
-        assertEquals(newQuantity, actual.get().getProductQuantity());
+        assertEquals(newQuantity, actual.get().getQuantity());
     }
 
     @Test
@@ -127,13 +131,13 @@ class ProductServiceImplTest {
     {
         Long productId = 1L;
         CategoryEntity newCategory = new CategoryEntity();
-        ProductEntity updatedProduct = new ProductEntity(1, "Product1", "Desc1", "SKU1", BigDecimal.TEN, 5, newCategory, LocalDate.now());
+        ProductEntity updatedProduct = new ProductEntity(1, "Product1", "Desc1", "SKU1", BigDecimal.TEN, 5, "Electronics", LocalDate.now());
         when(productRepository.updateProductCategory(1L, newCategory)).thenReturn(Optional.of(updatedProduct));
 
         Optional<ProductEntity> result = productService.updateProductCategory(productId, newCategory);
 
         assertEquals(updatedProduct, result.get());
-        assertEquals(newCategory, updatedProduct.getProductCategory());
+        assertEquals(newCategory, updatedProduct.getCategory());
         verify(productRepository).updateProductCategory(1L, newCategory);
     }
 

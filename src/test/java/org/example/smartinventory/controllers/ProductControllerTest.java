@@ -49,6 +49,8 @@ class ProductControllerTest {
     @MockBean
     private ProductService productService;
 
+    private String testCategory = "Electronics";
+
     private int testId = 1;
 
     @BeforeEach
@@ -84,16 +86,16 @@ class ProductControllerTest {
     @WithMockUser
     void testAddProduct() throws Exception {
         ProductEntity p = new ProductEntity();
-        p.setProductId(1);
+        p.setId(1);
 
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setCategoryId(1);
         categoryEntity.setName("Electronics");
         categoryEntity.setDescription("Electronics");
-        p.setProductCategory(categoryEntity);
-        p.setProductPrice(BigDecimal.TEN);
-        p.setProductSKU("1919191919");
-        p.setProductDescription("Electronics");
+        p.setCategory("Electronics");
+        p.setPrice(BigDecimal.TEN);
+        p.setSku("1919191919");
+        p.setDescription("Electronics");
         p.setDateAdded(LocalDate.now());
 
         mvc.perform(post("/api/products/")
@@ -107,7 +109,7 @@ class ProductControllerTest {
     @Test
     void testDeleteProductById() throws Exception {
         ProductEntity p = createProduct();
-        int id = p.getProductId();
+        int id = p.getId();
 
         mvc.perform(delete("/api/products/" + id))
                 .andExpect(status().isOk());
@@ -117,32 +119,32 @@ class ProductControllerTest {
     private ProductEntity updatedProduct(BigDecimal price)
     {
         ProductEntity p = new ProductEntity();
-        p.setProductId(1);
+        p.setId(1);
 
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setCategoryId(1);
         categoryEntity.setName("Electronics");
         categoryEntity.setDescription("Electronics");
-        p.setProductCategory(categoryEntity);
-        p.setProductPrice(price);
-        p.setProductSKU("1919191919");
-        p.setProductDescription("Electronics");
+        p.setCategory(testCategory);
+        p.setPrice(price);
+        p.setSku("1919191919");
+        p.setDescription("Electronics");
         p.setDateAdded(LocalDate.now());
         return p;
     }
 
     private ProductEntity createProduct() {
         ProductEntity p = new ProductEntity();
-        p.setProductId(1);
+        p.setId(1);
 
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setCategoryId(1);
         categoryEntity.setName("Electronics");
         categoryEntity.setDescription("Electronics");
-        p.setProductCategory(categoryEntity);
-        p.setProductPrice(BigDecimal.TEN);
-        p.setProductSKU("1919191919");
-        p.setProductDescription("Electronics");
+        p.setCategory(testCategory);
+        p.setPrice(BigDecimal.TEN);
+        p.setSku("1919191919");
+        p.setDescription("Electronics");
         p.setDateAdded(LocalDate.now());
         return p;
     }

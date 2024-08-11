@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,36 +25,52 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @JsonIdentityInfo(        // Add this line
         generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "productId"
+        property = "id"
 )
 public class ProductEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int productId;
+    private int id;
 
-    @NotBlank(message="Product Name cannot be null")
-    private String productName;
+    @Column(name="name")
+    private String name;
 
-    @NotBlank(message="Product description cannot be blank")
-    private String productDescription;
+    @Column(name="description")
+    private String description;
 
-    @NotBlank(message="Product SKU cannot be blank")
-    private String productSKU;
+    @Column(name="sku")
+    private String sku;
 
-    @Size(min=1)
-    private BigDecimal productPrice;
+    @Column(name="price")
+    private BigDecimal price;
 
-    private int productQuantity;
+    @Column(name="quantity")
+    private int quantity;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="categoryId")
-    @JsonBackReference
-    private CategoryEntity productCategory;
+    @Column(name="category")
+    private String category;
+
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name="categoryId")
+//    @JsonBackReference
+//    private CategoryEntity productCategory;
 
     @JsonIgnore
     @Column(name="dateAdded")
     private LocalDate dateAdded;
 
-
+    @Override
+    public String toString() {
+        return "ProductEntity{" +
+                "productId=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", sku='" + sku + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", category='" + category + '\'' +
+                ", dateAdded=" + dateAdded +
+                '}';
+    }
 }

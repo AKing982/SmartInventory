@@ -1,8 +1,12 @@
 package org.example.smartinventory.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
+import org.example.smartinventory.dto.ProductDTO;
 import org.example.smartinventory.entities.ProductEntity;
 import org.example.smartinventory.service.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +23,7 @@ import java.util.Optional;
 public class ProductController
 {
     private ProductService productService;
+    private Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
     @Autowired
     public ProductController(ProductService productService)
@@ -31,6 +36,10 @@ public class ProductController
     public ResponseEntity<?> getAllProducts()
     {
         Collection<ProductEntity> products = productService.getAllProducts();
+        if(products.isEmpty())
+        {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         return ResponseEntity.ok(products);
     }
 
@@ -47,14 +56,18 @@ public class ProductController
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> addProduct(@RequestBody ProductEntity product){
+    public ResponseEntity<?> addProduct(@RequestBody ProductDTO product){
         try
         {
-            productService.save(product);
+            LOGGER.info("Adding ProductDTO: {}", product);
+
+            productService.addProductDTO(product);
+            LOGGER.info("Product has been added to the database.");
             return ResponseEntity.status(HttpStatus.CREATED).build();
 
         }catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            LOGGER.error("There was an internal error saving the product: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
