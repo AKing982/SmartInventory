@@ -8,6 +8,8 @@ import RegistrationForm from "./components/RegistrationForm";
 import ForgotPasswordForm from "./components/ForgotPasswordForm";
 import HomePage from "./components/HomePage";
 import AddInventoryPage from "./components/AddInventoryPage";
+import CategoriesPage from "./components/CategoriesPage";
+import ContactsPage from "./components/ContactsPage";
 
 const theme = createTheme({
     palette: {
@@ -35,6 +37,8 @@ function App() {
                           <Route path="/forgot-password" element={<ForgotPasswordForm />}/>
                           <Route path="/home" element={<HomePage />}/>
                           <Route path="/addInventory" element={<AddInventoryPage /> }/>
+                          <Route path="/categories" element={<CategoriesPage />}/>
+                          <Route path="/contacts" element={<ContactsPage />}/>
                       </Routes>
                   </div>
               </Router>

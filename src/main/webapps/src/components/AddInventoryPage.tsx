@@ -29,7 +29,7 @@ import {
     Chip,
     Avatar,
     useMediaQuery,
-    useTheme,
+    useTheme, Collapse,
 } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import {ExitToApp as LogoutIcon} from  '@mui/icons-material';
@@ -38,6 +38,8 @@ import {FileCopy as FilyCopyIcon, Menu as MenuIcon} from '@mui/icons-material'
 import SearchIcon from '@mui/icons-material/Search';
 import {useNavigate} from "react-router-dom";
 import DeleteIcon from '@mui/icons-material/Delete';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import {fetchAllProductsInInventory, addProductToInventory, ProductData, deleteProductFromInventory} from "../api/InventoryApiService";
 import {
     // ... existing icon imports
@@ -54,6 +56,7 @@ import {
     Warning as WarningIcon,
     FileCopy as FileCopyIcon,
 } from '@mui/icons-material';
+import MainAppBar from "./MainAppBar";
 
 
 // You might want to replace this with actual categories from your backend
@@ -93,17 +96,21 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 const BackgroundContainer = styled('div')({
-    minHeight: '100vh',
+    minHeight: '120vh',
     display: 'flex',
     flexDirection: 'column',
     background: 'linear-gradient(120deg, #f6f7f9 0%, #e3e6ec 100%)',
 });
 
 // Styled component for the content area
-const ContentContainer = styled(Box)({
+const ContentContainer = styled(Box)(({ theme }) => ({
     flexGrow: 1,
-    padding: '24px 0',
-});
+    padding: theme.spacing(3),
+    paddingTop: `calc(${theme.spacing(3)} + ${theme.mixins.toolbar.minHeight}px)`,
+    [theme.breakpoints.up('sm')]: {
+        paddingTop: `calc(${theme.spacing(3)} + 64px)`, // AppBar height on larger screens
+    },
+}));
 
 const StyledCard = styled(Card)(({ theme }) => ({
     height: '100%',
@@ -152,6 +159,7 @@ const AddInventoryPage: React.FC = () => {
     const [totalInventoryValue, setTotalInventoryValue] = useState<number>(0);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [isAddInventoryOpen, setIsAddInventoryOpen] = useState(false);
 
     useEffect(() => {
         fetchInventoryItems();
@@ -383,124 +391,58 @@ const AddInventoryPage: React.FC = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-
-
     return (
         <BackgroundContainer>
-            <AppBar position="static">
-                <Toolbar>
-                    <InventoryIcon sx={{ mr: 2 }} />
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        SmartInventory Management System
-                    </Typography>
-                    <Button color="inherit" onClick={() => navigate('/')}>Dashboard</Button>
-                    <Button color="inherit" onClick={() => navigate('/inventory')}>Inventory</Button>
-                    <Button color="inherit" onClick={() => navigate('/reports')}>Reports</Button>
-                    <Button color="inherit" onClick={() => navigate('/profile')}>Profile</Button>
-                    <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
-                        Logout
-                    </Button>
-                </Toolbar>
-            </AppBar>
-
+            <MainAppBar title="Add Inventory"/>
             <ContentContainer>
                 <Container maxWidth="lg">
-                    <Grid container spacing={3} sx={{ mt: 2 }}>
-                        {/* User Metrics Section */}
-                        <Grid item xs={12}>
-                            <Paper elevation={3} sx={{ p: 3 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Avatar sx={{ width: 60, height: 60, mr: 2 }}>
-                                            {localStorage.getItem('user')?.charAt(0).toUpperCase()}
-                                        </Avatar>
-                                        <Box>
-                                            <Typography variant="h6">{localStorage.getItem('user')}</Typography>
-                                            <Typography variant="body2" color="textSecondary">
-                                                Last active: {userMetrics.lastActive}
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                    <Chip
-                                        icon={<TrendingUpIcon />}
-                                        label={`${userMetrics.totalItemsAdded} Total Items Added`}
-                                        color="primary"
-                                    />
-                                </Box>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-                                    <Tooltip title="Items added in the last 24 hours">
-                                        <Chip
-                                            icon={<TodayIcon />}
-                                            label={`${userMetrics.itemsAddedToday} Today`}
-                                            color="secondary"
-                                        />
-                                    </Tooltip>
-                                    <Tooltip title="Items added in the last 7 days">
-                                        <Chip
-                                            icon={<DateRangeIcon />}
-                                            label={`${userMetrics.itemsAddedThisWeek} This Week`}
-                                            color="info"
-                                        />
-                                    </Tooltip>
-                                    <Tooltip title="Average items added per day">
-                                        <Chip
-                                            icon={<SpeedIcon />}
-                                            label={`${userMetrics.averageItemsPerDay.toFixed(1)} Avg/Day`}
-                                            color="success"
-                                        />
-                                    </Tooltip>
-                                    <Chip
-                                        label={`Top Category: ${userMetrics.topCategory}`}
-                                        variant="outlined"
-                                    />
-                                </Box>
-                            </Paper>
-                        </Grid>
-
-                        {/* Inventory Stats Dashboard */}
-                        <Grid item xs={12} md={4}>
-                            <Card>
-                                <CardContent>
-                                    <Typography variant="h6">Total Items</Typography>
-                                    <Typography variant="h4">{inventoryItems.length}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Card>
-                                <CardContent>
-                                    <Typography variant="h6">Low Stock Items</Typography>
-                                    <Typography variant="h4">{lowStockItems.length}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Card>
-                                <CardContent>
-                                    <Typography variant="h6">Total Inventory Value</Typography>
-                                    <Typography variant="h4">${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalInventoryValue)}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-
-                        {/* Add New Item Form */}
-                        <Grid item xs={12}>
-                            <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                    <Typography variant="h4">Add New Inventory Item</Typography>
+                    {/* User Stats and Overview */}
+                    <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+                        <Grid container spacing={3} alignItems="center">
+                            <Grid item xs={12} md={4}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Avatar sx={{ width: 60, height: 60, mr: 2 }}>
+                                        {localStorage.getItem('user')?.charAt(0).toUpperCase()}
+                                    </Avatar>
                                     <Box>
-                                        <Tooltip title="Bulk Import">
-                                            <IconButton onClick={handleBulkImport}>
-                                                <CloudUploadIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Bulk Export">
-                                            <IconButton onClick={handleBulkExport}>
-                                                <CloudDownloadIcon />
-                                            </IconButton>
-                                        </Tooltip>
+                                        <Typography variant="h6">{localStorage.getItem('user')}</Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            Last active: {userMetrics.lastActive}
+                                        </Typography>
                                     </Box>
                                 </Box>
+                            </Grid>
+                            <Grid item xs={12} md={8}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={4}>
+                                        <Typography variant="subtitle2">Total Items</Typography>
+                                        <Typography variant="h6">{inventoryItems.length}</Typography>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <Typography variant="subtitle2">Low Stock Items</Typography>
+                                        <Typography variant="h6">{lowStockItems.length}</Typography>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <Typography variant="subtitle2">Total Inventory Value</Typography>
+                                        <Typography variant="h6">
+                                            ${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalInventoryValue)}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Paper>
+
+                    {/* Add Inventory Dropdown */}
+                    <Paper elevation={3} sx={{ mb: 3 }}>
+                        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Typography variant="h6">Add New Inventory Item</Typography>
+                            <IconButton onClick={() => setIsAddInventoryOpen(!isAddInventoryOpen)}>
+                                {isAddInventoryOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            </IconButton>
+                        </Box>
+                        <Collapse in={isAddInventoryOpen}>
+                            <Box sx={{ p: 2 }}>
                                 <form onSubmit={handleSubmit}>
                                     <Grid container spacing={3}>
                                         <Grid item xs={12} sm={6}>
@@ -612,85 +554,82 @@ const AddInventoryPage: React.FC = () => {
                                         </Grid>
                                     </Grid>
                                 </form>
-                            </Paper>
-                        </Grid>
+                            </Box>
+                        </Collapse>
+                    </Paper>
 
-                        {/* Inventory Table */}
-                        <Grid item xs={12}>
-                            <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-                                <Typography variant="h4" gutterBottom>
-                                    Inventory Items
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    placeholder="Search Inventory..."
-                                    value={searchTerm}
-                                    onChange={handleSearchChange}
-                                    sx={{ mb: 2 }}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <SearchIcon />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                                <TableContainer>
-                                    <Table>
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>Name</TableCell>
-                                                <TableCell>SKU</TableCell>
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>Price</TableCell>
-                                                <TableCell>Category</TableCell>
-                                                <TableCell>Actions</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {filteredInventoryItems.map((item) => (
-                                                <TableRow key={item.id}>
-                                                    <TableCell>
-                                                        {item.quantity < 10 && (
-                                                            <Tooltip title="Low Stock">
-                                                                <Badge badgeContent={<WarningIcon color="warning" />}>
-                                                                    {item.name}
-                                                                </Badge>
-                                                            </Tooltip>
-                                                        )}
-                                                        {item.quantity >= 10 && item.name}
-                                                    </TableCell>
-                                                    <TableCell>{item.sku}</TableCell>
-                                                    <TableCell>{item.quantity}</TableCell>
-                                                    <TableCell>${item.price.toFixed(2)}</TableCell>
-                                                    <TableCell>{item.category}</TableCell>
-                                                    <TableCell>
-                                                        <Tooltip title="Delete">
-                                                            <IconButton
-                                                                aria-label="delete"
-                                                                onClick={() => handleDeleteItems(item.id)}
-                                                            >
-                                                                <DeleteIcon />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                        <Tooltip title="Duplicate">
-                                                            <IconButton
-                                                                aria-label="duplicate"
-                                                                onClick={() => handleDuplicateItem(item)}
-                                                            >
-                                                                <FileCopyIcon />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </Paper>
-                        </Grid>
-                    </Grid>
+                    {/* Inventory Table */}
+                    <Paper elevation={3} sx={{ p: 3 }}>
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                            <Typography variant="h5">Inventory Items</Typography>
+                            <TextField
+                                variant="outlined"
+                                placeholder="Search Inventory..."
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                size="small"
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Box>
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>SKU</TableCell>
+                                        <TableCell>Quantity</TableCell>
+                                        <TableCell>Price</TableCell>
+                                        <TableCell>Category</TableCell>
+                                        <TableCell>Actions</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {filteredInventoryItems.map((item) => (
+                                        <TableRow key={item.id}>
+                                            <TableCell>
+                                                {item.quantity < 10 && (
+                                                    <Tooltip title="Low Stock">
+                                                        <Badge badgeContent={<WarningIcon color="warning" />}>
+                                                            {item.name}
+                                                        </Badge>
+                                                    </Tooltip>
+                                                )}
+                                                {item.quantity >= 10 && item.name}
+                                            </TableCell>
+                                            <TableCell>{item.sku}</TableCell>
+                                            <TableCell>{item.quantity}</TableCell>
+                                            <TableCell>${item.price.toFixed(2)}</TableCell>
+                                            <TableCell>{item.category}</TableCell>
+                                            <TableCell>
+                                                <Tooltip title="Delete">
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        onClick={() => handleDeleteItems(item.id)}
+                                                    >
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Duplicate">
+                                                    <IconButton
+                                                        aria-label="duplicate"
+                                                        onClick={() => handleDuplicateItem(item)}
+                                                    >
+                                                        <FileCopyIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
                 </Container>
                 <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
                     <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
@@ -700,6 +639,324 @@ const AddInventoryPage: React.FC = () => {
             </ContentContainer>
         </BackgroundContainer>
     );
+
+    //
+    //
+    // return (
+    //     <BackgroundContainer>
+    //         <AppBar position="static">
+    //             <Toolbar>
+    //                 <InventoryIcon sx={{ mr: 2 }} />
+    //                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+    //                     SmartInventory Management System
+    //                 </Typography>
+    //                 <Button color="inherit" onClick={() => navigate('/')}>Dashboard</Button>
+    //                 <Button color="inherit" onClick={() => navigate('/inventory')}>Inventory</Button>
+    //                 <Button color="inherit" onClick={() => navigate('/reports')}>Reports</Button>
+    //                 <Button color="inherit" onClick={() => navigate('/profile')}>Profile</Button>
+    //                 <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
+    //                     Logout
+    //                 </Button>
+    //             </Toolbar>
+    //         </AppBar>
+    //
+    //         <ContentContainer>
+    //             <Container maxWidth="lg">
+    //                 <Grid container spacing={3} sx={{ mt: 2 }}>
+    //                     {/* User Metrics Section */}
+    //                     <Grid item xs={12}>
+    //                         <Paper elevation={3} sx={{ p: 3 }}>
+    //                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    //                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
+    //                                     <Avatar sx={{ width: 60, height: 60, mr: 2 }}>
+    //                                         {localStorage.getItem('user')?.charAt(0).toUpperCase()}
+    //                                     </Avatar>
+    //                                     <Box>
+    //                                         <Typography variant="h6">{localStorage.getItem('user')}</Typography>
+    //                                         <Typography variant="body2" color="textSecondary">
+    //                                             Last active: {userMetrics.lastActive}
+    //                                         </Typography>
+    //                                     </Box>
+    //                                 </Box>
+    //                                 <Chip
+    //                                     icon={<TrendingUpIcon />}
+    //                                     label={`${userMetrics.totalItemsAdded} Total Items Added`}
+    //                                     color="primary"
+    //                                 />
+    //                             </Box>
+    //                             <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+    //                                 <Tooltip title="Items added in the last 24 hours">
+    //                                     <Chip
+    //                                         icon={<TodayIcon />}
+    //                                         label={`${userMetrics.itemsAddedToday} Today`}
+    //                                         color="secondary"
+    //                                     />
+    //                                 </Tooltip>
+    //                                 <Tooltip title="Items added in the last 7 days">
+    //                                     <Chip
+    //                                         icon={<DateRangeIcon />}
+    //                                         label={`${userMetrics.itemsAddedThisWeek} This Week`}
+    //                                         color="info"
+    //                                     />
+    //                                 </Tooltip>
+    //                                 <Tooltip title="Average items added per day">
+    //                                     <Chip
+    //                                         icon={<SpeedIcon />}
+    //                                         label={`${userMetrics.averageItemsPerDay.toFixed(1)} Avg/Day`}
+    //                                         color="success"
+    //                                     />
+    //                                 </Tooltip>
+    //                                 <Chip
+    //                                     label={`Top Category: ${userMetrics.topCategory}`}
+    //                                     variant="outlined"
+    //                                 />
+    //                             </Box>
+    //                         </Paper>
+    //                     </Grid>
+    //
+    //                     {/* Inventory Stats Dashboard */}
+    //                     <Grid item xs={12} md={4}>
+    //                         <Card>
+    //                             <CardContent>
+    //                                 <Typography variant="h6">Total Items</Typography>
+    //                                 <Typography variant="h4">{inventoryItems.length}</Typography>
+    //                             </CardContent>
+    //                         </Card>
+    //                     </Grid>
+    //                     <Grid item xs={12} md={4}>
+    //                         <Card>
+    //                             <CardContent>
+    //                                 <Typography variant="h6">Low Stock Items</Typography>
+    //                                 <Typography variant="h4">{lowStockItems.length}</Typography>
+    //                             </CardContent>
+    //                         </Card>
+    //                     </Grid>
+    //                     <Grid item xs={12} md={4}>
+    //                         <Card>
+    //                             <CardContent>
+    //                                 <Typography variant="h6">Total Inventory Value</Typography>
+    //                                 <Typography variant="h4">${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalInventoryValue)}</Typography>
+    //                             </CardContent>
+    //                         </Card>
+    //                     </Grid>
+    //
+    //                     {/* Add New Item Form */}
+    //                     <Grid item xs={12}>
+    //                         <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+    //                             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+    //                                 <Typography variant="h4">Add New Inventory Item</Typography>
+    //                                 <Box>
+    //                                     <Tooltip title="Bulk Import">
+    //                                         <IconButton onClick={handleBulkImport}>
+    //                                             <CloudUploadIcon />
+    //                                         </IconButton>
+    //                                     </Tooltip>
+    //                                     <Tooltip title="Bulk Export">
+    //                                         <IconButton onClick={handleBulkExport}>
+    //                                             <CloudDownloadIcon />
+    //                                         </IconButton>
+    //                                     </Tooltip>
+    //                                 </Box>
+    //                             </Box>
+    //                             <form onSubmit={handleSubmit}>
+    //                                 <Grid container spacing={3}>
+    //                                     <Grid item xs={12} sm={6}>
+    //                                         <TextField
+    //                                             required
+    //                                             fullWidth
+    //                                             label="Item Name"
+    //                                             name="name"
+    //                                             value={item.name}
+    //                                             onChange={handleChange}
+    //                                             error={!!errors.name}
+    //                                             helperText={errors.name}
+    //                                         />
+    //                                     </Grid>
+    //                                     <Grid item xs={12} sm={6}>
+    //                                         <TextField
+    //                                             fullWidth
+    //                                             label="SKU"
+    //                                             name="sku"
+    //                                             value={item.sku}
+    //                                             InputProps={{
+    //                                                 readOnly: true,
+    //                                                 endAdornment: (
+    //                                                     <Button
+    //                                                         variant="contained"
+    //                                                         color="secondary"
+    //                                                         onClick={generateSKU}
+    //                                                         size="small"
+    //                                                     >
+    //                                                         Generate
+    //                                                     </Button>
+    //                                                 ),
+    //                                             }}
+    //                                             error={!!errors.sku}
+    //                                             helperText={errors.sku}
+    //                                         />
+    //                                     </Grid>
+    //                                     <Grid item xs={12} sm={6}>
+    //                                         <TextField
+    //                                             required
+    //                                             fullWidth
+    //                                             type="number"
+    //                                             label="Quantity"
+    //                                             name="quantity"
+    //                                             value={item.quantity}
+    //                                             onChange={handleChange}
+    //                                             error={!!errors.quantity}
+    //                                             helperText={errors.quantity}
+    //                                             InputProps={{ inputProps: { min: 0 } }}
+    //                                         />
+    //                                     </Grid>
+    //                                     <Grid item xs={12} sm={6}>
+    //                                         <TextField
+    //                                             required
+    //                                             fullWidth
+    //                                             type="number"
+    //                                             label="Price"
+    //                                             name="price"
+    //                                             value={item.price}
+    //                                             onChange={handleChange}
+    //                                             error={!!errors.price}
+    //                                             helperText={errors.price}
+    //                                             InputProps={{
+    //                                                 startAdornment: <InputAdornment position="start">$</InputAdornment>,
+    //                                                 inputProps: { min: 0, step: 0.01 }
+    //                                             }}
+    //                                         />
+    //                                     </Grid>
+    //                                     <Grid item xs={12}>
+    //                                         <TextField
+    //                                             required
+    //                                             fullWidth
+    //                                             select
+    //                                             label="Category"
+    //                                             name="category"
+    //                                             value={item.category}
+    //                                             onChange={handleChange}
+    //                                             error={!!errors.category}
+    //                                             helperText={errors.category}
+    //                                         >
+    //                                             {categories.map((option) => (
+    //                                                 <MenuItem key={option} value={option}>
+    //                                                     {option}
+    //                                                 </MenuItem>
+    //                                             ))}
+    //                                         </TextField>
+    //                                     </Grid>
+    //                                     <Grid item xs={12}>
+    //                                         <TextField
+    //                                             fullWidth
+    //                                             multiline
+    //                                             rows={4}
+    //                                             label="Description"
+    //                                             name="description"
+    //                                             value={item.description}
+    //                                             onChange={handleChange}
+    //                                         />
+    //                                     </Grid>
+    //                                     <Grid item xs={12}>
+    //                                         <Button
+    //                                             type="submit"
+    //                                             variant="contained"
+    //                                             color="primary"
+    //                                             size="large"
+    //                                             disabled={isLoading}
+    //                                         >
+    //                                             {isLoading ? 'Adding...' : 'Add Item'}
+    //                                         </Button>
+    //                                     </Grid>
+    //                                 </Grid>
+    //                             </form>
+    //                         </Paper>
+    //                     </Grid>
+    //
+    //                     {/* Inventory Table */}
+    //                     <Grid item xs={12}>
+    //                         <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+    //                             <Typography variant="h4" gutterBottom>
+    //                                 Inventory Items
+    //                             </Typography>
+    //                             <TextField
+    //                                 fullWidth
+    //                                 variant="outlined"
+    //                                 placeholder="Search Inventory..."
+    //                                 value={searchTerm}
+    //                                 onChange={handleSearchChange}
+    //                                 sx={{ mb: 2 }}
+    //                                 InputProps={{
+    //                                     startAdornment: (
+    //                                         <InputAdornment position="start">
+    //                                             <SearchIcon />
+    //                                         </InputAdornment>
+    //                                     ),
+    //                                 }}
+    //                             />
+    //                             <TableContainer>
+    //                                 <Table>
+    //                                     <TableHead>
+    //                                         <TableRow>
+    //                                             <TableCell>Name</TableCell>
+    //                                             <TableCell>SKU</TableCell>
+    //                                             <TableCell>Quantity</TableCell>
+    //                                             <TableCell>Price</TableCell>
+    //                                             <TableCell>Category</TableCell>
+    //                                             <TableCell>Actions</TableCell>
+    //                                         </TableRow>
+    //                                     </TableHead>
+    //                                     <TableBody>
+    //                                         {filteredInventoryItems.map((item) => (
+    //                                             <TableRow key={item.id}>
+    //                                                 <TableCell>
+    //                                                     {item.quantity < 10 && (
+    //                                                         <Tooltip title="Low Stock">
+    //                                                             <Badge badgeContent={<WarningIcon color="warning" />}>
+    //                                                                 {item.name}
+    //                                                             </Badge>
+    //                                                         </Tooltip>
+    //                                                     )}
+    //                                                     {item.quantity >= 10 && item.name}
+    //                                                 </TableCell>
+    //                                                 <TableCell>{item.sku}</TableCell>
+    //                                                 <TableCell>{item.quantity}</TableCell>
+    //                                                 <TableCell>${item.price.toFixed(2)}</TableCell>
+    //                                                 <TableCell>{item.category}</TableCell>
+    //                                                 <TableCell>
+    //                                                     <Tooltip title="Delete">
+    //                                                         <IconButton
+    //                                                             aria-label="delete"
+    //                                                             onClick={() => handleDeleteItems(item.id)}
+    //                                                         >
+    //                                                             <DeleteIcon />
+    //                                                         </IconButton>
+    //                                                     </Tooltip>
+    //                                                     <Tooltip title="Duplicate">
+    //                                                         <IconButton
+    //                                                             aria-label="duplicate"
+    //                                                             onClick={() => handleDuplicateItem(item)}
+    //                                                         >
+    //                                                             <FileCopyIcon />
+    //                                                         </IconButton>
+    //                                                     </Tooltip>
+    //                                                 </TableCell>
+    //                                             </TableRow>
+    //                                         ))}
+    //                                     </TableBody>
+    //                                 </Table>
+    //                             </TableContainer>
+    //                         </Paper>
+    //                     </Grid>
+    //                 </Grid>
+    //             </Container>
+    //             <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+    //                 <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+    //                     {snackbarMessage}
+    //                 </Alert>
+    //             </Snackbar>
+    //         </ContentContainer>
+    //     </BackgroundContainer>
+    // );
 };
 
 export default AddInventoryPage;

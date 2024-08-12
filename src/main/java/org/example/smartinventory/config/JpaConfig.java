@@ -25,7 +25,7 @@ public class JpaConfig
     {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://db:5432/smartinventorydb");
+        dataSource.setUrl("jdbc:postgresql://localhost:5432/SmartInventoryDB");
         dataSource.setUsername("postgres");
         dataSource.setPassword("pass");
         return dataSource;
