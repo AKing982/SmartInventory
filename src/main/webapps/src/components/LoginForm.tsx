@@ -1,5 +1,5 @@
 import {
-    Alert,
+    Alert, Backdrop,
     Box,
     Button, Checkbox, CircularProgress,
     Container, FormControlLabel,
@@ -37,7 +37,7 @@ const BackgroundContainer = styled('div')({
     backgroundImage: `url(${backgroundImage})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    minHeight: '100vh',
+    minHeight: '120vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -141,6 +141,7 @@ const LoginForm: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (validateForm()) {
+            setIsLoading(true);
             try {
                 if (view === 'login') {
                     const loginData: LoginCredentials = {
@@ -151,13 +152,15 @@ const LoginForm: React.FC = () => {
                     console.log('Authentication Successful: ', response);
                     localStorage.setItem('token', response.token);
                     localStorage.setItem('user', response.username);
+
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+
                     navigate('/home');
                 } else if (view === 'forgotPassword') {
                     setIsLoading(true);
                     // Implement forgot password logic
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    await new Promise(resolve => setTimeout(resolve, 8000));
                     setForgotPasswordSuccess(true);
-                    setIsLoading(false);
                 } else if (view === 'register') {
                     const registrationData: Registration = {
                         firstName: formData.firstName,
@@ -178,6 +181,8 @@ const LoginForm: React.FC = () => {
                 setSubmitError(null);
             } catch (err) {
                 console.error(err);
+            }finally {
+                setIsLoading(false);
             }
         }
     };
@@ -557,96 +562,14 @@ const LoginForm: React.FC = () => {
                     )}
                 </StyledPaper>
             </Container>
+            <Backdrop
+                sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}}
+                open={isLoading}
+                >
+                <CircularProgress color="inherit"/>
+            </Backdrop>
         </BackgroundContainer>
     );
-
-    //
-    // return (
-    //     <BackgroundContainer>
-    //         <Container component="main" maxWidth="sm">
-    //             {view === 'login' ? (
-    //                 <StyledPaper elevation={6}>
-    //                     <InventoryIcon sx={{ fontSize: 50, color: 'primary.main', mb: 2 }} />
-    //                     <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-    //                         Welcome to SmartInventory Management System
-    //                     </Typography>
-    //                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
-    //                         <TextField
-    //                             margin="normal"
-    //                             required
-    //                             fullWidth
-    //                             id="usernameOrEmail"
-    //                             label="Username or Email"
-    //                             name="usernameOrEmail"
-    //                             autoComplete="username email"
-    //                             autoFocus
-    //                             value={formData.usernameOrEmail}
-    //                             onChange={handleInputChange}
-    //                             error={!!errors.usernameOrEmail}
-    //                             helperText={errors.usernameOrEmail}
-    //                         />
-    //                         <TextField
-    //                             margin="normal"
-    //                             required
-    //                             fullWidth
-    //                             name="password"
-    //                             label="Password"
-    //                             type={showPassword ? 'text' : 'password'}
-    //                             id="password"
-    //                             autoComplete="current-password"
-    //                             value={formData.password}
-    //                             onChange={handleInputChange}
-    //                             error={!!errors.password}
-    //                             helperText={errors.password}
-    //                             InputProps={{
-    //                                 endAdornment: (
-    //                                     <InputAdornment position="end">
-    //                                         <IconButton
-    //                                             aria-label="toggle password visibility"
-    //                                             onClick={() => setShowPassword(!showPassword)}
-    //                                             edge="end"
-    //                                         >
-    //                                             {showPassword ? <VisibilityOff /> : <Visibility />}
-    //                                         </IconButton>
-    //                                     </InputAdornment>
-    //                                 )
-    //                             }}
-    //                         />
-    //                         {submitError && (
-    //                             <Alert severity="error" sx={{ mt: 2 }}>
-    //                                 {submitError}
-    //                             </Alert>
-    //                         )}
-    //                         <Button
-    //                             type="submit"
-    //                             fullWidth
-    //                             variant="contained"
-    //                             sx={{ mt: 3, mb: 2 }}
-    //                         >
-    //                             Sign In
-    //                         </Button>
-    //                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-    //                             <Link component="button" variant="body2" onClick={() => setView('forgotPassword')}>
-    //                                 Forgot password?
-    //                             </Link>
-    //                             <Button
-    //                                 variant="outlined"
-    //                                 size="small"
-    //                                 onClick={() => setView('register')}
-    //                             >
-    //                                 Create Account
-    //                             </Button>
-    //                         </Box>
-    //                     </Box>
-    //                 </StyledPaper>
-    //             ) : view === 'forgotPassword' ? (
-    //                 <ForgotPasswordForm />
-    //             ) : (
-    //                 <RegistrationForm />
-    //             )}
-    //         </Container>
-    //     </BackgroundContainer>
-    // );
 };
 
 export default LoginForm;

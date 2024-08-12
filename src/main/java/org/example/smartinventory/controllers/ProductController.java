@@ -75,10 +75,16 @@ public class ProductController
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id){
 
-        try {
+        try
+        {
+            if(id == null) {
+                return ResponseEntity.badRequest().body("ProductID cannot be null");
+            }
+
             productService.deleteProduct(id);
             return ResponseEntity.ok().build();
         }catch(Exception e) {
+            LOGGER.error("There was an internal error deleting the product with id: {}, {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
