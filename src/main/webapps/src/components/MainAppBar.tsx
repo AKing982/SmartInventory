@@ -1,22 +1,29 @@
-import React, { useState } from 'react';
+import {useLocation, useNavigate} from "react-router-dom";
+import {useState} from "react";
+
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import SideDrawer from "./SideDrawer";
+import {Avatar, Badge, Box, InputBase, Menu, MenuItem, Tab, Tabs} from "@mui/material";
+import {AppBar, IconButton, Toolbar,
+    Typography,
+  } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
 import {
-    AppBar, Toolbar, Typography, Button, IconButton, InputBase, Badge,
-    Menu, MenuItem, Avatar, Tabs, Tab, Box
-} from '@mui/material';
-import {
-    Menu as MenuIcon,
-    Logout as LogoutIcon,
-    Notifications as NotificationsIcon,
-    Search as SearchIcon,
     Add as AddIcon,
-    Person as PersonIcon
+    Person as PersonIcon,
+    Logout as LogoutIcon
 } from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
-import SideDrawer from './SideDrawer';
 
 interface MainAppBarProps {
     title: string;
 }
+
+interface TabConfig {
+    label: string;
+    value: string;
+}
+
 
 const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
     const navigate = useNavigate();
@@ -24,6 +31,8 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const user = localStorage.getItem('user');
+    const [selectedSection, setSelectedSection] = useState<string>('dashboard');
+    const [selectedTabs, setSelectedTabs] = useState<TabConfig[]>([]);
 
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);
@@ -55,12 +64,64 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
         { label: 'Reports', value: '/reports' },
     ];
 
+    const tabConfigs: Record<string, TabConfig[]> = {
+        dashboard: [
+            { label: 'User Performance', value: '/dashboard/user-performance' },
+            { label: 'Sales Overview', value: '/dashboard/sales-overview' },
+            { label: 'Inventory Status', value: '/dashboard/inventory-status' },
+            { label: 'Financial Summary', value: '/dashboard/financial-summary' },
+        ],
+        inventory: [
+            { label: 'New Inventory', value: '/inventory/new' },
+            { label: 'Generate Inventory Report', value: '/inventory/report' },
+            { label: 'Stock Levels', value: '/inventory/stock-levels' },
+            { label: 'Inventory Valuation', value: '/inventory/valuation' },
+        ],
+        categories: [
+            { label: 'View Category Groups', value: '/categories/groups' },
+            { label: 'View Category History', value: '/categories/history' },
+            { label: 'Manage Categories', value: '/categories/manage' },
+        ],
+        orders: [
+            { label: 'New Orders', value: '/orders/new' },
+            { label: 'Order History', value: '/orders/history' },
+            { label: 'Returns', value: '/orders/returns' },
+        ],
+        customers: [
+            { label: 'Customer List', value: '/customers/list' },
+            { label: 'Customer Analytics', value: '/customers/analytics' },
+            { label: 'Loyalty Program', value: '/customers/loyalty' },
+        ],
+        reports: [
+            { label: 'Sales Reports', value: '/reports/sales' },
+            { label: 'Inventory Reports', value: '/reports/inventory' },
+            { label: 'Financial Reports', value: '/reports/financial' },
+        ],
+    };
+
+    const getCurrentTabs = (): TabConfig[] => {
+        return tabConfigs[selectedSection] || [];
+    }
+
+    const handleTabSelect = (selectedPage: string) : void => {
+        const pageKey = selectedPage.toLowerCase();
+        if(tabConfigs[pageKey]){
+            const tabs = tabConfigs[pageKey];
+            console.log('Tabs: ', tabs);
+            setSelectedTabs(tabs);
+        }else{
+            throw new Error("Invalid page has been selected.");
+        }
+
+    }
+
+
+    // @ts-ignore
     return (
         <>
             <AppBar position="fixed">
                 <Toolbar>
                     <IconButton
-                        color="inherit"
                         aria-label="open drawer"
                         edge="start"
                         onClick={handleDrawerToggle}
@@ -112,7 +173,7 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
                         scrollButtons="auto"
                         aria-label="main navigation tabs"
                     >
-                        {tabs.map((tab) => (
+                        {selectedTabs.map((tab) => (
                             <Tab key={tab.value} label={tab.label} value={tab.value} />
                         ))}
                     </Tabs>
@@ -143,13 +204,12 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
                 open={drawerOpen}
                 onClose={handleDrawerToggle}
                 username={user}
-                userTitle="Manager"
-            />
+                selected={handleTabSelect}
+                userTitle="Manager"/>
             {/* Add a toolbar to push content below the AppBar */}
             <Toolbar />
             <Toolbar /> {/* Second Toolbar for the tabs */}
         </>
     );
 };
-
 export default MainAppBar;

@@ -126,7 +126,6 @@ const CategoriesPage: React.FC = () => {
     ];
 
 
-
     return (
         <BackgroundContainer>
             <MainAppBar title="Product Categories"/>
@@ -156,21 +155,9 @@ const CategoriesPage: React.FC = () => {
                     minHeight: '100vh'
                 }}
             >
-                <Container maxWidth="lg">
-                    <Box sx={{ mb: 4 }}>
-                        <Paper sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
-                            <Avatar sx={{ mr: 2 }}>{user?.charAt(0).toUpperCase()}</Avatar>
-                            <Box>
-                                <Typography variant="h6">{user}</Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Last login: {new Date().toLocaleString()}
-                                </Typography>
-                            </Box>
-                        </Paper>
-                    </Box>
-
+                <Container maxWidth="xl">
                     <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={4}>
                             <Paper sx={{ p: 2 }}>
                                 <Typography variant="h5" gutterBottom>
                                     Add New Category
@@ -209,25 +196,7 @@ const CategoriesPage: React.FC = () => {
                             </Paper>
                         </Grid>
 
-                        <Grid item xs={12} md={6}>
-                            <Paper sx={{ p: 2 }}>
-                                <Typography variant="h5" gutterBottom>
-                                    Recent Categories
-                                </Typography>
-                                <List>
-                                    {recentCategories.map((category) => (
-                                        <ListItem key={category.id}>
-                                            <ListItemText
-                                                primary={category.name}
-                                                secondary={`Added on ${category.createdAt}`}
-                                            />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Paper>
-                        </Grid>
-
-                        <Grid item xs={12}>
+                        <Grid item xs={12} md={8}>
                             <Paper sx={{ p: 2 }}>
                                 <Typography variant="h5" gutterBottom>
                                     All Categories

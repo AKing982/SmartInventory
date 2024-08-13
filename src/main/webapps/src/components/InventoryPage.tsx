@@ -129,7 +129,6 @@ const InventoryPage: React.FC = () => {
             <ContentContainer>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h4">
-                        Inventory Management
                     </Typography>
                     <Button
                         variant="contained"

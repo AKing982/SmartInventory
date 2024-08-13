@@ -24,8 +24,9 @@ import { useNavigate } from 'react-router-dom';
 interface SideDrawerProps {
     open: boolean;
     onClose: () => void;
-    username?: string | null;
-    userTitle?: string | null;
+    username: string | null;
+    userTitle: string;
+    selected: (selectedPage: string) => void;
 }
 
 const menuItems = [
@@ -41,10 +42,11 @@ const menuItems = [
     { title: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 
-const SideDrawer: React.FC<SideDrawerProps> = ({ open, onClose, username, userTitle }) => {
+const SideDrawer: React.FC<SideDrawerProps> = ({ selected, open, onClose, username, userTitle }) => {
     const navigate = useNavigate();
 
-    const handleNavigation = (path: string) => {
+    const handleNavigation = (path: string, title: string) => {
+        selected(title);
         navigate(path);
         onClose();
     }
@@ -69,7 +71,7 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ open, onClose, username, userTi
                 {/* Menu Items */}
                 <List>
                     {menuItems.map((item, index) => (
-                        <ListItem button key={item.title} onClick={() => handleNavigation(item.path)}>
+                        <ListItem button key={item.title} onClick={() => handleNavigation(item.path, item.title)}>
                             <ListItemIcon>{item.icon}</ListItemIcon>
                             <ListItemText primary={item.title} />
                         </ListItem>

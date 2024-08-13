@@ -75,6 +75,29 @@ const NewInventoryPage: React.FC = () => {
         }));
     };
 
+    const generateModelNumber = () => {
+        const prefix = newItem.brand ? newItem.brand.substring(0, 2).toUpperCase() : 'XX';
+        const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const newModelNumber = `${prefix}-${randomPart}`;
+
+        setNewItem(prevItem => ({
+            ...prevItem,
+            modelNumber: newModelNumber
+        }));
+    };
+
+    const generateSKU = () => {
+        const prefix = newItem.category ? newItem.category.substring(0, 3).toUpperCase() : 'XXX';
+        const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const newSKU = `${prefix}-${randomPart}`;
+
+        setNewItem(prevItem => ({
+            ...prevItem,
+            sku: newSKU
+        }));
+    };
+
+
     const handleCategoryChange = (event: SelectChangeEvent<string>) => {
         setNewItem(prev => ({ ...prev, category: event.target.value }));
     };
@@ -125,6 +148,18 @@ const NewInventoryPage: React.FC = () => {
                                     value={newItem.sku}
                                     onChange={handleInputChange}
                                     required
+                                    InputProps={{
+                                        endAdornment: (
+                                            <Button
+                                                onClick={generateSKU}
+                                                variant="contained"
+                                                color="secondary"
+                                                size="small"
+                                                >
+                                                Generate
+                                            </Button>
+                                        ),
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12} md={3}>
@@ -143,6 +178,18 @@ const NewInventoryPage: React.FC = () => {
                                     name="modelNumber"
                                     value={newItem.modelNumber}
                                     onChange={handleInputChange}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <Button
+                                                onClick={generateModelNumber}
+                                                variant="contained"
+                                                color="secondary"
+                                                size="small"
+                                            >
+                                                Generate
+                                            </Button>
+                                        ),
+                                    }}
                                 />
                             </Grid>
 
