@@ -57,7 +57,7 @@ public class ProductEntity implements Serializable {
 //    private CategoryEntity productCategory;
 
     @JsonIgnore
-    @Column(name="dateAdded")
+    @Column(name="date_added")
     private LocalDate dateAdded;
 
     @Override

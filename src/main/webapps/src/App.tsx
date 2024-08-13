@@ -10,6 +10,9 @@ import HomePage from "./components/HomePage";
 import AddInventoryPage from "./components/AddInventoryPage";
 import CategoriesPage from "./components/CategoriesPage";
 import ContactsPage from "./components/ContactsPage";
+import InventoryPage from "./components/InventoryPage";
+import InventoryHistoryPage from "./components/InventoryHistoryPage";
+import NewInventoryPage from "./components/NewInventoryPage";
 
 const theme = createTheme({
     palette: {
@@ -39,6 +42,9 @@ function App() {
                           <Route path="/addInventory" element={<AddInventoryPage /> }/>
                           <Route path="/categories" element={<CategoriesPage />}/>
                           <Route path="/contacts" element={<ContactsPage />}/>
+                          <Route path="/inventory" element={<InventoryPage />}/>
+                          <Route path="/inventory-history" element={<InventoryHistoryPage />}/>
+                          <Route path="/inventory/new" element={<NewInventoryPage />}/>
                       </Routes>
                   </div>
               </Router>

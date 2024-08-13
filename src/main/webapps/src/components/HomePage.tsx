@@ -91,6 +91,13 @@ const HomePage: React.FC = () => {
         recentSales: 0,
         pendingOrders: 0
     });
+    const [inventoryStats, setInventoryStats] = useState({
+        totalValue: 0,
+        topSellingItem: '',
+        itemsNeedingRestock: 0,
+        averageDailyOrders: 0,
+        inventoryTurnoverRate: 0,
+    });
     const [recentActivity, setRecentActivity] = useState<string[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [upcomingDeliveries, setUpcomingDeliveries] = useState<Delivery[]>([]);
@@ -121,6 +128,20 @@ const HomePage: React.FC = () => {
             { id: 1, date: '2023-06-15', description: 'Office Supplies from Vendor A' },
             { id: 2, date: '2023-06-18', description: 'Electronics Shipment' },
             { id: 3, date: '2023-06-20', description: 'Furniture Delivery' }
+        ]);
+        setInventoryStats({
+            totalValue: 250000,
+            topSellingItem: 'Wireless Earbuds',
+            itemsNeedingRestock: 8,
+            averageDailyOrders: 25,
+            inventoryTurnoverRate: 4.5,
+        });
+        setInventoryNotifications([
+            'Low stock alert: USB-C Cables (5 remaining)',
+            'New shipment arrived: Wireless Keyboards (50 units)',
+            'Item "HDMI Adapter" is out of stock',
+            'Price update required for "Laptop Stands"',
+            'Bulk order received for "Smartphone Cases"',
         ]);
     }, []);
 
@@ -175,76 +196,68 @@ const HomePage: React.FC = () => {
     return (
         <BackgroundContainer>
             <MainAppBar title="Home Dashboard"/>
-            <Drawer
-                anchor="left"
-                open={drawerOpen}
-                onClose={handleDrawerToggle}
-            >
+            <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
                 {drawerContent}
             </Drawer>
-            <Box
-                component="main"
-                sx={{
-                    flexGrow: 1,
-                    p: 3,
-                    mt: ['48px', '56px', '64px'],
-                }}
-            >
+            <Box component="main" sx={{ flexGrow: 1, p: 3, mt: ['48px', '56px', '64px'] }}>
                 <Container maxWidth="lg">
                     <Grid container spacing={3}>
-                        {/* User Welcome and Quick Stats */}
-                        <Grid item xs={12} md={4}>
-                            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        {/* Expanded User Welcome and Inventory Stats */}
+                        <Grid item xs={12}>
+                            <Paper sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                    <Avatar sx={{ width: 60, height: 60, mr: 2 }}>{user?.charAt(0).toUpperCase()}</Avatar>
+                                    <Avatar sx={{ width: 80, height: 80, mr: 2 }}>{user?.charAt(0).toUpperCase()}</Avatar>
                                     <Box>
-                                        <Typography variant="h5">Welcome, {user}!</Typography>
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography variant="h4">Welcome, {user}!</Typography>
+                                        <Typography variant="body1" color="text.secondary">
                                             Last login: {new Date().toLocaleString()}
                                         </Typography>
                                     </Box>
                                 </Box>
                                 <Divider sx={{ my: 2 }} />
-                                <Typography variant="h6" gutterBottom>Quick Stats</Typography>
-                                <Grid container spacing={1}>
-                                    <Grid item xs={6}>
-                                        <Chip icon={<InventoryIcon />} label={`${quickStats.totalItems} Items`} color="primary" size="small" />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Chip icon={<TrendingDownIcon />} label={`${quickStats.lowStockItems} Low Stock`} color="warning" size="small" />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Chip icon={<TrendingUpIcon />} label={`${quickStats.recentSales} Sales`} color="success" size="small" />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Chip icon={<NotificationsIcon />} label={`${quickStats.pendingOrders} Orders`} color="info" size="small" />
-                                    </Grid>
-                                </Grid>
-                            </Paper>
-                        </Grid>
-
-                        {/* Quick Access */}
-                        <Grid item xs={12} md={8}>
-                            <Paper sx={{ p: 2 }}>
-                                <Typography variant="h6" gutterBottom>Quick Access</Typography>
+                                <Typography variant="h5" gutterBottom>Inventory Overview</Typography>
                                 <Grid container spacing={2}>
-                                    {quickAccessItems.map((item, index) => (
-                                        <Grid item xs={6} sm={3} key={index}>
-                                            <Button
-                                                variant="outlined"
-                                                startIcon={item.icon}
-                                                onClick={item.action}
-                                                fullWidth
-                                            >
-                                                {item.title}
-                                            </Button>
-                                        </Grid>
-                                    ))}
+                                    <Grid item xs={12} sm={6} md={4}>
+                                        <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+                                            <Typography variant="h6">${inventoryStats.totalValue.toLocaleString()}</Typography>
+                                            <Typography variant="body2">Total Inventory Value</Typography>
+                                        </Paper>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={4}>
+                                        <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+                                            <Typography variant="h6">{quickStats.totalItems}</Typography>
+                                            <Typography variant="body2">Total Items</Typography>
+                                        </Paper>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={4}>
+                                        <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+                                            <Typography variant="h6">{quickStats.lowStockItems}</Typography>
+                                            <Typography variant="body2">Low Stock Items</Typography>
+                                        </Paper>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={4}>
+                                        <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+                                            <Typography variant="h6">{inventoryStats.topSellingItem}</Typography>
+                                            <Typography variant="body2">Top Selling Item</Typography>
+                                        </Paper>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={4}>
+                                        <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+                                            <Typography variant="h6">{inventoryStats.averageDailyOrders}</Typography>
+                                            <Typography variant="body2">Avg. Daily Orders</Typography>
+                                        </Paper>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={4}>
+                                        <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+                                            <Typography variant="h6">{inventoryStats.inventoryTurnoverRate}</Typography>
+                                            <Typography variant="body2">Inventory Turnover Rate</Typography>
+                                        </Paper>
+                                    </Grid>
                                 </Grid>
                             </Paper>
                         </Grid>
 
-                        {/* Personal Productivity Dashboard */}
+                        {/* Tasks & Goals */}
                         <Grid item xs={12} md={6}>
                             <Paper sx={{ p: 2, height: '100%' }}>
                                 <Typography variant="h6" gutterBottom>Tasks & Goals</Typography>

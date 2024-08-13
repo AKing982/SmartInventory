@@ -19,10 +19,10 @@ public class UserEntity
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name="firstName", unique=true)
+    @Column(name="first_name", unique=true)
     private String firstName;
 
-    @Column(name="lastName", unique=true)
+    @Column(name="last_name", unique=true)
     private String lastName;
 
     @Column(name="email", unique=true)
@@ -35,7 +35,7 @@ public class UserEntity
     @Column(name="password", unique=true)
     private String password;
 
-    @Column(name="isActive")
+    @Column(name="is_active")
     private boolean isActive;
 
     public UserEntity(int userId, String firstName, String lastName, String email, String username, String password, boolean isActive) {

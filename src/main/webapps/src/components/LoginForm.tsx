@@ -162,6 +162,7 @@ const LoginForm: React.FC = () => {
                     await new Promise(resolve => setTimeout(resolve, 8000));
                     setForgotPasswordSuccess(true);
                 } else if (view === 'register') {
+                    console.log('Registering user');
                     const registrationData: Registration = {
                         firstName: formData.firstName,
                         lastName: formData.lastName,
@@ -174,7 +175,10 @@ const LoginForm: React.FC = () => {
                         role: formData.role,
                         agreeToTerms: false
                     };
+
                     const response = await registerUser(registrationData);
+                    await new Promise(resolve => setTimeout(resolve, 8000));
+
                     console.log('Registration successful:', response);
                     setView('login');
                 }
