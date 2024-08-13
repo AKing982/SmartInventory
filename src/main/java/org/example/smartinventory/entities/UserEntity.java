@@ -1,6 +1,7 @@
 package org.example.smartinventory.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -16,22 +17,29 @@ public class UserEntity
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userId;
+    private int id;
 
+    @Column(name="firstName", unique=true)
     private String firstName;
 
+    @Column(name="lastName", unique=true)
     private String lastName;
 
+    @Column(name="email", unique=true)
     private String email;
 
+    @NotBlank
+    @Column(name="username")
     private String username;
 
+    @Column(name="password", unique=true)
     private String password;
 
+    @Column(name="isActive")
     private boolean isActive;
 
     public UserEntity(int userId, String firstName, String lastName, String email, String username, String password, boolean isActive) {
-        this.userId = userId;
+        this.id = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

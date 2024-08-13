@@ -1,6 +1,8 @@
 package org.example.smartinventory.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,10 +25,14 @@ public class OrderEntity
     @JoinColumn(name="userId")
     private UserEntity createdByUser;
 
+    @Column(name="orderNumber", nullable=false)
     private String orderNumber;
 
+    @Column(name="orderDate", nullable=false)
     private LocalDateTime orderDate;
 
+    @NotNull
+    @Column(name="orderStatus")
     private OrderStatus orderStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,12 +43,19 @@ public class OrderEntity
     @JoinColumn(name="notesId")
     private InventoryNotesEntity inventoryNotes;
 
+    @Column(name="totalAmount")
     private BigDecimal totalAmount;
 
+    @Column(name="billingAddress")
     private String billingAddress;
+
+    @Column(name="shippingAddress")
     private String shippingAddress;
 
+    @Column(name="createdAt")
     private LocalDateTime createdAt;
+
+    @Column(name="updatedAt")
     private LocalDateTime updatedAt;
 
     public OrderEntity(int orderId, UserEntity createdByUser, String orderNumber, LocalDateTime orderDate, OrderStatus orderStatus, CustomerEntity customer, InventoryNotesEntity inventoryNotes, BigDecimal totalAmount, String billingAddress, String shippingAddress, LocalDateTime createdAt, LocalDateTime updatedAt) {

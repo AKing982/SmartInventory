@@ -38,7 +38,7 @@ class UserServiceImplTest {
         testUser.setFirstName("test");
         testUser.setLastName("test");
         testUser.setEmail("test@test.com");
-        testUser.setUserId(1);
+        testUser.setId(1);
     }
 
     @Test

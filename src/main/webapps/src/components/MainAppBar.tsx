@@ -16,6 +16,7 @@ import {
 import WarehouseIcon from "@mui/icons-material/Warehouse";
 import PeopleIcon from "@mui/icons-material/People";
 import BusinessIcon from "@mui/icons-material/Business";
+import SideDrawer from "./SideDrawer";
 
 interface MainAppBarProps {
     title: string;
@@ -24,6 +25,7 @@ interface MainAppBarProps {
 const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
     const navigate = useNavigate();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+    const user = localStorage.getItem('user');
 
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);
@@ -33,20 +35,6 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
         localStorage.clear();
         navigate('/');
     };
-
-    const menuItems = [
-        { title: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
-        { title: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
-        { title: 'Categories', icon: <CategoryIcon />, path: '/categories' },
-        { title: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
-        { title: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
-        { title: 'Departments', icon: <BusinessIcon />, path: '/departments' },
-        { title: 'Employees', icon: <PeopleIcon />, path: '/employees' },
-        { title: 'Customers', icon: <PeopleIcon />, path: '/customers' },
-        { title: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
-        { title: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-    ];
-
 
     return (
         <>
@@ -69,27 +57,10 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
                     </Button>
                 </Toolbar>
             </AppBar>
-            <Drawer
-                anchor="left"
-                open={drawerOpen}
-                onClose={handleDrawerToggle}
-            >
-                <Box
-                    sx={{ width: 250 }}
-                    role="presentation"
-                    onClick={handleDrawerToggle}
-                    onKeyDown={handleDrawerToggle}
-                >
-                    <List>
-                        {menuItems.map((item) => (
-                            <ListItem button key={item.title} onClick={() => navigate(item.path)}>
-                                <ListItemIcon>{item.icon}</ListItemIcon>
-                                <ListItemText primary={item.title} />
-                            </ListItem>
-                        ))}
-                    </List>
-                </Box>
-            </Drawer>
+            <SideDrawer open={drawerOpen}
+                        onClose={handleDrawerToggle}
+                        username={user}
+                        userTitle="Manager"/>
         </>
     );
 };
