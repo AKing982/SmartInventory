@@ -24,6 +24,9 @@ public enum Permission
     GENERATE_INVENTORY_REPORTS,
 
     // Additional permissions based on the provided roles
+    VIEW_PURCHASE_ORDERS,
+    UPDATE_PRODUCT_INFORMATION,
+    MANAGE_OWN_INVENTORY,
     VIEW_PRODUCT_CATALOG,
     CHECK_ITEM_AVAILABILITY,
     PLACE_ORDERS,
