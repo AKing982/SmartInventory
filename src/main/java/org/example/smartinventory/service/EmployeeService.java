@@ -1,8 +1,10 @@
 package org.example.smartinventory.service;
 
+import org.example.smartinventory.dto.RegistrationDTO;
 import org.example.smartinventory.entities.EmployeeEntity;
 import org.example.smartinventory.entities.EmployeeRoleAssignment;
 import org.example.smartinventory.entities.ManagerEntity;
+import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.model.Employee;
 import org.example.smartinventory.model.EmployeeRole;
 import org.example.smartinventory.model.Permission;
@@ -18,6 +20,9 @@ import java.util.Set;
 
 public interface EmployeeService extends ServiceModel<EmployeeEntity>
 {
+    UserEntity findUserByUserId(int userId, int id);
+
+    EmployeeEntity createEmployeeFromRegistration(RegistrationDTO registrationDTO);
 
     List<EmployeeEntity> findByWarehouseId(int warehouseId);
 

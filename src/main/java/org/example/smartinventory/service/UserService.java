@@ -2,6 +2,7 @@ package org.example.smartinventory.service;
 
 import org.example.smartinventory.dto.RegistrationDTO;
 import org.example.smartinventory.entities.UserEntity;
+import org.example.smartinventory.model.Registration;
 import org.example.smartinventory.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ public interface UserService extends ServiceModel<UserEntity>
 {
     Optional<UserEntity> findByUserNameOrEmail(String userName, String email);
 
-    UserEntity createUserFromRegistration(RegistrationDTO user);
+    UserEntity createUserFromRegistration(Registration user);
 
     // Read
     Optional<UserEntity> getUserByUsername(String username);

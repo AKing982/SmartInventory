@@ -63,12 +63,6 @@ public class EmployeeEntity {
     @Column(name="is_active")
     private boolean is_active = true;
 
-    @Column(name="username")
-    private String username;
-
-    @Column(name="hashCombine")
-    private String hashCombine;
-
     private LocalDateTime lastLogin;
 
     @Column(nullable=false, updatable = false)

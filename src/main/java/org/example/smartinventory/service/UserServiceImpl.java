@@ -2,6 +2,7 @@ package org.example.smartinventory.service;
 
 import org.example.smartinventory.dto.RegistrationDTO;
 import org.example.smartinventory.entities.UserEntity;
+import org.example.smartinventory.model.Registration;
 import org.example.smartinventory.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,15 +43,15 @@ public class UserServiceImpl implements UserService
 
     @Override
     @Transactional
-    public UserEntity createUserFromRegistration(RegistrationDTO user) {
+    public UserEntity createUserFromRegistration(Registration user) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setEmail(user.email());
-        String hashedPassword = passwordEncoder.encode(user.password());
+        userEntity.setEmail(user.getEmail());
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
         LOGGER.info("Hashed password: " + hashedPassword);
         userEntity.setPassword(hashedPassword);
-        userEntity.setFirstName(user.firstName());
-        userEntity.setLastName(user.lastName());
-        userEntity.setUsername(user.username());
+        userEntity.setFirstName(user.getFirstName());
+        userEntity.setLastName(user.getLastName());
+        userEntity.setUsername(user.getUsername());
         LOGGER.info("Saving User from Registration: {} ", userEntity.toString());
 
         return userRepository.save(userEntity);

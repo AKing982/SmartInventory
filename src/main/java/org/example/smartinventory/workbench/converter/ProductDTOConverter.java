@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Component
 @NoArgsConstructor
-public class ProductDTOConverter implements Converter<ProductDTO, ProductEntity>
+public class ProductDTOConverter implements ModelToEntityConverter<ProductDTO, ProductEntity>
 {
     private Logger LOGGER = LoggerFactory.getLogger(ProductDTOConverter.class);
 

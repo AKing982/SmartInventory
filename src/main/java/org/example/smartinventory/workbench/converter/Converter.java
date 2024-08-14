@@ -1,6 +1,6 @@
 package org.example.smartinventory.workbench.converter;
 
-public interface Converter<M, E>
+public interface Converter<D, M>
 {
-    E convert(M source);
+    M convert(D d);
 }

@@ -1,7 +1,10 @@
 package org.example.smartinventory.service;
 
+import org.example.smartinventory.dto.RegistrationDTO;
 import org.example.smartinventory.entities.EmployeeEntity;
 import org.example.smartinventory.entities.ManagerEntity;
+import org.example.smartinventory.entities.UserEntity;
+import org.example.smartinventory.model.Employee;
 import org.example.smartinventory.model.EmployeeRole;
 import org.example.smartinventory.model.Permission;
 import org.example.smartinventory.repository.EmployeeRepository;
@@ -47,6 +50,16 @@ public class EmployeeServiceImpl implements EmployeeService
         return List.of();
     }
 
+
+    @Override
+    public UserEntity findUserByUserId(int userId, int id) {
+        return null;
+    }
+
+    @Override
+    public EmployeeEntity createEmployeeFromRegistration(RegistrationDTO registrationDTO) {
+        return null;
+    }
 
     @Override
     public List<EmployeeEntity> findByWarehouseId(int warehouseId) {

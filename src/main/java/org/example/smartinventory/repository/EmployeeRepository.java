@@ -19,7 +19,7 @@ import java.util.Optional;
 @Repository
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Integer>
 {
-    @Query("SELECT e FROM EmployeeEntity e WHERE e.firstName = :firstName AND e.lastName = :lastName")
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.empFirstName = :firstName AND e.empLastName = :lastName")
     List<EmployeeEntity> findByFullName(@Param("firstName") String firstName, @Param("lastName") String lastName);
 
     @Query("SELECT e FROM EmployeeEntity e WHERE e.email =:email")
@@ -40,17 +40,14 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
     @Query("SELECT e FROM EmployeeEntity e WHERE e.role =:role")
     List<EmployeeEntity> findByRole(@Param("role") EmployeeRole role);
 
-    @Query("SELECT e FROM EmployeeEntity e WHERE e.isActive =:isActive")
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.is_active =:isActive")
     List<EmployeeEntity> findByActiveStatus(@Param("isActive") boolean isActive);
 
     @Query("SELECT e FROM EmployeeEntity e WHERE e.hireDate >=:startDate AND e.hireDate <=:endDate")
     List<EmployeeEntity> findByHireDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT e FROM EmployeeEntity e WHERE e.managerEntity.managerId =:managerId")
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.manager.id =:managerId")
     List<EmployeeEntity> findByManagerId(@Param("managerId") int managerId);
-
-    @Query("SELECT e FROM EmployeeEntity e WHERE :roleAssignment MEMBER OF e.roleAssignments")
-    List<EmployeeEntity> findByRoleAssignment(@Param("roleAssignment") EmployeeRoleAssignment roleAssignment);
 
     @Query("SELECT e FROM EmployeeEntity e WHERE e.salary >:minSalary")
     List<EmployeeEntity> findBySalaryGreaterThan(@Param("minSalary") String minSalary);
@@ -62,8 +59,8 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
     long countEmployeesByDepartment(@Param("departmentId") int departmentId);
 
     @Query("SELECT e FROM EmployeeEntity e WHERE " +
-            "LOWER(e.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(e.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(e.empFirstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(e.empLastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(e.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(e.jobTitle) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<EmployeeEntity> searchEmployees(@Param("keyword") String keyword);
@@ -72,19 +69,16 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
     Optional<ManagerEntity> findWarehouseManagerById(@Param("id") int id);
 
     @Modifying
-    @Query("UPDATE EmployeeEntity e SET e.isActive =:isActive WHERE e.employeeId =:employeeId")
+    @Query("UPDATE EmployeeEntity e SET e.is_active =:isActive WHERE e.id =:employeeId")
     int updateEmployeeActiveStatus(@Param("employeeId") int employeeId, @Param("isActive") boolean isActive);
 
     @Modifying
-    @Query("UPDATE EmployeeEntity e SET e.department.departmentId =:departmentId WHERE e.employeeId =:employeeId")
+    @Query("UPDATE EmployeeEntity e SET e.department.departmentId =:departmentId WHERE e.id =:employeeId")
     int updateEmployeeDepartment(@Param("employeeId") int employeeId, @Param("departmentId") int departmentId);
 
     @Modifying
-    @Query("UPDATE EmployeeEntity e SET e.salary = :newSalary WHERE e.employeeId = :employeeId")
+    @Query("UPDATE EmployeeEntity e SET e.salary = :newSalary WHERE e.id = :employeeId")
     int updateEmployeeSalary(@Param("employeeId") int employeeId, @Param("newSalary") String newSalary);
-
-    @Query("SELECT e FROM EmployeeEntity e WHERE SIZE(e.roleAssignments) >:count")
-    List<EmployeeEntity> findEmployeesWithMultipleRoles(@Param("count") int count);
 
     @Query("SELECT e FROM EmployeeEntity e WHERE e.createdAt >= :startDateTime AND e.createdAt <= :endDateTime")
     List<EmployeeEntity> findEmployeesCreatedBetween(@Param("startDateTime") LocalDateTime startDateTime, @Param("endDateTime") LocalDateTime endDateTime);
@@ -102,7 +96,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
     List<EmployeeEntity> findTopEarnersByDepartment(@Param("departmentId") int departmentId, @Param("limit") int limit);
 
     @Modifying
-    @Query("DELETE FROM EmployeeEntity e WHERE e.isActive = false AND e.updatedAt < :date")
+    @Query("DELETE FROM EmployeeEntity e WHERE e.is_active = false AND e.updatedAt < :date")
     int deleteInactiveEmployeesBeforeDate(@Param("date") LocalDateTime date);
 }
 

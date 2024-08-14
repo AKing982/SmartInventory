@@ -18,11 +18,24 @@ public class Registration
     private String email;
     private String username;
     private String password;
+    private String role;
     private String confirmPassword;
     private LocalDate dateOfBirth;
     private String phoneNumber;
+    private String company;
     private String address;
     private boolean termsAgreed;
     private String jobTitle;
     private LocalDate hireDate;
+
+    public Registration(String firstName, String lastName, String email, String username, String password, String role, String company, String jobTitle) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.company = company;
+        this.jobTitle = jobTitle;
+    }
 }
