@@ -26,7 +26,7 @@ interface SideDrawerProps {
     onClose: () => void;
     username: string | null;
     userTitle: string;
-    selected: (selectedPage: string) => void;
+    // onMenuItemSelect: (selectedPage: string) => void;
 }
 
 const menuItems = [
@@ -42,13 +42,13 @@ const menuItems = [
     { title: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 
-const SideDrawer: React.FC<SideDrawerProps> = ({ selected, open, onClose, username, userTitle }) => {
+const SideDrawer: React.FC<SideDrawerProps> = ({ open, onClose, username, userTitle}) => {
     const navigate = useNavigate();
 
     const handleNavigation = (path: string, title: string) => {
-        selected(title);
         navigate(path);
         onClose();
+        // onMenuItemSelect(title);
     }
 
     return (

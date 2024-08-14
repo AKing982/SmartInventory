@@ -1,5 +1,5 @@
 import {useLocation, useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SideDrawer from "./SideDrawer";
@@ -14,6 +14,7 @@ import {
     Person as PersonIcon,
     Logout as LogoutIcon
 } from '@mui/icons-material';
+import DynamicTabs from "./DynamicTabs";
 
 interface MainAppBarProps {
     title: string;
@@ -52,6 +53,7 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
     };
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+        console.log('Changing tabs');
         navigate(newValue);
     };
 
@@ -99,21 +101,47 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
         ],
     };
 
+    const handleSectionChange = (_event: React.SyntheticEvent, newValue: string) => {
+        setSelectedSection(newValue.split('/')[1]);
+        navigate(newValue);
+    };
+
+    // useEffect(() => {
+    //     const currentSection = location.pathname.split('/')[1] || 'dashboard';
+    //     setSelectedSection(currentSection);
+    //     const newTabs = tabConfigs[currentSection] || [];
+    //     setSelectedTabs(newTabs);
+    // }, [location]);
+
+    useEffect(() => {
+        const currentSection = location.pathname.split('/')[1] || 'dashboard';
+        setSelectedSection(currentSection);
+    }, [location]);
+
     const getCurrentTabs = (): TabConfig[] => {
         return tabConfigs[selectedSection] || [];
     }
 
-    const handleTabSelect = (selectedPage: string) : void => {
+    const handleTabSelect = (selectedPage: string) : TabConfig[] | null => {
         const pageKey = selectedPage.toLowerCase();
         if(tabConfigs[pageKey]){
             const tabs = tabConfigs[pageKey];
             console.log('Tabs: ', tabs);
-            setSelectedTabs(tabs);
+            return tabs;
         }else{
-            throw new Error("Invalid page has been selected.");
+            return null;
         }
-
     }
+
+    const handleMenuItemSelect = (selectedItem: string) => {
+        setSelectedSection(selectedItem.toLowerCase());
+        const newTabs = tabConfigs[selectedItem.toLowerCase()] || [];
+        setSelectedTabs(newTabs);
+        if (newTabs.length > 0) {
+            navigate(newTabs[0].value);
+        }
+        setDrawerOpen(false);
+    };
 
 
     // @ts-ignore
@@ -164,19 +192,20 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
                     </IconButton>
                 </Toolbar>
                 <Box sx={{ bgcolor: 'primary.dark' }}>
-                    <Tabs
-                        value={location.pathname}
-                        onChange={handleTabChange}
-                        indicatorColor="secondary"
-                        textColor="inherit"
-                        variant="scrollable"
-                        scrollButtons="auto"
-                        aria-label="main navigation tabs"
-                    >
-                        {selectedTabs.map((tab) => (
-                            <Tab key={tab.value} label={tab.label} value={tab.value} />
-                        ))}
-                    </Tabs>
+                    {/*<Tabs*/}
+                    {/*    value={location.pathname}*/}
+                    {/*    onChange={handleTabChange}*/}
+                    {/*    indicatorColor="secondary"*/}
+                    {/*    textColor="inherit"*/}
+                    {/*    variant="scrollable"*/}
+                    {/*    scrollButtons="auto"*/}
+                    {/*    aria-label="main navigation tabs"*/}
+                    {/*>*/}
+                    {/*    {tabs.map((tab) => (*/}
+                    {/*        <Tab key={tab.label} label={tab.label} value={tab.value} />*/}
+                    {/*    ))}*/}
+                    {/*</Tabs>*/}
+                    <DynamicTabs selectedMenuItem={selectedSection}/>
                 </Box>
             </AppBar>
             <Menu
@@ -204,7 +233,6 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
                 open={drawerOpen}
                 onClose={handleDrawerToggle}
                 username={user}
-                selected={handleTabSelect}
                 userTitle="Manager"/>
             {/* Add a toolbar to push content below the AppBar */}
             <Toolbar />

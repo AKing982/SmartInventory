@@ -13,6 +13,7 @@ import ContactsPage from "./components/ContactsPage";
 import InventoryPage from "./components/InventoryPage";
 import InventoryHistoryPage from "./components/InventoryHistoryPage";
 import NewInventoryPage from "./components/NewInventoryPage";
+import StockLevels from "./components/StockLevels";
 
 const theme = createTheme({
     palette: {
@@ -45,6 +46,7 @@ function App() {
                           <Route path="/inventory" element={<InventoryPage />}/>
                           <Route path="/inventory-history" element={<InventoryHistoryPage />}/>
                           <Route path="/inventory/new" element={<NewInventoryPage />}/>
+                          <Route path="/stocks" element={<StockLevels />}/>
                       </Routes>
                   </div>
               </Router>
