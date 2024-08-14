@@ -1,27 +1,31 @@
 package org.example.smartinventory.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.smartinventory.model.EmployeeRole;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Table(name="managers")
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class ManagerEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int managerId;
+    private int id;
 
-    private String managerName;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="employeeId")
+    @OneToOne
+    @JoinColumn(name="employeeId", unique = true, nullable = false)
     private EmployeeEntity employee;
 
     @OneToOne
@@ -34,22 +38,17 @@ public class ManagerEntity {
     @Column(nullable = false)
     private LocalDate endDate;
 
-    private boolean isActive;
+    @Column(name="is_active")
+    private boolean is_active = true;
 
+    @Column(nullable=false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable=false)
     private LocalDateTime updatedAt;
 
-    public ManagerEntity(int managerId, EmployeeEntity employee, DepartmentEntity department, LocalDate startDate, LocalDate endDate, boolean isActive, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.managerId = managerId;
-        this.employee = employee;
-        this.department = department;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.isActive = isActive;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+    @OneToMany(mappedBy="manager")
+    private Set<EmployeeEntity> managedEmployees = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
@@ -61,4 +60,13 @@ public class ManagerEntity {
         updatedAt = LocalDateTime.now();
     }
 
+    public void addManagedEmployee(EmployeeEntity employee) {
+        managedEmployees.add(employee);
+        employee.setManager(this);
+    }
+
+    public void removeManagedEmployee(EmployeeEntity employee) {
+        managedEmployees.remove(employee);
+        employee.setManager(null);
+    }
 }

@@ -2,31 +2,35 @@ package org.example.smartinventory.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.example.smartinventory.model.Permission;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Table(name="users")
 @Entity
 @Data
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class UserEntity
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @Column(name="first_name", unique=true)
+    @Column(name="first_name")
     private String firstName;
 
-    @Column(name="last_name", unique=true)
+    @Column(name="last_name")
     private String lastName;
 
-    @Column(name="email", unique=true)
+    @Column(name="email")
     private String email;
+
+    @Column(name="phone")
+    private String phone;
 
     @NotBlank
     @Column(name="username")
@@ -36,17 +40,32 @@ public class UserEntity
     private String password;
 
     @Column(name="is_active")
-    private boolean isActive;
+    private boolean is_active;
 
-    public UserEntity(int userId, String firstName, String lastName, String email, String username, String password, boolean isActive) {
-        this.id = userId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.isActive = isActive;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name="user_roles",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="role_id")
+    )
+    private Set<RoleEntity> roles = new HashSet<>();
+
+    @Column(nullable=false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable=false)
+    private LocalDateTime updatedAt;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private EmployeeEntity employee;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 
-
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

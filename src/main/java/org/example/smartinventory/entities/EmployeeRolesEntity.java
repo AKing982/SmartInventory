@@ -10,6 +10,7 @@ import java.util.Set;
 
 @Data
 @Entity
+@Deprecated
 @Table(name="employeeRoles")
 public class EmployeeRolesEntity
 {
