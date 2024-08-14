@@ -1,30 +1,28 @@
 package org.example.smartinventory.service;
 
+import org.example.smartinventory.entities.RoleEntity;
 import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.model.Permission;
 import org.example.smartinventory.model.Role;
 import org.springframework.stereotype.Service;
 
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class PermissionsService
 {
-    private EnumMap<Role, Set<Permission>> permissions = new EnumMap<>(Role.class);
+    private Map<String, Set<Permission>> permissions = new HashMap<>();
 
     public PermissionsService()
     {
-        permissions = new EnumMap<>(Role.class);
-
+        initializeRolePermissions();
     }
 
     private void initializeRolePermissions(){
-        permissions.put(Role.USER, createRegularUserPermissions());
-        permissions.put(Role.MANAGER, createManagerPermissions());
-        permissions.put(Role.SUPPLIER, createSupplierPermissions());
-
+        permissions.put("USER", createRegularUserPermissions());
+        permissions.put("MANAGER", createManagerPermissions());
+        permissions.put("SUPPLIER", createSupplierPermissions());
+        permissions.put("EMPLOYEE", createEmployeePermissions());
     }
 
     private Set<Permission> createRegularUserPermissions(){
@@ -73,7 +71,12 @@ public class PermissionsService
     }
 
     public Set<Permission> getPermissionsForUser(UserEntity user){
-        return permissions.getOrDefault(user.getRoles(), new HashSet<>());
+        Set<Permission> userPermissions = new HashSet<>();
+        for(RoleEntity role : user.getRoles())
+        {
+            userPermissions.addAll(permissions.getOrDefault(role.getRole(), new HashSet<>()));
+        }
+        return userPermissions;
     }
 
     public boolean hasPermission(UserEntity user, Permission permission){
