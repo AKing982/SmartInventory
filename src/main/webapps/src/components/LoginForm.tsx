@@ -68,7 +68,8 @@ interface FormData {
     agreeToTerms: boolean;
 }
 
-export interface Registration{
+export interface Registration
+{
     firstName: string;
     lastName: string;
     email?: string;
@@ -77,11 +78,34 @@ export interface Registration{
     companyName?: string;
     jobTitle: string;
     username: string;
-    role: string;
+    role: RoleType;
     agreeToTerms: false;
 }
 
+enum RoleType {
+    ROLE_SUPPLIER = "ROLE_SUPPLIER",
+    ROLE_USER = "ROLE_USER",
+    ROLE_EMPLOYEE = "ROLE_EMPLOYEE",
+    ROLE_MANAGER = "ROLE_MANAGER",
+    ROLE_ADMIN = "ROLE_ADMIN"
+}
 
+interface RoleModel {
+    role: RoleType;
+    item: RoleItem;
+}
+
+interface RoleItem {
+    roleName: string;
+}
+
+const roleItems : RoleModel[] = [
+    { role: RoleType.ROLE_SUPPLIER, item: { roleName: 'Inventory Supplier' } },
+    { role: RoleType.ROLE_ADMIN, item: { roleName: 'Administrator' } },
+    { role: RoleType.ROLE_USER, item: { roleName: 'Regular User' } },
+    { role: RoleType.ROLE_EMPLOYEE, item: { roleName: 'Inventory Specialist' } },
+    { role: RoleType.ROLE_MANAGER, item: { roleName: 'Inventory Manager' } }
+]
 
 const LoginForm: React.FC = () => {
     const [formData, setFormData] = useState<FormData>({
@@ -136,6 +160,27 @@ const LoginForm: React.FC = () => {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+
+    const createRegistrationRequest = (formData: FormData) : Registration => {
+        const roleModel = roleItems.find(item => item.item.roleName === formData.role);
+        if(!roleModel){
+            throw new Error(`Invalid Role: ${formData.role}`);
+        }
+
+        return {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            username: formData.username,
+            password: formData.password,
+            confirmPassword: formData.confirmPassword,
+            companyName: formData.companyName,
+            jobTitle: formData.jobTitle,
+            role: roleModel.role,
+            agreeToTerms: false
+        }
+    };
+
 
     // Update the handleSubmit function
     const handleSubmit = async (e: React.FormEvent) => {

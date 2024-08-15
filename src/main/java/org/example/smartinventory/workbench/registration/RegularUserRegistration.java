@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Component
-public class RegularUserRegistration implements RegistrationStrategy<UserEntity>
+public class RegularUserRegistration extends AbstractRegistrationBase<UserEntity> implements RegistrationStrategy<UserEntity>
 {
     private UserService userService;
 
@@ -27,7 +27,7 @@ public class RegularUserRegistration implements RegistrationStrategy<UserEntity>
     }
 
     @Override
-    public String getRole() {
+    public final String getRole() {
         return "ROLE_USER";
     }
 
@@ -38,19 +38,11 @@ public class RegularUserRegistration implements RegistrationStrategy<UserEntity>
         }
         // Create the user
         UserEntity user = createUserEntity(registration);
-        Set<Permission> permissions = getPermissions(permissionsService, user);
-        Set<RoleEntity> roles = Set.of(createRoleEntity(permissions));
-        user.setRoles(roles);
+        Set<Permission> permissions = getPermissions(user, permissionsService);
+        addRoleToPermissions(permissions, getRole(), permissionsService);
+        setRoleConfigurationForEntity(permissions, user);
         // Create the roles for the user
         return Optional.of(user);
-    }
-
-
-    private RoleEntity createRoleEntity(Set<Permission> permissions) {
-        RoleEntity roleEntity = new RoleEntity();
-        roleEntity.setRole(getRole());
-        roleEntity.setPermissions(permissions);
-        return roleEntity;
     }
 
     private UserEntity createUserEntity(Registration registration)
@@ -58,10 +50,18 @@ public class RegularUserRegistration implements RegistrationStrategy<UserEntity>
         return userService.createUserFromRegistration(registration);
     }
 
-    public Set<Permission> getPermissions(PermissionsService permissionsService, UserEntity userEntity) {
+    @Override
+    protected Set<Permission> getPermissions(UserEntity userEntity, PermissionsService permissionsService) {
         if(permissionsService == null || userEntity == null){
             throw new IllegalArgumentException("Permissions service cannot be null");
         }
         return permissionsService.getPermissionsForUser(userEntity);
+    }
+
+    @Override
+    protected void setRoleConfigurationForEntity(Set<Permission> permissions, UserEntity entity) {
+        RoleEntity role = createRoleEntity(getRole(), permissions);
+        Set<RoleEntity> roles = Set.of(role);
+        entity.setRoles(roles);
     }
 }

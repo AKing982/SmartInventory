@@ -14,17 +14,14 @@ public class RegistrationService
 {
     private RegistrationFactory registrationFactory;
     private PermissionsService permissionsService;
-    private RoleService roleService;
     private UserService userService;
 
     @Autowired
     public RegistrationService(RegistrationFactory registrationFactory,
                                PermissionsService permissionsService,
-                               RoleService roleService,
                                UserService userService) {
         this.registrationFactory = registrationFactory;
         this.permissionsService = permissionsService;
-        this.roleService = roleService;
         this.userService = userService;
     }
 
@@ -59,8 +56,12 @@ public class RegistrationService
             throw new IllegalArgumentException("Registration has no valid role: " + registration);
         }
 
-        RegistrationStrategy<T> registrationStrategy = registrationFactory.getStrategy(role);
-        return registrationStrategy.register(registration, permissionsService);
+        UserEntity user = createDefaultUserFromRegistration(registration);
+        if(user != null){
+            RegistrationStrategy<T> registrationStrategy = registrationFactory.getStrategy(role);
+            return registrationStrategy.register(registration, permissionsService);
+        }
+        return Optional.empty();
     }
 
     public void validateRegistration(Registration registration){

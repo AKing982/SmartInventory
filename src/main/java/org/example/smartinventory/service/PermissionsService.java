@@ -3,7 +3,6 @@ package org.example.smartinventory.service;
 import org.example.smartinventory.entities.RoleEntity;
 import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.model.Permission;
-import org.example.smartinventory.model.Role;
 import org.example.smartinventory.workbench.security.permissions.PermissionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

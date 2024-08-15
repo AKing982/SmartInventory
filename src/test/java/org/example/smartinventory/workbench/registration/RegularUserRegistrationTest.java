@@ -119,7 +119,7 @@ class RegularUserRegistrationTest {
     void testGetPermissions_WhenPermissionsServiceIsNull_ShouldThrowException() {
         UserEntity mockUser = mock(UserEntity.class);
         assertThrows(IllegalArgumentException.class, () -> {
-            regularUserRegistration.getPermissions(null, mockUser);
+            regularUserRegistration.getPermissions(mockUser, null);
         });
     }
 
@@ -127,7 +127,7 @@ class RegularUserRegistrationTest {
     void testGetPermissions_whenUserIsNull_ShouldThrowException() {
         PermissionsService mockPermissionsService = mock(PermissionsService.class);
         assertThrows(IllegalArgumentException.class, () -> {
-            regularUserRegistration.getPermissions(mockPermissionsService, null);
+            regularUserRegistration.getPermissions(null, mockPermissionsService);
         });
     }
 
@@ -142,7 +142,7 @@ class RegularUserRegistrationTest {
 
         when(permissionsService.getPermissionsForUser(createUserEntity())).thenReturn(userPermissions);
 
-        Set<Permission> actualPermissions = regularUserRegistration.getPermissions(permissionsService, createUserEntity());
+        Set<Permission> actualPermissions = regularUserRegistration.getPermissions(createUserEntity(), permissionsService);
         assertNotNull(actualPermissions);
         assertEquals(userPermissions, actualPermissions);
     }
