@@ -1,6 +1,7 @@
 package org.example.smartinventory.workbench.registration;
 
 import org.example.smartinventory.dto.RegistrationDTO;
+import org.example.smartinventory.entities.SupplierEntity;
 import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.model.Registration;
 import org.example.smartinventory.service.PermissionsService;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class SupplierRegistration implements RegistrationStrategy
+public class SupplierRegistration implements RegistrationStrategy<SupplierEntity>
 {
     private SupplierService supplierService;
 
@@ -27,7 +28,7 @@ public class SupplierRegistration implements RegistrationStrategy
     }
 
     @Override
-    public Optional<? extends UserEntity> register(Registration registration, PermissionsService permissionsService)
+    public Optional<SupplierEntity> register(Registration registration, PermissionsService permissionsService)
     {
         return Optional.empty();
     }

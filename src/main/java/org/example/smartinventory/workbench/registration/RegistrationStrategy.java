@@ -7,8 +7,8 @@ import org.example.smartinventory.service.PermissionsService;
 
 import java.util.Optional;
 
-public interface RegistrationStrategy
+public interface RegistrationStrategy<T>
 {
     String getRole();
-    Optional<?> register(Registration registrationDTO, PermissionsService permissionsService);
+    Optional<T> register(Registration registrationDTO, PermissionsService permissionsService);
 }

@@ -38,4 +38,24 @@ public class Registration
         this.company = company;
         this.jobTitle = jobTitle;
     }
+
+    @Override
+    public String toString() {
+        return "Registration{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                ", confirmPassword='" + confirmPassword + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", company='" + company + '\'' +
+                ", address='" + address + '\'' +
+                ", termsAgreed=" + termsAgreed +
+                ", jobTitle='" + jobTitle + '\'' +
+                ", hireDate=" + hireDate +
+                '}';
+    }
 }

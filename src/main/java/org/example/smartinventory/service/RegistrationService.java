@@ -15,26 +15,63 @@ public class RegistrationService
     private RegistrationFactory registrationFactory;
     private PermissionsService permissionsService;
     private RoleService roleService;
+    private UserService userService;
 
     @Autowired
     public RegistrationService(RegistrationFactory registrationFactory,
                                PermissionsService permissionsService,
-                               RoleService roleService) {
+                               RoleService roleService,
+                               UserService userService) {
         this.registrationFactory = registrationFactory;
         this.permissionsService = permissionsService;
         this.roleService = roleService;
+        this.userService = userService;
     }
 
     public Optional<UserEntity> createDefaultUser(Registration registration){
         if(registration == null){
             throw new IllegalArgumentException("registration is null");
         }
-        return null;
+        validateRegistrationParameters(registration);
+        UserEntity user = createDefaultUserFromRegistration(registration);
+        return Optional.of(user);
     }
 
-    public Optional<?> register(String role, Registration registration)
+    private UserEntity createDefaultUserFromRegistration(Registration registration){
+        return userService.createUserFromRegistration(registration);
+    }
+
+    public void validateRegistrationParameters(Registration registration)
     {
-        RegistrationStrategy registrationStrategy = registrationFactory.getStrategy(role);
+        if(registration.getEmail() == null || registration.getRole() == null ||
+           registration.getCompany() == null || registration.getPassword() == null ||
+           registration.getFirstName() == null || registration.getLastName() == null ||
+           registration.getUsername() == null || registration.getJobTitle() == null){
+            throw new IllegalArgumentException("Registration has null parameters: " + registration);
+        }
+    }
+
+    public <T> Optional<T> register(String role, Registration registration)
+    {
+        validateRoleIsEmpty(role);
+        validateRegistration(registration);
+        if(!role.contains("ROLE_")){
+            throw new IllegalArgumentException("Registration has no valid role: " + registration);
+        }
+
+        RegistrationStrategy<T> registrationStrategy = registrationFactory.getStrategy(role);
         return registrationStrategy.register(registration, permissionsService);
+    }
+
+    public void validateRegistration(Registration registration){
+        if(registration == null){
+            throw new IllegalArgumentException("Unable to complete registration from null registration");
+        }
+    }
+
+    public void validateRoleIsEmpty(String role){
+        if(role.isEmpty()){
+            throw new IllegalArgumentException("Role is Empty");
+        }
     }
 }
