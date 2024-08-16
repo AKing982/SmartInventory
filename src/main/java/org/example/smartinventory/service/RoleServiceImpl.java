@@ -3,21 +3,22 @@ package org.example.smartinventory.service;
 import org.example.smartinventory.entities.RoleEntity;
 import org.example.smartinventory.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RoleServiceImpl implements RoleService
 {
     private RoleRepository roleRepository;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public RoleServiceImpl(RoleRepository roleRepository)
     {
         this.roleRepository = roleRepository;
+        this.jdbcTemplate = new JdbcTemplate();
     }
 
     @Override
@@ -44,4 +45,35 @@ public class RoleServiceImpl implements RoleService
     public Collection<RoleEntity> findAllById(Iterable<Long> ids) {
         return roleRepository.findAllById(ids);
     }
+
+    @Override
+    public Set<String> getUserRoles(Long userId){
+        String sql = "SELECT r.role FROM RoleEntity r JOIN user_roles ur ON r.role_id = ur.role_id WHERE ur.user_id = ?";
+        return new HashSet<>(jdbcTemplate.queryForList(sql, String.class, userId));
+    }
+
+    @Override
+    public Set<String> getUserRolePermissions(Long userId){
+        String sql = "SELECT DISTINCT rp.permission FROM role_permissions rp " +
+                     "JOIN user_roles ur ON rp.role_id = ur.role_id WHERE ur.user_id = ?";
+        return new HashSet<>(jdbcTemplate.queryForList(sql, String.class, userId));
+    }
+
+    @Override
+    public void addRoleToUser(Long userId, Integer roleId){
+        String sql = "INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)";
+        jdbcTemplate.update(sql, userId, roleId);
+    }
+
+    @Override
+    public void removeRoleFromUser(Long userId, Integer roleId){
+        String sql = "DELETE FROM user_roles WHERE user_id = ? AND role_id = ?";
+        jdbcTemplate.update(sql, userId, roleId);
+    }
+
+    @Override
+    public Optional<RoleEntity> findByName(String name) {
+        return roleRepository.findByName(name);
+    }
+
 }

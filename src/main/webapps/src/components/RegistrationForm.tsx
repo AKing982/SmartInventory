@@ -25,7 +25,7 @@ interface RegistrationFormData {
 }
 
 const RegistrationForm: React.FC = () => {
-    const [formData, setFormData] = useState<Registration>({
+    const [formData, setFormData] = useState<RegistrationFormData>({
         firstName: '',
         lastName: '',
         email: '',
@@ -76,8 +76,8 @@ const RegistrationForm: React.FC = () => {
             try
             {
                 // Here you would typically send the registration data to your backend
-                const response = await registerUser(formData);
-                console.log('Response: ', response);
+            //    const response = await registerUser(formData);
+            //    console.log('Response: ', response);
                 console.log('Registration data:', formData);
                 navigate('/');
 

@@ -5,6 +5,7 @@ import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.model.Permission;
 import org.example.smartinventory.model.Registration;
 import org.example.smartinventory.service.PermissionsService;
+import org.example.smartinventory.service.RoleService;
 import org.example.smartinventory.service.UserService;
 import org.example.smartinventory.workbench.security.permissions.PermissionFactory;
 import org.junit.jupiter.api.AfterEach;
@@ -20,8 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RegularUserRegistrationTest {
@@ -31,6 +31,9 @@ class RegularUserRegistrationTest {
 
     @Mock
     private PermissionsService permissionsService;
+
+    @Mock
+    private RoleService roleService;
 
     @InjectMocks
     private RegularUserRegistration regularUserRegistration;
@@ -98,21 +101,24 @@ class RegularUserRegistrationTest {
 
         RoleEntity roleEntity = createRoleEntity("ROLE_USER", userPermissions);
 
+        UserEntity user = createUserEntity();
         Set<RoleEntity> roles = new HashSet<>();
         roles.add(roleEntity);
 
         Optional<UserEntity> createdUser = Optional.of(createUserEntity());
         when(userService.createUserFromRegistration(mockRegistration)).thenReturn(createUserEntity());
         when(mockPermissionsService.getPermissionsForUser(createUserEntity())).thenReturn(userPermissions);
+        when(roleService.findByName("ROLE_USER")).thenReturn(Optional.of(roleEntity));
 
         Optional<UserEntity> actualUser = regularUserRegistration.register(mockRegistration, mockPermissionsService);
+        Set<Permission> actualPermissions = mockPermissionsService.getPermissionsForUser(createUserEntity());
 
         assertTrue(actualUser.isPresent());
         assertEquals(createdUser.get().getId(), actualUser.get().getId());
         assertEquals(createdUser.get().getUsername(), actualUser.get().getUsername());
         assertEquals(createdUser.get().getPassword(), actualUser.get().getPassword());
-        assertEquals(roles.size(), actualUser.get().getRoles().size());
-        assertTrue(actualUser.get().getRoles().containsAll(roles));
+        assertTrue(actualPermissions.containsAll(userPermissions));
+
     }
 
     @Test

@@ -17,6 +17,7 @@ import java.util.Set;
 public class UserEntity
 {
     @Id
+    @Column(name="userid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -29,9 +30,6 @@ public class UserEntity
     @Column(name="email")
     private String email;
 
-    @Column(name="phone")
-    private String phone;
-
     @NotBlank
     @Column(name="username")
     private String username;
@@ -42,30 +40,17 @@ public class UserEntity
     @Column(name="is_active")
     private boolean is_active;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     @JoinTable(
             name="user_roles",
-            joinColumns = @JoinColumn(name="user_id"),
-            inverseJoinColumns = @JoinColumn(name="role_id")
+            joinColumns = @JoinColumn(name="userid"),
+            inverseJoinColumns = @JoinColumn(name="role_Id")
     )
-    private Set<RoleEntity> roles = new HashSet<>();
+    private Set<Integer> roles = new HashSet<>();
 
-    @Column(nullable=false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable=false)
-    private LocalDateTime updatedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private EmployeeEntity employee;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }

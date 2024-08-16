@@ -1,56 +1,52 @@
 import apiUrl from "../config/api";
+import axios from "axios";
 
-export interface RegistrationResponse {
 
+enum RoleType {
+    ROLE_SUPPLIER = "ROLE_SUPPLIER",
+    ROLE_USER = "ROLE_USER",
+    ROLE_EMPLOYEE = "ROLE_EMPLOYEE",
+    ROLE_MANAGER = "ROLE_MANAGER",
+    ROLE_ADMIN = "ROLE_ADMIN"
 }
 
-export interface Registration{
+
+export interface Registration
+{
     firstName: string;
     lastName: string;
     email?: string;
     password: string;
-    confirmPassword: string;
     companyName?: string;
     jobTitle: string;
     username: string;
-    role: string;
-    agreeToTerms: false;
+    role: RoleType;
 }
 
 export async function registerUser(registration: Registration) : Promise<any>
 {
     const {firstName, lastName, email, jobTitle, password, username, role} = registration;
-
+    console.log('Registration: ', registration);
+    console.log('Role: ', role);
+    if(!role){
+        throw new Error("Role is required for registration.");
+    }
     try
     {
-        const response = await fetch(`${apiUrl}/api/register/`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                jobTitle: jobTitle,
-                password: password,
-                username: username,
-                role: role
-            }),
-        });
+        const response = await axios.post(`${apiUrl}/api/register/`, registration);
 
         console.log('Response Status: ', response.status);
 
-        if(!response.ok)
-        {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        return await response.json();
+        return response.data;
 
     }catch(error)
     {
-        console.error("Registration Error: ", error);
+        if (axios.isAxiosError(error)) {
+            console.error("Registration Error: ", error.response?.data);
+            throw new Error(error.response?.data?.message || "An error occurred during registration");
+        } else {
+            console.error("Unexpected error: ", error);
+            throw error;
+        }
     }
 }

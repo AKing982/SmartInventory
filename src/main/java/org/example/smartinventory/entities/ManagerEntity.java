@@ -21,8 +21,9 @@ import java.util.Set;
 public class ManagerEntity {
 
     @Id
+    @Column(name="managerid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int managerId;
 
     @OneToOne
     @JoinColumn(name="employeeId", unique = true, nullable = false)
@@ -38,7 +39,7 @@ public class ManagerEntity {
     @Column(nullable = false)
     private LocalDate endDate;
 
-    @Column(name="is_active")
+    @Column(name="isactive")
     private boolean is_active = true;
 
     @Column(nullable=false, updatable = false)

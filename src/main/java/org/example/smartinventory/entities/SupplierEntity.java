@@ -13,14 +13,18 @@ import org.example.smartinventory.model.EmployeeRole;
 public class SupplierEntity {
 
     @Id
+    @Column(name="supplier_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int supplierId;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="user_id", unique = true)
+    @JoinColumn(name="userid", unique = true)
     private UserEntity user;
 
+    @Column(name="supplier_name")
     private String supplierName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="employee_role")
     private EmployeeRole employeeRole;
 }

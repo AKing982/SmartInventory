@@ -6,7 +6,7 @@ import {
     Grid,
     IconButton,
     InputAdornment,
-    Link, MenuItem, Paper, styled,
+    Link, Menu, MenuItem, Paper, styled,
     TextField,
     Typography
 } from "@mui/material";
@@ -64,7 +64,7 @@ interface FormData {
     confirmPassword: string;
     companyName: string;
     jobTitle: string;
-    role: string;
+    role: RoleType | '';
     agreeToTerms: boolean;
 }
 
@@ -74,12 +74,10 @@ export interface Registration
     lastName: string;
     email?: string;
     password: string;
-    confirmPassword: string;
     companyName?: string;
     jobTitle: string;
     username: string;
     role: RoleType;
-    agreeToTerms: false;
 }
 
 enum RoleType {
@@ -134,17 +132,34 @@ const LoginForm: React.FC = () => {
     const [view, setView] = useState<ViewType>('login');
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-        setFormData(prevData => ({
-            ...prevData,
-            [name]:value
-        }));
-
-        if(errors[name as keyof FormErrors])
-        {
-            setErrors(prevErrors => ({...prevErrors, [name]: undefined}))
+        const { name, value } = e.target;
+        if (name === 'role') {
+            console.log('Role selected:', value);
+            setFormData(prevData => ({
+                ...prevData,
+                [name]: value as RoleType  // Ensure it's cast to RoleType
+            }));
+        } else {
+            setFormData(prevData => ({
+                ...prevData,
+                [name]: value
+            }));
         }
     };
+
+    // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const {name, value} = e.target;
+    //     setFormData(prevData => ({
+    //         ...prevData,
+    //         [name]:value
+    //     }));
+    //     console.log(`Updated ${name}:`, value);
+    //
+    //     if(errors[name as keyof FormErrors])
+    //     {
+    //         setErrors(prevErrors => ({...prevErrors, [name]: undefined}))
+    //     }
+    // };
 
     // Validation
     const validateForm = (): boolean => {
@@ -162,10 +177,15 @@ const LoginForm: React.FC = () => {
     };
 
     const createRegistrationRequest = (formData: FormData) : Registration => {
+        console.log('Creating registration request with role:', formData.role);
+        console.log('Available roles:', roleItems.map(item => item.role));
         const roleModel = roleItems.find(item => item.item.roleName === formData.role);
-        if(!roleModel){
-            throw new Error(`Invalid Role: ${formData.role}`);
-        }
+        console.log('Role Model: ', roleModel);
+        // if(!roleModel){
+        //     console.error('Role not found. FormData role:', formData.role);
+        //     console.error('RoleItems:', JSON.stringify(roleItems, null, 2));
+        //     throw new Error(`Invalid Role: ${formData.role}`);
+        // }
 
         return {
             firstName: formData.firstName,
@@ -173,11 +193,9 @@ const LoginForm: React.FC = () => {
             email: formData.email,
             username: formData.username,
             password: formData.password,
-            confirmPassword: formData.confirmPassword,
             companyName: formData.companyName,
             jobTitle: formData.jobTitle,
-            role: roleModel.role,
-            agreeToTerms: false
+            role: formData.role as RoleType
         }
     };
 
@@ -208,20 +226,13 @@ const LoginForm: React.FC = () => {
                     setForgotPasswordSuccess(true);
                 } else if (view === 'register') {
                     console.log('Registering user');
-                    const registrationData: Registration = {
-                        firstName: formData.firstName,
-                        lastName: formData.lastName,
-                        email: formData.email,
-                        username: formData.username,
-                        password: formData.password,
-                        confirmPassword: formData.confirmPassword,
-                        companyName: formData.companyName,
-                        jobTitle: formData.jobTitle,
-                        role: formData.role,
-                        agreeToTerms: false
-                    };
+                    if(!formData.role){
+                        throw new Error("Role is required for registration.");
+                    }
 
-                    const response = await registerUser(registrationData);
+                    let request = createRegistrationRequest(formData);
+                    console.log('Registration Request: ', request);
+                    const response = await registerUser(request);
                     await new Promise(resolve => setTimeout(resolve, 8000));
 
                     console.log('Registration successful:', response);
@@ -548,9 +559,17 @@ const LoginForm: React.FC = () => {
                     error={!!errors.role}
                     helperText={errors.role}
                 >
-                    <MenuItem value="admin">Administrator</MenuItem>
-                    <MenuItem value="manager">Inventory Manager</MenuItem>
-                    <MenuItem value="user">Regular User</MenuItem>
+                    <MenuItem value="" disabled>Select a role</MenuItem>
+                    {roleItems.map((roleItem) => (
+                        <MenuItem key={roleItem.role} value={roleItem.role}>
+                            {roleItem.item.roleName}
+                        </MenuItem>
+                    ))}
+                    {/*{roleItems.map((roleModel) => (*/}
+                    {/*    <MenuItem key={roleModel.role} value={roleModel.role}>*/}
+                    {/*        {roleModel.item.roleName}*/}
+                    {/*    </MenuItem>*/}
+                    {/*))}*/}
                 </TextField>
             </Grid>
             <Grid item xs={12}>

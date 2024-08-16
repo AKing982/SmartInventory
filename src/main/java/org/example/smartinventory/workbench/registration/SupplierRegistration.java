@@ -9,7 +9,9 @@ import org.example.smartinventory.model.Permission;
 import org.example.smartinventory.model.Registration;
 import org.example.smartinventory.repository.UserRepository;
 import org.example.smartinventory.service.PermissionsService;
+import org.example.smartinventory.service.RoleService;
 import org.example.smartinventory.service.SupplierService;
+import org.example.smartinventory.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +23,16 @@ import java.util.Set;
 public class SupplierRegistration extends AbstractRegistrationBase<SupplierEntity> implements RegistrationStrategy<SupplierEntity>
 {
     private SupplierService supplierService;
+    private UserRepository userRepository;
 
     @Autowired
-    public SupplierRegistration(SupplierService supplierService)
+    public SupplierRegistration(SupplierService supplierService,
+                                UserRepository userRepository,
+                                RoleService roleService)
     {
+        super(roleService);
         this.supplierService = supplierService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -50,10 +57,14 @@ public class SupplierRegistration extends AbstractRegistrationBase<SupplierEntit
 
     @Override
     public void setRoleConfigurationForEntity(Set<Permission> permissions, SupplierEntity supplier){
-        RoleEntity createSupplierRole = createRoleEntity(getRole(), permissions);
-        Set<RoleEntity> roles = Set.of(createSupplierRole);
+        RoleEntity supplierRole = roleService.findByName(getRole())
+                .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+
         UserEntity user = supplier.getUser();
-        user.setRoles(roles);
+        roleService.addRoleToUser(user.getId(), supplierRole.getId());
+
+        userRepository.save(user);
+        supplier.setUser(user);
     }
 
     private void saveSupplier(SupplierEntity supplier){

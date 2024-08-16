@@ -118,12 +118,11 @@ class RegistrationServiceTest {
 
         assertEquals(expectedEmployee.getRole(), actualEmployee.getRole());
         assertEquals(expectedEmployee.getId(), actualEmployee.getId());
-        assertEquals(expectedEmployee.getEmail(), actualEmployee.getEmail());
-        assertEquals(expectedEmployee.getEmpFirstName(), actualEmployee.getEmpFirstName());
-        assertEquals(expectedEmployee.getEmpLastName(), actualEmployee.getEmpLastName());
+        assertEquals(expectedEmployee.getUser().getEmail(), actualEmployee.getUser().getEmail());
+        assertEquals(expectedEmployee.getUser().getFirstName(), actualEmployee.getUser().getFirstName());
+        assertEquals(expectedEmployee.getUser().getLastName(), actualEmployee.getUser().getLastName());
         assertEquals(expectedEmployee.getJobTitle(), actualEmployee.getJobTitle());
         assertEquals(expectedEmployee.getUser().getId(), actualEmployee.getUser().getId());
-        assertEquals(expectedEmployee.is_active(), actualEmployee.is_active());
 
         verify(registrationFactory).getStrategy(role);
         verify(strategy).register(eq(registrationDTO), any(PermissionsService.class));
@@ -162,11 +161,6 @@ class RegistrationServiceTest {
     private EmployeeEntity createEmployeeEntity(){
         EmployeeEntity employeeEntity = new EmployeeEntity();
         employeeEntity.setId(1L);
-        employeeEntity.setEmail("test@test.com");
-        employeeEntity.set_active(true);
-        employeeEntity.setPhoneNumber("1234567890");
-        employeeEntity.setEmpFirstName("empFirst");
-        employeeEntity.setEmpLastName("empLast");
         employeeEntity.setJobTitle("testJob");
         employeeEntity.setUser(createUserEntity());
         employeeEntity.setRole(EmployeeRole.INVENTORY_MANAGER);

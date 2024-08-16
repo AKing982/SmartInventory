@@ -19,13 +19,13 @@ import java.util.Optional;
 @Repository
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Integer>
 {
-    @Query("SELECT e FROM EmployeeEntity e WHERE e.empFirstName = :firstName AND e.empLastName = :lastName")
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.user.firstName = :firstName AND e.user.lastName = :lastName")
     List<EmployeeEntity> findByFullName(@Param("firstName") String firstName, @Param("lastName") String lastName);
 
-    @Query("SELECT e FROM EmployeeEntity e WHERE e.email =:email")
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.user.email =:email")
     Optional<EmployeeEntity> findByEmail(@Param("email") String email);
 
-    @Query("SELECT e FROM EmployeeEntity e WHERE e.username =:username")
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.user.username =:username")
     Optional<EmployeeEntity> findByUsername(@Param("username") String username);
 
     @Query("SELECT e FROM EmployeeEntity e WHERE e.department.departmentId =:departmentId")
@@ -40,13 +40,13 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
     @Query("SELECT e FROM EmployeeEntity e WHERE e.role =:role")
     List<EmployeeEntity> findByRole(@Param("role") EmployeeRole role);
 
-    @Query("SELECT e FROM EmployeeEntity e WHERE e.is_active =:isActive")
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.user.is_active =:isActive")
     List<EmployeeEntity> findByActiveStatus(@Param("isActive") boolean isActive);
 
     @Query("SELECT e FROM EmployeeEntity e WHERE e.hireDate >=:startDate AND e.hireDate <=:endDate")
     List<EmployeeEntity> findByHireDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT e FROM EmployeeEntity e WHERE e.manager.id =:managerId")
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.manager.managerId=:managerId")
     List<EmployeeEntity> findByManagerId(@Param("managerId") int managerId);
 
     @Query("SELECT e FROM EmployeeEntity e WHERE e.salary >:minSalary")
@@ -59,9 +59,9 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
     long countEmployeesByDepartment(@Param("departmentId") int departmentId);
 
     @Query("SELECT e FROM EmployeeEntity e WHERE " +
-            "LOWER(e.empFirstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(e.empLastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(e.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(e.user.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(e.user.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(e.user.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(e.jobTitle) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<EmployeeEntity> searchEmployees(@Param("keyword") String keyword);
 
@@ -69,7 +69,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
     Optional<ManagerEntity> findWarehouseManagerById(@Param("id") int id);
 
     @Modifying
-    @Query("UPDATE EmployeeEntity e SET e.is_active =:isActive WHERE e.id =:employeeId")
+    @Query("UPDATE EmployeeEntity e SET e.user.is_active =:isActive WHERE e.id =:employeeId")
     int updateEmployeeActiveStatus(@Param("employeeId") int employeeId, @Param("isActive") boolean isActive);
 
     @Modifying
@@ -92,11 +92,8 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
     @Query("SELECT COUNT(e) FROM EmployeeEntity e WHERE FUNCTION('YEAR', e.hireDate) = :year")
     long countEmployeesHiredInYear(@Param("year") int year);
 
-    @Query(value = "SELECT * FROM employees e WHERE e.department_id = :departmentId ORDER BY e.salary DESC LIMIT :limit", nativeQuery = true)
-    List<EmployeeEntity> findTopEarnersByDepartment(@Param("departmentId") int departmentId, @Param("limit") int limit);
-
     @Modifying
-    @Query("DELETE FROM EmployeeEntity e WHERE e.is_active = false AND e.updatedAt < :date")
+    @Query("DELETE FROM EmployeeEntity e WHERE e.user.is_active = false AND e.updatedAt < :date")
     int deleteInactiveEmployeesBeforeDate(@Param("date") LocalDateTime date);
 }
 

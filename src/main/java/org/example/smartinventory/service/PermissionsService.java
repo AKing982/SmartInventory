@@ -14,11 +14,14 @@ public class PermissionsService
 {
     private Map<String, Set<Permission>> permissions = new HashMap<>();
     private final PermissionFactory permissionFactory;
+    private RoleService roleService;
 
     @Autowired
-    public PermissionsService(PermissionFactory permissionFactory)
+    public PermissionsService(PermissionFactory permissionFactory,
+                              RoleService roleService)
     {
         this.permissionFactory = permissionFactory;
+        this.roleService = roleService;
         initializeRolePermissions();
     }
 
@@ -30,9 +33,11 @@ public class PermissionsService
 
     public Set<Permission> getPermissionsForUser(UserEntity user){
         Set<Permission> userPermissions = new HashSet<>();
-        for(RoleEntity role : user.getRoles())
+
+        Set<String> userRoles = roleService.getUserRoles(user.getId());
+        for(String role : userRoles)
         {
-            userPermissions.addAll(permissions.getOrDefault(role.getRole(), new HashSet<>()));
+            userPermissions.addAll(permissions.getOrDefault(role, new HashSet<>()));
         }
         return userPermissions;
     }

@@ -4,6 +4,8 @@ import org.example.smartinventory.dto.RegistrationDTO;
 import org.example.smartinventory.entities.*;
 import org.example.smartinventory.model.Registration;
 import org.example.smartinventory.workbench.registration.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ public class RegistrationService
     private RegistrationFactory registrationFactory;
     private PermissionsService permissionsService;
     private UserService userService;
+    private Logger LOGGER = LoggerFactory.getLogger(RegistrationService.class);
 
     @Autowired
     public RegistrationService(RegistrationFactory registrationFactory,
@@ -50,8 +53,9 @@ public class RegistrationService
 
     public <T> Optional<T> register(String role, Registration registration)
     {
-        validateRoleIsEmpty(role);
+//        validateRoleIsEmpty(role);
         validateRegistration(registration);
+        LOGGER.info("Role: {}", role);
         if(!role.contains("ROLE_")){
             throw new IllegalArgumentException("Registration has no valid role: " + registration);
         }

@@ -7,6 +7,7 @@ import org.example.smartinventory.model.*;
 import org.example.smartinventory.repository.UserRepository;
 import org.example.smartinventory.service.EmployeeService;
 import org.example.smartinventory.service.PermissionsService;
+import org.example.smartinventory.service.RoleService;
 import org.example.smartinventory.workbench.security.permissions.PermissionUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -99,15 +100,17 @@ class EmployeeRegistrationTest {
         PermissionsService permissionsService = mock(PermissionsService.class);
 
         EmployeeEntity employeeEntity = createEmployee();
-        Set<RoleEntity> roles = employeeEntity.getUser().getRoles();
-        Set<Permission> expectedPermissions = PermissionUtil.extractPermissionFromRoles(roles);
+        UserEntity userEntity = createUser();
+        employeeEntity.setUser(userEntity);
 
-        when(permissionsService.getPermissionsForUser(createUser())).thenReturn(expectedPermissions);
+        Set<Permission> permissions = createPermissionSet();
+
+        when(permissionsService.getPermissionsForUser(createUser())).thenReturn(permissions);
 
         Set<Permission> actualPermissions = employeeRegistration.getPermissions(employeeEntity, permissionsService);
-        assertEquals(expectedPermissions, actualPermissions);
+        assertEquals(permissions, actualPermissions);
         assertNotNull(actualPermissions);
-        assertEquals(expectedPermissions.size(), actualPermissions.size());
+        assertEquals(permissions.size(), actualPermissions.size());
     }
 
     @Test
@@ -120,7 +123,11 @@ class EmployeeRegistrationTest {
 
     @Test
     void testRegister_whenRegistrationAndPermissionsValid(){
+        // Mock services
         PermissionsService mockPermissionsService = mock(PermissionsService.class);
+        RoleService mockRoleService = mock(RoleService.class);
+
+        // Create mock registration
         Registration mockRegistration = Registration.builder()
                 .firstName("first")
                 .lastName("last")
@@ -133,22 +140,41 @@ class EmployeeRegistrationTest {
                 .company("testCompany")
                 .build();
 
+        // Create mock user
         UserEntity mockUser = createUser();
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
 
+        // Mock employee service behavior
         doNothing().when(employeeService).save(any(EmployeeEntity.class));
 
+        // Mock role service behavior
+        RoleEntity mockRole = new RoleEntity();
+        mockRole.setId(1);
+        mockRole.setRole("ROLE_EMPLOYEE");
+        when(mockRoleService.findByName("ROLE_EMPLOYEE")).thenReturn(Optional.of(mockRole));
+        doNothing().when(mockRoleService).addRoleToUser(anyLong(), anyInt());
+
+        // Mock permissions service behavior
         Set<Permission> expectedPermissions = createPermissionSet();
+        when(mockPermissionsService.getPermissionsForUser(any(UserEntity.class))).thenReturn(expectedPermissions);
+
+        // Perform the registration
         Optional<EmployeeEntity> actualEmployee = employeeRegistration.register(mockRegistration, mockPermissionsService);
-        Set<RoleEntity> roles = actualEmployee.get().getUser().getRoles();
-        Set<Permission> actualPermissions = PermissionUtil.extractPermissionFromRoles(roles);
+
+        // Assertions
         assertTrue(actualEmployee.isPresent());
         assertEquals("ROLE_EMPLOYEE", actualEmployee.get().getRole().name());
-        assertEquals("test@test.com", actualEmployee.get().getEmail());
-        assertEquals("first", actualEmployee.get().getEmpFirstName());
-        assertEquals("last", actualEmployee.get().getEmpLastName());
-        assertTrue(actualPermissions.containsAll(expectedPermissions));
+        assertEquals("test@test.com", actualEmployee.get().getUser().getEmail());
+        assertEquals("first", actualEmployee.get().getUser().getFirstName());
+        assertEquals("last", actualEmployee.get().getUser().getLastName());
 
+        // Verify that the role was added to the user
+        verify(mockRoleService).addRoleToUser(mockUser.getId(), mockRole.getId());
+
+        // Verify that the permissions service was called to get permissions
+        verify(mockPermissionsService).getPermissionsForUser(mockUser);
+
+        // Verify repository and service calls
         verify(userRepository).findByEmail("test@test.com");
         verify(employeeService).save(any(EmployeeEntity.class));
     }
@@ -202,20 +228,13 @@ class EmployeeRegistrationTest {
         user.setUsername("testUser");
         user.setEmail("test@test.com");
         user.setPassword("password");
-        RoleEntity roleEntity = createRoleEntity("ROLE_EMPLOYEE", createPermissionSet());
-        Set<RoleEntity> roles = new HashSet<>();
-        roles.add(roleEntity);
-        user.setRoles(roles);
         return user;
     }
 
     private EmployeeEntity createEmployeeWithNullUser(){
         EmployeeEntity employeeEntity = new EmployeeEntity();
         employeeEntity.setUser(null);
-        employeeEntity.set_active(true);
-        employeeEntity.setEmpLastName("empLast");
         employeeEntity.setRole(EmployeeRole.INVENTORY_MANAGER);
-        employeeEntity.setEmpFirstName("empFirst");
         employeeEntity.setId(1L);
         return employeeEntity;
     }
@@ -223,9 +242,6 @@ class EmployeeRegistrationTest {
     private EmployeeEntity createEmployee(){
         EmployeeEntity employeeEntity = new EmployeeEntity();
         employeeEntity.setUser(createUser());
-        employeeEntity.set_active(true);
-        employeeEntity.setEmpLastName("empLast");
-        employeeEntity.setEmpFirstName("empFirst");
         employeeEntity.setRole(EmployeeRole.ROLE_EMPLOYEE);
         employeeEntity.setId(1L);
         return employeeEntity;

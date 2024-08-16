@@ -4,6 +4,8 @@ import org.example.smartinventory.dto.RegistrationDTO;
 import org.example.smartinventory.model.Registration;
 import org.example.smartinventory.service.RegistrationService;
 import org.example.smartinventory.workbench.converter.RegistrationConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ public class RegistrationController
 {
     private RegistrationService registrationService;
     private RegistrationConverter registrationConverter;
+    private Logger LOGGER = LoggerFactory.getLogger(RegistrationController.class);
 
     @Autowired
     public RegistrationController(RegistrationService registrationService)
@@ -26,14 +29,22 @@ public class RegistrationController
     @PostMapping("/")
     public ResponseEntity<?> registerNewUser(@RequestBody RegistrationDTO registration)
     {
+        LOGGER.info("Received request to register a new user: " + registration);
+        LOGGER.info("Role: {}", registration.role());
+        LOGGER.info("Role as String: {}", registration.role().name());
         try
         {
+            if(registration.role() == null){
+                LOGGER.error("Role is null in registration request");
+                throw new Exception("Role is null in registration request");
+            }
             Registration registration1 = registrationConverter.convert(registration);
             String userRole = registration1.getRole();
             registrationService.register(userRole, registration1);
             return ResponseEntity.ok().build();
 
         }catch(Exception e) {
+            LOGGER.error("Unexpected error during registration: ", e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

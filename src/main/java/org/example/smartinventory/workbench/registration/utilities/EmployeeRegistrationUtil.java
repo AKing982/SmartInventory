@@ -27,13 +27,7 @@ public class EmployeeRegistrationUtil
     public static EmployeeEntity createEmployeeEntity(Employee employee, UserEntity user) {
         EmployeeEntity employeeEntity = new EmployeeEntity();
         employeeEntity.setUser(user);
-        employeeEntity.setPhoneNumber(employee.getEmpPhone());
-        employeeEntity.setEmail(employee.getEmpEmail());
         employeeEntity.setRole(getEmployeeRoleFromValue(employee.getEmployeeRole()));
-        employeeEntity.setEmpFirstName(employee.getEmpFirstName());
-        employeeEntity.setEmpLastName(employee.getEmpLastName());
-        employeeEntity.setPhoneNumber(employee.getEmpPhone());
-        employeeEntity.set_active(true);
         employeeEntity.setDepartment(null);
         employeeEntity.setJobTitle(employee.getTitle());
         employeeEntity.setCreatedAt(LocalDateTime.now());

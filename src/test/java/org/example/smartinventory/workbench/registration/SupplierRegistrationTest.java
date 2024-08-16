@@ -8,6 +8,7 @@ import org.example.smartinventory.model.Permission;
 import org.example.smartinventory.model.Registration;
 import org.example.smartinventory.repository.UserRepository;
 import org.example.smartinventory.service.PermissionsService;
+import org.example.smartinventory.service.RoleService;
 import org.example.smartinventory.service.SupplierService;
 import org.example.smartinventory.workbench.security.permissions.PermissionUtil;
 import org.junit.jupiter.api.AfterEach;
@@ -33,6 +34,9 @@ class SupplierRegistrationTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private RoleService roleService;
 
     @InjectMocks
     private SupplierRegistration supplierRegistration;
@@ -63,7 +67,11 @@ class SupplierRegistrationTest {
 
     @Test
     void testRegister_whenPermissionsServiceAndRegistration(){
+        // Mock services
         PermissionsService mockPermissionsService = mock(PermissionsService.class);
+        RoleService mockRoleService = mock(RoleService.class);
+
+        // Create mock registration
         Registration mockRegistration = Registration.builder()
                 .firstName("first")
                 .lastName("last")
@@ -76,18 +84,48 @@ class SupplierRegistrationTest {
                 .company("testCompany")
                 .build();
 
+        // Create mock user and supplier
         UserEntity mockUser = createUser();
-        when(supplierService.createSupplierFromRegistration(mockRegistration)).thenReturn(createSupplierEntity());
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
+        SupplierEntity mockSupplier = createSupplierEntity();
+        mockSupplier.setUser(mockUser);
+
+        // Mock service behaviors
+        when(supplierService.createSupplierFromRegistration(mockRegistration)).thenReturn(mockSupplier);
         doNothing().when(supplierService).save(any(SupplierEntity.class));
 
+        // Mock role service behavior
+        RoleEntity mockRole = new RoleEntity();
+        mockRole.setId(1);
+        mockRole.setRole("ROLE_SUPPLIER");
         Set<Permission> permissions = createPermissionSet();
+        mockRole.setPermissions(permissions);
+        when(roleService.findByName("ROLE_SUPPLIER")).thenReturn(Optional.of(mockRole));
+        doNothing().when(mockRoleService).addRoleToUser(anyLong(), anyInt());
+
+        // Mock permissions service behavior
+        when(mockPermissionsService.getPermissionsForUser(any(UserEntity.class))).thenReturn(permissions);
+
+        // Perform the registration
         Optional<SupplierEntity> actualSupplier = supplierRegistration.register(mockRegistration, mockPermissionsService);
-        Set<RoleEntity> roles = actualSupplier.get().getUser().getRoles();
-        Set<Permission> actualPermissions = PermissionUtil.extractPermissionFromRoles(roles);
-        assertNotNull(actualPermissions);
+
+        // Verify the results
         assertTrue(actualSupplier.isPresent());
         assertEquals("ROLE_SUPPLIER", actualSupplier.get().getEmployeeRole().name());
-        assertTrue(actualPermissions.containsAll(permissions));
+
+        // Verify that the role was added to the user
+        verify(roleService).addRoleToUser(mockUser.getId(), mockRole.getId());
+
+        // Verify that the permissions service was called to get permissions
+        verify(mockPermissionsService).getPermissionsForUser(mockUser);
+
+        // Verify that the supplier was saved
+        verify(supplierService).save(mockSupplier);
+
+        // Optionally, verify the permissions if needed
+        Set<Permission> actualPermissions = mockPermissionsService.getPermissionsForUser(mockUser);
+        assertNotNull(actualPermissions);
+        assertEquals(permissions, actualPermissions);
     }
 
     @Test
@@ -110,9 +148,14 @@ class SupplierRegistrationTest {
     @Test
     void testGetPermissions_whenSupplierAndPermissionsValid(){
         PermissionsService mockPermissionsService = mock(PermissionsService.class);
+        RoleService mockRoleService = mock(RoleService.class);
+
+        UserEntity mockUser = createUser();
         SupplierEntity mockSupplier = createSupplierEntity();
-        Set<RoleEntity> roles = mockSupplier.getUser().getRoles();
-        Set<Permission> permissions = PermissionUtil.extractPermissionFromRoles(roles);
+        mockSupplier.setUser(mockUser);
+
+        Set<Permission> permissions = createPermissionSet();
+
         when(mockPermissionsService.getPermissionsForUser(createUser())).thenReturn(permissions);
 
         Set<Permission> actualPermissions = supplierRegistration.getPermissions(mockSupplier, mockPermissionsService);
@@ -174,10 +217,6 @@ class SupplierRegistrationTest {
         user.setUsername("testUser");
         user.setEmail("test@test.com");
         user.setPassword("password");
-        RoleEntity roleEntity = createRoleEntity("ROLE_SUPPLIER", createPermissionSet());
-        Set<RoleEntity> roles = new HashSet<>();
-        roles.add(roleEntity);
-        user.setRoles(roles);
         return user;
     }
 

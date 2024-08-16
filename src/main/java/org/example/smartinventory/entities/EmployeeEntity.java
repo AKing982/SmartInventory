@@ -21,20 +21,8 @@ public class EmployeeEntity {
     private Long id;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="user_id", unique = true)
+    @JoinColumn(name="userid", unique = true)
     private UserEntity user;
-
-    @Column(name="empFirstName")
-    private String empFirstName;
-
-    @Column(name="empLastName")
-    private String empLastName;
-
-    @Column(name="email")
-    private String email;
-
-    @Column(name="phoneNumber")
-    private String phoneNumber;
 
     @Column(name="hireDate", nullable = false)
     private LocalDate hireDate;
@@ -43,27 +31,22 @@ public class EmployeeEntity {
     private String jobTitle;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="departmentId")
+    @JoinColumn(name="departmentid")
     private DepartmentEntity department;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="managerId")
+    @JoinColumn(name="managerid")
     private ManagerEntity manager;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="warehouseId")
     private WarehouseEntity warehouse;
 
-    @Column(name="role")
+    @Column(name="emprole")
     private EmployeeRole role;
 
     @Column(name="salary")
     private String salary;
-
-    @Column(name="is_active")
-    private boolean is_active = true;
-
-    private LocalDateTime lastLogin;
 
     @Column(nullable=false, updatable = false)
     private LocalDateTime createdAt;

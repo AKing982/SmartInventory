@@ -8,6 +8,8 @@ import org.example.smartinventory.model.Registration;
 import org.example.smartinventory.service.PermissionsService;
 import org.example.smartinventory.service.RoleService;
 import org.example.smartinventory.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,11 +21,14 @@ import java.util.Set;
 public class RegularUserRegistration extends AbstractRegistrationBase<UserEntity> implements RegistrationStrategy<UserEntity>
 {
     private UserService userService;
+    private Logger LOGGER = LoggerFactory.getLogger(RegularUserRegistration.class);
 
     @Autowired
-    public RegularUserRegistration(UserService userService)
+    public RegularUserRegistration(UserService userService, RoleService roleService)
     {
+        super(roleService);
         this.userService = userService;
+        LOGGER.debug("RoleService: {}", roleService);
     }
 
     @Override
@@ -60,8 +65,15 @@ public class RegularUserRegistration extends AbstractRegistrationBase<UserEntity
 
     @Override
     protected void setRoleConfigurationForEntity(Set<Permission> permissions, UserEntity entity) {
-        RoleEntity role = createRoleEntity(getRole(), permissions);
-        Set<RoleEntity> roles = Set.of(role);
-        entity.setRoles(roles);
+        RoleEntity role = roleService.findByName(getRole())
+                .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+
+        roleService.addRoleToUser(entity.getId(), role.getId());
+
+        Set<Permission> rolePermissions = new HashSet<>(role.getPermissions());
+        if(!rolePermissions.equals(permissions)){
+           LOGGER.warn("Provided permissions for role {} do not match existing permissions." +
+                   "No changes were made to the role.", getRole());
+        }
     }
 }
