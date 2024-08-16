@@ -43,9 +43,9 @@ public class UserEntity
     @ElementCollection(fetch = FetchType.EAGER)
     @JoinTable(
             name="user_roles",
-            joinColumns = @JoinColumn(name="userid"),
-            inverseJoinColumns = @JoinColumn(name="role_Id")
+            joinColumns = @JoinColumn(name="userid")
     )
+    @Column(name="roleid")
     private Set<Integer> roles = new HashSet<>();
 
 

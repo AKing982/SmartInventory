@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.example.smartinventory.model.EmployeeRole;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -46,7 +47,7 @@ public class EmployeeEntity {
     private EmployeeRole role;
 
     @Column(name="salary")
-    private String salary;
+    private BigDecimal salary;
 
     @Column(nullable=false, updatable = false)
     private LocalDateTime createdAt;

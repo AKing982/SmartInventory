@@ -18,14 +18,14 @@ public class RoleEntity
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="role_id")
+    @Column(name="roleid")
     private int id;
 
     @Column(name="role", unique = true)
     private String role;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name="role_permissions", joinColumns = @JoinColumn(name = "role_id"))
+    @CollectionTable(name="role_permissions", joinColumns = @JoinColumn(name = "roleid"))
     @Column(name="permission")
     @Enumerated(EnumType.STRING)
     private Set<Permission> permissions = new HashSet<>();

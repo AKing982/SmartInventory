@@ -28,10 +28,10 @@ public class DepartmentEntity
     @Column(name="manager_id")
     private int managerId;
 
-    @Column(name="created_at", nullable = false)
+    @Column(name="createdat", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name="updated_at")
+    @Column(name="updatedat")
     private LocalDateTime updatedAt;
 
     @Column(nullable = false, name="is_active")
@@ -40,7 +40,7 @@ public class DepartmentEntity
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<EmployeeEntity> employees;
 
-    @Column(name="address")
+    @Column(name="deptAddress")
     private String address;
 
     public DepartmentEntity(int departmentId, String departmentName, String departmentDescription, int managerId, LocalDateTime createdAt, LocalDateTime updatedAt, boolean isActive, List<EmployeeEntity> employees, String address) {

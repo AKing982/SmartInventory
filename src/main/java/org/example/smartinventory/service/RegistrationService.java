@@ -59,13 +59,8 @@ public class RegistrationService
         if(!role.contains("ROLE_")){
             throw new IllegalArgumentException("Registration has no valid role: " + registration);
         }
-
-        UserEntity user = createDefaultUserFromRegistration(registration);
-        if(user != null){
-            RegistrationStrategy<T> registrationStrategy = registrationFactory.getStrategy(role);
-            return registrationStrategy.register(registration, permissionsService);
-        }
-        return Optional.empty();
+        RegistrationStrategy<T> registrationStrategy = registrationFactory.getStrategy(role);
+        return registrationStrategy.register(registration, permissionsService);
     }
 
     public void validateRegistration(Registration registration){

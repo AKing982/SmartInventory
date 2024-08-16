@@ -6,21 +6,16 @@ import org.example.smartinventory.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class PermissionCacheService
 {
-    private final Map<String, Set<Permission>> rolePermissions = new ConcurrentHashMap<>();
-    private final RoleService roleService;
+    private final Map<String, Set<Permission>> rolePermissions;
 
-    @Autowired
-    public PermissionCacheService(RoleService roleService){
-        this.roleService = roleService;
+    public PermissionCacheService(){
+        this.rolePermissions = new ConcurrentHashMap<>();
     }
 
     @PostConstruct

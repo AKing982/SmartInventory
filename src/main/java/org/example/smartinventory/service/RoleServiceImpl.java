@@ -15,10 +15,10 @@ public class RoleServiceImpl implements RoleService
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public RoleServiceImpl(RoleRepository roleRepository)
+    public RoleServiceImpl(RoleRepository roleRepository, JdbcTemplate jdbcTemplate)
     {
         this.roleRepository = roleRepository;
-        this.jdbcTemplate = new JdbcTemplate();
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -48,20 +48,20 @@ public class RoleServiceImpl implements RoleService
 
     @Override
     public Set<String> getUserRoles(Long userId){
-        String sql = "SELECT r.role FROM RoleEntity r JOIN user_roles ur ON r.role_id = ur.role_id WHERE ur.user_id = ?";
+        String sql = "SELECT r.role FROM roles r JOIN user_roles ur ON r.roleid = ur.roleid WHERE ur.userid = ?";
         return new HashSet<>(jdbcTemplate.queryForList(sql, String.class, userId));
     }
 
     @Override
     public Set<String> getUserRolePermissions(Long userId){
         String sql = "SELECT DISTINCT rp.permission FROM role_permissions rp " +
-                     "JOIN user_roles ur ON rp.role_id = ur.role_id WHERE ur.user_id = ?";
+                "JOIN user_roles ur ON rp.role_id = ur.roleid WHERE ur.userid = ?";
         return new HashSet<>(jdbcTemplate.queryForList(sql, String.class, userId));
     }
 
     @Override
     public void addRoleToUser(Long userId, Integer roleId){
-        String sql = "INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)";
+        String sql = "INSERT INTO user_roles (userid, roleid) VALUES (?, ?)";
         jdbcTemplate.update(sql, userId, roleId);
     }
 

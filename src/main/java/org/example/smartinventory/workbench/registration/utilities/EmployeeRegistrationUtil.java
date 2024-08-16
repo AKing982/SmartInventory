@@ -7,6 +7,7 @@ import org.example.smartinventory.model.Employee;
 import org.example.smartinventory.model.EmployeeRole;
 import org.example.smartinventory.model.Registration;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class EmployeeRegistrationUtil
@@ -27,6 +28,7 @@ public class EmployeeRegistrationUtil
     public static EmployeeEntity createEmployeeEntity(Employee employee, UserEntity user) {
         EmployeeEntity employeeEntity = new EmployeeEntity();
         employeeEntity.setUser(user);
+        employeeEntity.setSalary(BigDecimal.ZERO);
         employeeEntity.setRole(getEmployeeRoleFromValue(employee.getEmployeeRole()));
         employeeEntity.setDepartment(null);
         employeeEntity.setJobTitle(employee.getTitle());

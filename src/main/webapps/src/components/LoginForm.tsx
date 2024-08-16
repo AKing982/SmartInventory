@@ -97,6 +97,20 @@ interface RoleItem {
     roleName: string;
 }
 
+interface FormErrors {
+    usernameOrEmail?: string;
+    password?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    username?: string;
+    confirmPassword?: string;
+    companyName?: string;
+    jobTitle?: string;
+    role?: string;
+    agreeToTerms?: string;
+}
+
 const roleItems : RoleModel[] = [
     { role: RoleType.ROLE_SUPPLIER, item: { roleName: 'Inventory Supplier' } },
     { role: RoleType.ROLE_ADMIN, item: { roleName: 'Administrator' } },
@@ -119,7 +133,7 @@ const LoginForm: React.FC = () => {
         role: '',
         agreeToTerms: false,
     });
-    const [errors, setErrors] = useState<Partial<FormData>>({});
+    const [errors, setErrors] = useState<FormErrors>({});
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const navigate = useNavigate();
@@ -164,6 +178,18 @@ const LoginForm: React.FC = () => {
     // Validation
     const validateForm = (): boolean => {
         const newErrors: FormErrors = {};
+        if(view === 'register'){
+            if (!formData.firstName) newErrors.firstName = 'First name is required';
+            if (!formData.lastName) newErrors.lastName = 'Last name is required';
+            if (!formData.email) newErrors.email = 'Email is required';
+            if (!formData.username) newErrors.username = 'Username is required';
+            if (!formData.password) newErrors.password = 'Password is required';
+            if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+            if (!formData.companyName) newErrors.companyName = 'Company name is required';
+            if (!formData.jobTitle) newErrors.jobTitle = 'Job title is required';
+            if (!formData.role) newErrors.role = 'Role is required';
+            if (!formData.agreeToTerms) newErrors.agreeToTerms = 'You must agree to the terms and conditions';
+        }
         if (!formData.usernameOrEmail) {
             newErrors.usernameOrEmail = 'Email is required';
         }
@@ -206,6 +232,7 @@ const LoginForm: React.FC = () => {
         if (validateForm()) {
             setIsLoading(true);
             try {
+                console.log('View: ', view);
                 if (view === 'login') {
                     const loginData: LoginCredentials = {
                         usernameOrEmail: formData.usernameOrEmail,

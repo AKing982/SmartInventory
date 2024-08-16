@@ -1,7 +1,9 @@
 package org.example.smartinventory.service;
 
 import org.example.smartinventory.entities.UserEntity;
+import org.example.smartinventory.model.SecurityUser;
 import org.example.smartinventory.repository.UserRepository;
+import org.example.smartinventory.workbench.security.permissions.PermissionCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +25,16 @@ import java.util.regex.Pattern;
 public class UserDetailsLoginService implements UserDetailsService
 {
     private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PermissionCacheService permissionCacheService;
+    private final RoleService roleService;
     private Logger LOGGER = LoggerFactory.getLogger(UserDetailsLoginService.class);
 
     @Autowired
-    public UserDetailsLoginService(UserRepository userRepository)
+    public UserDetailsLoginService(UserRepository userRepository, PermissionCacheService permissionCacheService, RoleService roleService)
     {
         this.userRepository = userRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder();
+        this.permissionCacheService = permissionCacheService;
+        this.roleService = roleService;
     }
 
     @Override
@@ -57,8 +61,8 @@ public class UserDetailsLoginService implements UserDetailsService
         return getUserDetails(user);
     }
 
-    private User getUserDetails(UserEntity user)
+    private SecurityUser getUserDetails(UserEntity user)
     {
-        return new User(user.getUsername(), user.getPassword(), new ArrayList<>());
+        return new SecurityUser(user, permissionCacheService, roleService);
     }
 }
