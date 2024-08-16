@@ -53,4 +53,12 @@ public class UserEntity
     private EmployeeEntity employee;
 
 
+    public UserEntity(Long id, String firstName, String lastName, String email, String username, String password) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+    }
 }

@@ -91,7 +91,7 @@ class SupplierRegistrationTest {
         mockSupplier.setUser(mockUser);
 
         // Mock service behaviors
-        when(supplierService.createSupplierFromRegistration(mockRegistration)).thenReturn(mockSupplier);
+        when(supplierService.createSupplierFromRegistration(mockRegistration, mockUser)).thenReturn(mockSupplier);
         doNothing().when(supplierService).save(any(SupplierEntity.class));
 
         // Mock role service behavior

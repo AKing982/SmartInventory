@@ -17,7 +17,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -40,6 +42,9 @@ class RegistrationServiceTest {
 
     @Mock
     private RoleService roleService;
+
+    @Mock
+    private SupplierService supplierService;
 
     @InjectMocks
     private RegistrationService registrationService;
@@ -160,7 +165,7 @@ class RegistrationServiceTest {
         String role = "ROLE_SUPPLIER";
         Registration registration = new Registration("Mike", "Adams", "madams@outlook.com", "MAdams52", "Gamer25!", "ROLE_SUPPLIER", "Carpenter Utilities", "Supplier Specialist");
         UserEntity userEntity = createUser("Mike", "Adams", "madams@outlook.com", "Gamer25!");
-        SupplierEntity supplier = createSupplier("Carpenter Utilities", userEntity);
+        SupplierEntity supplier = createSupplier("Carpenter Utilities", null);
 
         RegistrationStrategy<SupplierEntity> strategy = mock(RegistrationStrategy.class);
         when(userService.getUserByEmail(anyString())).thenReturn(Optional.empty());
@@ -168,7 +173,14 @@ class RegistrationServiceTest {
         when(strategy.register(eq(registration), any(PermissionsService.class)))
                 .thenReturn(Optional.of(supplier));
 
+        when(supplierService.createSupplierFromRegistration(registration, userEntity))
+                .thenThrow(new NoSuchElementException());
 
+        assertThrows(NoSuchElementException.class, () -> {
+            registrationService.register(role, registration);
+        });
+
+        when(supplierService.createSupplierFromRegistration(registration, userEntity)).thenReturn(supplier);
 
         Optional<SupplierEntity> actualSupplierOptional = registrationService.register(role, registration);
         assertTrue(actualSupplierOptional.isPresent());
@@ -179,6 +191,26 @@ class RegistrationServiceTest {
         assertEquals(supplier.getUser().getFirstName(), actualSupplier.getUser().getFirstName());
         assertEquals(supplier.getUser().getLastName(), actualSupplier.getUser().getLastName());
         assertEquals(supplier.getUser().getEmail(), actualSupplier.getUser().getEmail());
+    }
+
+    @Test
+    void testRegister_whenRoleEqualsSupplier_throwNoSuchElementException() {
+        String role = "ROLE_SUPPLIER";
+        Registration registration = new Registration("Mike", "Adams", "madams@outlook.com", "MAdams52", "Gamer25!", "ROLE_SUPPLIER", "Carpenter Utilities", "Supplier Specialist");
+
+        RegistrationStrategy<SupplierEntity> strategy = mock(RegistrationStrategy.class);
+        when(userService.getUserByEmail(anyString())).thenReturn(Optional.empty());
+        when(registrationFactory.getStrategy(role)).thenReturn(strategy);
+
+        // Return an empty Optional to simulate the condition leading to NoSuchElementException
+        when(strategy.register(eq(registration), any(PermissionsService.class)))
+                .thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> {
+            registrationService.register(role, registration);
+        });
+
+        verify(strategy).register(eq(registration), any(PermissionsService.class));
     }
 
     private SupplierEntity createSupplier(String supplierName, UserEntity userEntity) {

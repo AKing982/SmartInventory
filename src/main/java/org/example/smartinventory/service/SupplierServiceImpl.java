@@ -55,15 +55,13 @@ public class SupplierServiceImpl implements SupplierService
     }
 
     @Override
-    public SupplierEntity createSupplierFromRegistration(Registration registration) {
+    public SupplierEntity createSupplierFromRegistration(Registration registration, UserEntity userEntity) {
         SupplierEntity supplierEntity = new SupplierEntity();
         try
         {
             supplierEntity.setSupplierName(registration.getCompany());
             supplierEntity.setEmployeeRole(EmployeeRole.ROLE_SUPPLIER);
 
-            UserEntity userEntity = userRepository.findByEmail(registration.getEmail())
-                    .orElseThrow();
             supplierEntity.setUser(userEntity);
 
         }catch(Exception e)

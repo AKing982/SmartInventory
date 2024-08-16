@@ -7,16 +7,39 @@ import {
     Box,
     Paper,
     Alert,
-    CircularProgress
+    CircularProgress, styled
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 import EmailIcon from '@mui/icons-material/Email';
+import { Link as MuiLink } from '@mui/material';
+import {useNavigate} from "react-router-dom";
+import backgroundImage from "../images/pexels-tiger-lily-4483610.jpg";
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Semi-transparent white
+    padding: theme.spacing(4),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backdropFilter: 'blur(10px)', // Add a blur effect
+}));
+
+const BackgroundContainer = styled('div')({
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    minHeight: '120vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+});
+
 
 const ForgotPasswordForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
@@ -27,6 +50,10 @@ const ForgotPasswordForm: React.FC = () => {
         const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return re.test(email);
     };
+
+    const handleBackToLogin = () => {
+        navigate('/');
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,6 +82,7 @@ const ForgotPasswordForm: React.FC = () => {
     };
 
     return (
+        <BackgroundContainer>
         <Container component="main" maxWidth="xs">
             <Paper elevation={6} sx={{ mt: 8, p: 4 }}>
                 <Box
@@ -102,17 +130,15 @@ const ForgotPasswordForm: React.FC = () => {
                             {isLoading ? <CircularProgress size={24} /> : 'Reset Password'}
                         </Button>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                            <RouterLink to="/" style={{ textDecoration: 'none' }}>
+                            <MuiLink component="button" variant="body2" onClick={handleBackToLogin}>
                                 Back to Login
-                            </RouterLink>
-                            <RouterLink to="/register" style={{ textDecoration: 'none' }}>
-                                Create an account
-                            </RouterLink>
+                            </MuiLink>
                         </Box>
                     </Box>
                 </Box>
             </Paper>
         </Container>
+        </BackgroundContainer>
     );
 };
 

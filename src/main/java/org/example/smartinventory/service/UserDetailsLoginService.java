@@ -63,6 +63,9 @@ public class UserDetailsLoginService implements UserDetailsService
 
     private SecurityUser getUserDetails(UserEntity user)
     {
-        return new SecurityUser(user, permissionCacheService, roleService);
+        SecurityUser securityUser = new SecurityUser(user, permissionCacheService, roleService);
+        LOGGER.info("Getting User info: {}", user);
+        LOGGER.info("SecurityUser: {}", securityUser);
+        return securityUser;
     }
 }

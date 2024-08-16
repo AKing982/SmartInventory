@@ -23,16 +23,16 @@ import java.util.Set;
 public class SupplierRegistration extends AbstractRegistrationBase<SupplierEntity> implements RegistrationStrategy<SupplierEntity>
 {
     private SupplierService supplierService;
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     public SupplierRegistration(SupplierService supplierService,
-                                UserRepository userRepository,
+                                UserService userService,
                                 RoleService roleService)
     {
-        super(roleService);
+        super(roleService, userService);
         this.supplierService = supplierService;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -47,7 +47,8 @@ public class SupplierRegistration extends AbstractRegistrationBase<SupplierEntit
             throw new IllegalArgumentException("registration and permissionsService can't be null");
         }
 
-        SupplierEntity supplier = createSupplier(registration);
+        UserEntity user = createDefaultUser(registration);
+        SupplierEntity supplier = createSupplier(registration, user);
         Set<Permission> permissions = getPermissions(supplier, permissionsService);
         addRoleToPermissions(permissions, getRole(), permissionsService);
         setRoleConfigurationForEntity(permissions, supplier);
@@ -63,7 +64,7 @@ public class SupplierRegistration extends AbstractRegistrationBase<SupplierEntit
         UserEntity user = supplier.getUser();
         roleService.addRoleToUser(user.getId(), supplierRole.getId());
 
-        userRepository.save(user);
+        userService.save(user);
         supplier.setUser(user);
     }
 
@@ -72,8 +73,8 @@ public class SupplierRegistration extends AbstractRegistrationBase<SupplierEntit
     }
 
 
-    private SupplierEntity createSupplier(Registration registration){
-        return supplierService.createSupplierFromRegistration(registration);
+    private SupplierEntity createSupplier(Registration registration, UserEntity user){
+        return supplierService.createSupplierFromRegistration(registration, user);
     }
 
     @Override

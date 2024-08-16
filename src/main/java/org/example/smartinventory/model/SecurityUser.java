@@ -29,7 +29,7 @@ public class SecurityUser implements UserDetails
         initializeRoleAndPermissions(user, roleService, permissionCacheService);
     }
 
-    void initializeRoleAndPermissions(UserEntity user, RoleService roleService, PermissionCacheService permissionCacheService){
+    public void initializeRoleAndPermissions(UserEntity user, RoleService roleService, PermissionCacheService permissionCacheService){
         Set<String> userRoles = roleService.getUserRoles(user.getId());
         for (String role : userRoles) {
             authorities.add(new SimpleGrantedAuthority(role));

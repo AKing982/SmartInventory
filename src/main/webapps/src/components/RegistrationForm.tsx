@@ -1,4 +1,4 @@
-import {FormControlLabel, Paper} from "@mui/material";
+import {Backdrop, CircularProgress, FormControlLabel, Link, Paper, styled} from "@mui/material";
 import { Container } from "@mui/material";
 import { Button } from "@mui/material";
 import { Checkbox } from "@mui/material";
@@ -7,8 +7,37 @@ import { Grid } from "@mui/material";
 import {Box, TextField} from "@mui/material";
 import {Typography} from "@mui/material";
 import {Link as RouterLink, useNavigate} from 'react-router-dom';
-import { useState } from "react";
+import React, { useState } from "react";
 import {registerUser, Registration} from '../api/RegistrationApiService';
+import {roleItems, RoleType} from '../items/Items';
+import backgroundImage from "../images/pexels-tiger-lily-4483610.jpg";
+
+
+interface FormErrors {
+    password?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    username?: string;
+    confirmPassword?: string;
+    companyName?: string;
+    jobTitle?: string;
+    role?: string;
+    agreeToTerms?: string;
+}
+
+interface FormData {
+    password: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    username: string;
+    confirmPassword: string;
+    companyName: string;
+    jobTitle: string;
+    role: RoleType | '';
+    agreeToTerms: boolean;
+}
 
 
 interface RegistrationFormData {
@@ -20,12 +49,48 @@ interface RegistrationFormData {
     confirmPassword: string;
     companyName: string;
     jobTitle: string;
-    role: string;
+    role: RoleType;
     agreeToTerms: boolean;
 }
 
+interface FormErrors {
+    usernameOrEmail?: string;
+    password?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    username?: string;
+    confirmPassword?: string;
+    companyName?: string;
+    jobTitle?: string;
+    role?: string;
+    agreeToTerms?: string;
+}
+
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Semi-transparent white
+    padding: theme.spacing(4),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backdropFilter: 'blur(10px)', // Add a blur effect
+}));
+
+const BackgroundContainer = styled('div')({
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    minHeight: '120vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+});
+
+
+
 const RegistrationForm: React.FC = () => {
-    const [formData, setFormData] = useState<RegistrationFormData>({
+    const [formData, setFormData] = useState<FormData>({
         firstName: '',
         lastName: '',
         email: '',
@@ -38,7 +103,8 @@ const RegistrationForm: React.FC = () => {
         agreeToTerms: false,
     });
 
-    const [errors, setErrors] = useState<Partial<RegistrationFormData>>({});
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, checked } = e.target;
@@ -53,7 +119,7 @@ const RegistrationForm: React.FC = () => {
     };
 
     const validateForm = (): boolean => {
-        const newErrors: Partial<RegistrationFormData> = {};
+        const newErrors: FormErrors = {};
         if (!formData.firstName) newErrors.firstName = 'First name is required';
         if (!formData.lastName) newErrors.lastName = 'Last name is required';
         if (!formData.email) newErrors.email = 'Email is required';
@@ -70,26 +136,52 @@ const RegistrationForm: React.FC = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+    const handleBackToLogin = () => {
+        navigate('/');
+    }
+
+    const createRegistrationRequest = (formData: FormData) : Registration => {
+        return {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            username: formData.username,
+            password: formData.password,
+            companyName: formData.companyName,
+            jobTitle: formData.jobTitle,
+            role: formData.role as RoleType
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (validateForm()) {
+            setIsLoading(true);
             try
             {
-                // Here you would typically send the registration data to your backend
-            //    const response = await registerUser(formData);
-            //    console.log('Response: ', response);
+                if(!formData.role){
+                    throw new Error('Role is required for registration');
+                }
                 console.log('Registration data:', formData);
+                let request = createRegistrationRequest(formData);
+                const response = await registerUser(request);
+                await new Promise(resolve => setTimeout(resolve, 6000));
+                console.log('Registration successful');
                 navigate('/');
 
             }catch(error)
             {
                 console.error('Error: ', error);
+            }finally{
+                setIsLoading(false);
             }
-            // Handle successful registration (e.g., redirect to login page or dashboard)
         }
     };
 
     return (
+        <BackgroundContainer>
+
+
         <Container component="main" maxWidth="md">
             <Paper elevation={6} sx={{ mt: 8, p: 4 }}>
                 <Typography component="h1" variant="h4" align="center" gutterBottom>
@@ -208,9 +300,12 @@ const RegistrationForm: React.FC = () => {
                                 error={!!errors.role}
                                 helperText={errors.role}
                             >
-                                <MenuItem value="admin">Administrator</MenuItem>
-                                <MenuItem value="manager">Inventory Manager</MenuItem>
-                                <MenuItem value="user">Regular User</MenuItem>
+                                <MenuItem value="" disabled>Select a role</MenuItem>
+                                {roleItems.map((roleItem) => (
+                                    <MenuItem key={roleItem.role} value={roleItem.role}>
+                                        {roleItem.item.roleName}
+                                    </MenuItem>
+                                ))}
                             </TextField>
                         </Grid>
                         <Grid item xs={12}>
@@ -231,25 +326,32 @@ const RegistrationForm: React.FC = () => {
                                 </Typography>
                             )}
                         </Grid>
-                    </Grid>
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                    >
-                        Register
-                    </Button>
-                    <Grid container justifyContent="flex-end">
-                        <Grid item>
-                            <RouterLink to="/">
+                        <Grid item xs={12}>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
+                            >
+                                Register
+                            </Button>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Link component="button" variant="body2" onClick={handleBackToLogin}>
                                 Already have an account? Sign in
-                            </RouterLink>
+                            </Link>
                         </Grid>
                     </Grid>
                 </Box>
             </Paper>
+            <Backdrop
+                sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}}
+                open={isLoading}
+            >
+                <CircularProgress color="inherit"/>
+            </Backdrop>
         </Container>
+        </BackgroundContainer>
     );
 };
 

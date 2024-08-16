@@ -1,16 +1,21 @@
 package org.example.smartinventory.workbench.registration;
 
 import org.example.smartinventory.entities.EmployeeEntity;
+import org.example.smartinventory.entities.RoleEntity;
 import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.model.Employee;
 import org.example.smartinventory.model.Permission;
 import org.example.smartinventory.model.Registration;
+import org.example.smartinventory.repository.RoleRepository;
 import org.example.smartinventory.repository.UserRepository;
 import org.example.smartinventory.service.EmployeeService;
 import org.example.smartinventory.service.PermissionsService;
+import org.example.smartinventory.service.RoleService;
+import org.example.smartinventory.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,16 +23,16 @@ import static org.example.smartinventory.workbench.registration.utilities.Employ
 import static org.example.smartinventory.workbench.registration.utilities.EmployeeRegistrationUtil.createEmployeeEntity;
 
 @Component
-public class EmployeeRegistration implements RegistrationStrategy<EmployeeEntity>
+public class EmployeeRegistration extends AbstractRegistrationBase<EmployeeEntity> implements RegistrationStrategy<EmployeeEntity>
 {
     private EmployeeService employeeService;
-    private UserRepository userRepository;
 
     @Autowired
     public EmployeeRegistration(EmployeeService employeeService,
-                                UserRepository userRepository){
+                                UserService userService,
+                                RoleService roleService){
+        super(roleService, userService);
         this.employeeService = employeeService;
-        this.userRepository = userRepository;
     }
 
     @Override
@@ -39,17 +44,19 @@ public class EmployeeRegistration implements RegistrationStrategy<EmployeeEntity
     public Optional<EmployeeEntity> register(Registration registration, PermissionsService permissionsService) {
         validateRegistrationAndPermissionsService(registration, permissionsService);
         validateRegistrationParams(registration);
-        String email = registration.getEmail();
-        Optional<UserEntity> userByEmail = Optional.of(userRepository.findByEmail(email)
-                .orElseThrow());
-
-        UserEntity user = userByEmail.get();
+        
+        UserEntity user = createDefaultUser(registration);
         Employee employee = createEmployee(registration);
         EmployeeEntity employeeEntity = createEmployeeEntity(employee, user);
-        employeeService.save(employeeEntity);
-        // Create the Employee Entity
-        // Save the employee entity and return
+        Set<Permission> permissions = getPermissions(employeeEntity, permissionsService);
+        addRoleToPermissions(permissions, getRole(), permissionsService);
+        setRoleConfigurationForEntity(permissions, employeeEntity);
+        saveEmployee(employeeEntity);
         return Optional.of(employeeEntity);
+    }
+
+    private void saveEmployee(EmployeeEntity employeeEntity) {
+        employeeService.save(employeeEntity);
     }
 
     public void validateRegistrationAndPermissionsService(Registration registration, PermissionsService permissionsService) {
@@ -78,7 +85,8 @@ public class EmployeeRegistration implements RegistrationStrategy<EmployeeEntity
         }
     }
 
-    public Set<Permission> getPermissions(EmployeeEntity employeeEntity, PermissionsService permissionsService) {
+    @Override
+    protected Set<Permission> getPermissions(EmployeeEntity employeeEntity, PermissionsService permissionsService) {
         if(employeeEntity == null || permissionsService == null){
             throw new IllegalArgumentException("Unable to retrieve permissions for null employee");
         }
@@ -90,5 +98,15 @@ public class EmployeeRegistration implements RegistrationStrategy<EmployeeEntity
         return permissionsService.getPermissionsForUser(userEntity);
     }
 
+    @Override
+    protected void setRoleConfigurationForEntity(Set<Permission> permissions, EmployeeEntity entity) {
+        RoleEntity employeeRole = roleService.findByName(getRole())
+                .orElseThrow(() -> new IllegalArgumentException("Role not found"));
 
+        UserEntity user = entity.getUser();
+        roleService.addRoleToUser(user.getId(), employeeRole.getId());
+
+        userService.save(user);
+        entity.setUser(user);
+    }
 }
