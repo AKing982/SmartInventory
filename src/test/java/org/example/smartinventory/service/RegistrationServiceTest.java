@@ -2,6 +2,7 @@ package org.example.smartinventory.service;
 
 import org.example.smartinventory.dto.RegistrationDTO;
 import org.example.smartinventory.entities.EmployeeEntity;
+import org.example.smartinventory.entities.SupplierEntity;
 import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.model.EmployeeRole;
 import org.example.smartinventory.model.Registration;
@@ -154,6 +155,40 @@ class RegistrationServiceTest {
         assertEquals(expectedUser.is_active(), actualUser.is_active());
     }
 
+    @Test
+    void testRegister_whenRoleEqualsSupplier_returnSupplier(){
+        String role = "ROLE_SUPPLIER";
+        Registration registration = new Registration("Mike", "Adams", "madams@outlook.com", "MAdams52", "Gamer25!", "ROLE_SUPPLIER", "Carpenter Utilities", "Supplier Specialist");
+        UserEntity userEntity = createUser("Mike", "Adams", "madams@outlook.com", "Gamer25!");
+        SupplierEntity supplier = createSupplier("Carpenter Utilities", userEntity);
+
+        RegistrationStrategy<SupplierEntity> strategy = mock(RegistrationStrategy.class);
+        when(userService.getUserByEmail(anyString())).thenReturn(Optional.empty());
+        when(registrationFactory.getStrategy(role)).thenReturn(strategy);
+        when(strategy.register(eq(registration), any(PermissionsService.class)))
+                .thenReturn(Optional.of(supplier));
+
+
+
+        Optional<SupplierEntity> actualSupplierOptional = registrationService.register(role, registration);
+        assertTrue(actualSupplierOptional.isPresent());
+        SupplierEntity actualSupplier = actualSupplierOptional.get();
+
+        assertEquals(supplier.getSupplierName(), actualSupplier.getSupplierName());
+        assertEquals(supplier.getEmployeeRole(), actualSupplier.getEmployeeRole());
+        assertEquals(supplier.getUser().getFirstName(), actualSupplier.getUser().getFirstName());
+        assertEquals(supplier.getUser().getLastName(), actualSupplier.getUser().getLastName());
+        assertEquals(supplier.getUser().getEmail(), actualSupplier.getUser().getEmail());
+    }
+
+    private SupplierEntity createSupplier(String supplierName, UserEntity userEntity) {
+        SupplierEntity supplierEntity = new SupplierEntity();
+        supplierEntity.setSupplierName(supplierName);
+        supplierEntity.setUser(userEntity);
+        supplierEntity.setEmployeeRole(EmployeeRole.ROLE_SUPPLIER);
+        return supplierEntity;
+    }
+
     private RegistrationStrategy createStrategy(String role){
         return registrationFactory.getStrategy(role);
     }
@@ -165,6 +200,15 @@ class RegistrationServiceTest {
         employeeEntity.setUser(createUserEntity());
         employeeEntity.setRole(EmployeeRole.INVENTORY_MANAGER);
         return employeeEntity;
+    }
+
+    private UserEntity createUser(String first, String last, String email, String password){
+        UserEntity userEntity = new UserEntity();
+        userEntity.setFirstName(first);
+        userEntity.setLastName(last);
+        userEntity.setEmail(email);
+        userEntity.setPassword(password);
+        return userEntity;
     }
 
     private UserEntity createUserEntity(){
