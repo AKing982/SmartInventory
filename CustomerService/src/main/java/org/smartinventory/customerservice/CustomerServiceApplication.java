@@ -1,4 +1,4 @@
-package com.smartinventory.customerservice;
+package org.smartinventory.customerservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

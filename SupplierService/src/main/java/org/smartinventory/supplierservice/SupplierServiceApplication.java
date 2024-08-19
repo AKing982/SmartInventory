@@ -1,4 +1,4 @@
-package com.smartinventory.supplierservice;
+package org.smartinventory.supplierservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

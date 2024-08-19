@@ -1,4 +1,4 @@
-package com.smartinventory.supplierservice;
+package org.smartinventory.supplierservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
