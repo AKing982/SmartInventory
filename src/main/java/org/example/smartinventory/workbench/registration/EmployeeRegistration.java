@@ -6,8 +6,6 @@ import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.model.Employee;
 import org.example.smartinventory.model.Permission;
 import org.example.smartinventory.model.Registration;
-import org.example.smartinventory.repository.RoleRepository;
-import org.example.smartinventory.repository.UserRepository;
 import org.example.smartinventory.service.EmployeeService;
 import org.example.smartinventory.service.PermissionsService;
 import org.example.smartinventory.service.RoleService;
@@ -15,7 +13,6 @@ import org.example.smartinventory.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,7 +41,7 @@ public class EmployeeRegistration extends AbstractRegistrationBase<EmployeeEntit
     public Optional<EmployeeEntity> register(Registration registration, PermissionsService permissionsService) {
         validateRegistrationAndPermissionsService(registration, permissionsService);
         validateRegistrationParams(registration);
-        
+
         UserEntity user = createDefaultUser(registration);
         Employee employee = createEmployee(registration);
         EmployeeEntity employeeEntity = createEmployeeEntity(employee, user);
