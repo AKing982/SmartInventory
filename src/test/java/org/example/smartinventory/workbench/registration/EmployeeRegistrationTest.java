@@ -8,6 +8,7 @@ import org.example.smartinventory.repository.UserRepository;
 import org.example.smartinventory.service.EmployeeService;
 import org.example.smartinventory.service.PermissionsService;
 import org.example.smartinventory.service.RoleService;
+import org.example.smartinventory.service.UserService;
 import org.example.smartinventory.workbench.security.permissions.PermissionUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,10 @@ class EmployeeRegistrationTest {
     private EmployeeService employeeService;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userRepository;
+
+    @Mock
+    private RoleService roleService;
 
     @InjectMocks
     private EmployeeRegistration employeeRegistration;
@@ -142,7 +146,7 @@ class EmployeeRegistrationTest {
 
         // Create mock user
         UserEntity mockUser = createUser();
-        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
+        when(userRepository.createUserFromRegistration(mockRegistration)).thenReturn(mockUser);
 
         // Mock employee service behavior
         doNothing().when(employeeService).save(any(EmployeeEntity.class));
@@ -151,8 +155,7 @@ class EmployeeRegistrationTest {
         RoleEntity mockRole = new RoleEntity();
         mockRole.setId(1);
         mockRole.setRole("ROLE_EMPLOYEE");
-        when(mockRoleService.findByName("ROLE_EMPLOYEE")).thenReturn(Optional.of(mockRole));
-        doNothing().when(mockRoleService).addRoleToUser(anyLong(), anyInt());
+        when(roleService.findByName("ROLE_EMPLOYEE")).thenReturn(Optional.of(mockRole));
 
         // Mock permissions service behavior
         Set<Permission> expectedPermissions = createPermissionSet();
@@ -168,14 +171,11 @@ class EmployeeRegistrationTest {
         assertEquals("first", actualEmployee.get().getUser().getFirstName());
         assertEquals("last", actualEmployee.get().getUser().getLastName());
 
-        // Verify that the role was added to the user
-        verify(mockRoleService).addRoleToUser(mockUser.getId(), mockRole.getId());
-
         // Verify that the permissions service was called to get permissions
         verify(mockPermissionsService).getPermissionsForUser(mockUser);
 
         // Verify repository and service calls
-        verify(userRepository).findByEmail("test@test.com");
+        verify(roleService).findByName("ROLE_EMPLOYEE");
         verify(employeeService).save(any(EmployeeEntity.class));
     }
 

@@ -119,6 +119,19 @@ const roleItems : RoleModel[] = [
     { role: RoleType.ROLE_MANAGER, item: { roleName: 'Inventory Manager' } }
 ]
 
+function extractRole(roles: string[] | Array<{authority: string}>): string {
+    if(roles.length === 0){
+        return 'ROLE_GUEST';
+    }
+    const firstRole = roles[0];
+    if(typeof firstRole === 'string'){
+        return firstRole;
+    }else if(typeof firstRole === 'object' && 'authority' in firstRole){
+        return firstRole.authority;
+    }
+    return 'ROLE_GUEST';
+}
+
 const LoginForm: React.FC = () => {
     const [formData, setFormData] = useState<FormData>({
         usernameOrEmail: '',
@@ -164,19 +177,6 @@ const LoginForm: React.FC = () => {
         }
     };
 
-    // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const {name, value} = e.target;
-    //     setFormData(prevData => ({
-    //         ...prevData,
-    //         [name]:value
-    //     }));
-    //     console.log(`Updated ${name}:`, value);
-    //
-    //     if(errors[name as keyof FormErrors])
-    //     {
-    //         setErrors(prevErrors => ({...prevErrors, [name]: undefined}))
-    //     }
-    // };
 
     // Validation
     const validateForm = (): boolean => {
@@ -210,11 +210,6 @@ const LoginForm: React.FC = () => {
         console.log('Available roles:', roleItems.map(item => item.role));
         const roleModel = roleItems.find(item => item.item.roleName === formData.role);
         console.log('Role Model: ', roleModel);
-        // if(!roleModel){
-        //     console.error('Role not found. FormData role:', formData.role);
-        //     console.error('RoleItems:', JSON.stringify(roleItems, null, 2));
-        //     throw new Error(`Invalid Role: ${formData.role}`);
-        // }
 
         return {
             firstName: formData.firstName,
@@ -236,38 +231,20 @@ const LoginForm: React.FC = () => {
             setIsLoading(true);
             try {
                 console.log('View: ', view);
-                if (view === 'login') {
-                    const loginData: LoginCredentials = {
-                        usernameOrEmail: formData.usernameOrEmail,
+                const loginData: LoginCredentials = {
+                    usernameOrEmail: formData.usernameOrEmail,
                         password: formData.password
-                    };
-                    const response = await authenticateUser(loginData);
-                    console.log('Authentication Successful: ', response);
-                    localStorage.setItem('token', response.token);
-                    localStorage.setItem('user', response.username);
+                };
+                const response = await authenticateUser(loginData);
+                let role = extractRole(response.roles);
+                console.log('Role: ', role);
+                console.log('Authentication Successful: ', response);
+                localStorage.setItem('authority', role);
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('user', response.username);
 
-                    await new Promise(resolve => setTimeout(resolve, 3000));
-
-                    navigate('/home');
-                } else if (view === 'forgotPassword') {
-                    setIsLoading(true);
-                    // Implement forgot password logic
-                    await new Promise(resolve => setTimeout(resolve, 8000));
-                    setForgotPasswordSuccess(true);
-                } else if (view === 'register') {
-                    console.log('Registering user');
-                    if(!formData.role){
-                        throw new Error("Role is required for registration.");
-                    }
-
-                    let request = createRegistrationRequest(formData);
-                    console.log('Registration Request: ', request);
-                    const response = await registerUser(request);
-                    await new Promise(resolve => setTimeout(resolve, 8000));
-
-                    console.log('Registration successful:', response);
-                    setView('login');
-                }
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                navigate('/loading');
                 setSubmitError(null);
             } catch (err) {
                 console.error(err);
@@ -351,276 +328,6 @@ const LoginForm: React.FC = () => {
         setShowPassword(!showPassword);
     };
 
-    // const renderLoginForm = () => (
-    //     <>
-    //         <TextField
-    //             margin="normal"
-    //             required
-    //             fullWidth
-    //             id="usernameOrEmail"
-    //             label="Username or Email"
-    //             name="usernameOrEmail"
-    //             autoComplete="username email"
-    //             autoFocus
-    //             value={formData.usernameOrEmail}
-    //             onChange={handleInputChange}
-    //             error={!!errors.usernameOrEmail}
-    //             helperText={errors.usernameOrEmail}
-    //         />
-    //         <TextField
-    //             margin="normal"
-    //             required
-    //             fullWidth
-    //             name="password"
-    //             label="Password"
-    //             type={showPassword ? 'text' : 'password'}
-    //             id="password"
-    //             autoComplete="current-password"
-    //             value={formData.password}
-    //             onChange={handleInputChange}
-    //             error={!!errors.password}
-    //             helperText={errors.password}
-    //             InputProps={{
-    //                 endAdornment: (
-    //                     <InputAdornment position="end">
-    //                         <IconButton
-    //                             aria-label="toggle password visibility"
-    //                             onClick={() => setShowPassword(!showPassword)}
-    //                             edge="end"
-    //                         >
-    //                             {showPassword ? <VisibilityOff /> : <Visibility />}
-    //                         </IconButton>
-    //                     </InputAdornment>
-    //                 )
-    //             }}
-    //         />
-    //         <Button
-    //             type="submit"
-    //             fullWidth
-    //             variant="contained"
-    //             sx={{ mt: 3, mb: 2 }}
-    //         >
-    //             Sign In
-    //         </Button>
-    //         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-    //             <Link component="button" variant="body2" onClick={() => setView('forgotPassword')}>
-    //                 Forgot password?
-    //             </Link>
-    //             <Button
-    //                 variant="outlined"
-    //                 size="small"
-    //                 onClick={() => setView('register')}
-    //             >
-    //                 Create Account
-    //             </Button>
-    //         </Box>
-    //     </>
-    // );
-    //
-
-    //
-    // const renderForgotPasswordForm = () => (
-    //     <>
-    //         <Typography variant="body2" sx={{ mt: 1, mb: 3, textAlign: 'center' }}>
-    //             Enter your email address and we'll send you instructions to reset your password.
-    //         </Typography>
-    //         <TextField
-    //             margin="normal"
-    //             required
-    //             fullWidth
-    //             id="email"
-    //             label="Email Address"
-    //             name="email"
-    //             autoComplete="email"
-    //             autoFocus
-    //             value={formData.email}
-    //             onChange={handleInputChange}
-    //             error={!!errors.email}
-    //             helperText={errors.email}
-    //             disabled={isLoading}
-    //         />
-    //         {forgotPasswordSuccess && (
-    //             <Alert severity="success" sx={{ mt: 2 }}>
-    //                 If an account exists for {formData.email}, you will receive password reset instructions.
-    //             </Alert>
-    //         )}
-    //         <Button
-    //             type="submit"
-    //             fullWidth
-    //             variant="contained"
-    //             sx={{ mt: 3, mb: 2 }}
-    //             disabled={isLoading}
-    //         >
-    //             {isLoading ? <CircularProgress size={24} /> : 'Reset Password'}
-    //         </Button>
-    //         <Link component="button" variant="body2" onClick={() => setView('login')}>
-    //             Back to Login
-    //         </Link>
-    //     </>
-    // );
-
-    // const renderRegistrationForm = () => (
-    //     <Grid container spacing={2}>
-    //         <Grid item xs={12} sm={6}>
-    //             <TextField
-    //                 required
-    //                 fullWidth
-    //                 label="First Name"
-    //                 name="firstName"
-    //                 value={formData.firstName}
-    //                 onChange={handleInputChange}
-    //                 error={!!errors.firstName}
-    //                 helperText={errors.firstName}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //             <TextField
-    //                 required
-    //                 fullWidth
-    //                 label="Last Name"
-    //                 name="lastName"
-    //                 value={formData.lastName}
-    //                 onChange={handleInputChange}
-    //                 error={!!errors.lastName}
-    //                 helperText={errors.lastName}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12}>
-    //             <TextField
-    //                 required
-    //                 fullWidth
-    //                 label="Email Address"
-    //                 name="email"
-    //                 type="email"
-    //                 value={formData.email}
-    //                 onChange={handleInputChange}
-    //                 error={!!errors.email}
-    //                 helperText={errors.email}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12}>
-    //             <TextField
-    //                 required
-    //                 fullWidth
-    //                 label="Username"
-    //                 name="username"
-    //                 value={formData.username}
-    //                 onChange={handleInputChange}
-    //                 error={!!errors.username}
-    //                 helperText={errors.username}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //             <TextField
-    //                 required
-    //                 fullWidth
-    //                 label="Password"
-    //                 name="password"
-    //                 type="password"
-    //                 value={formData.password}
-    //                 onChange={handleInputChange}
-    //                 error={!!errors.password}
-    //                 helperText={errors.password}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //             <TextField
-    //                 required
-    //                 fullWidth
-    //                 label="Confirm Password"
-    //                 name="confirmPassword"
-    //                 type="password"
-    //                 value={formData.confirmPassword}
-    //                 onChange={handleInputChange}
-    //                 error={!!errors.confirmPassword}
-    //                 helperText={errors.confirmPassword}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12}>
-    //             <TextField
-    //                 required
-    //                 fullWidth
-    //                 label="Company Name"
-    //                 name="companyName"
-    //                 value={formData.companyName}
-    //                 onChange={handleInputChange}
-    //                 error={!!errors.companyName}
-    //                 helperText={errors.companyName}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //             <TextField
-    //                 required
-    //                 fullWidth
-    //                 label="Job Title"
-    //                 name="jobTitle"
-    //                 value={formData.jobTitle}
-    //                 onChange={handleInputChange}
-    //                 error={!!errors.jobTitle}
-    //                 helperText={errors.jobTitle}
-    //             />
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //             <TextField
-    //                 select
-    //                 required
-    //                 fullWidth
-    //                 label="Role"
-    //                 name="role"
-    //                 value={formData.role}
-    //                 onChange={handleInputChange}
-    //                 error={!!errors.role}
-    //                 helperText={errors.role}
-    //             >
-    //                 <MenuItem value="" disabled>Select a role</MenuItem>
-    //                 {roleItems.map((roleItem) => (
-    //                     <MenuItem key={roleItem.role} value={roleItem.role}>
-    //                         {roleItem.item.roleName}
-    //                     </MenuItem>
-    //                 ))}
-    //                 {/*{roleItems.map((roleModel) => (*/}
-    //                 {/*    <MenuItem key={roleModel.role} value={roleModel.role}>*/}
-    //                 {/*        {roleModel.item.roleName}*/}
-    //                 {/*    </MenuItem>*/}
-    //                 {/*))}*/}
-    //             </TextField>
-    //         </Grid>
-    //         <Grid item xs={12}>
-    //             <FormControlLabel
-    //                 control={
-    //                     <Checkbox
-    //                         name="agreeToTerms"
-    //                         checked={formData.agreeToTerms}
-    //                         onChange={handleInputChange}
-    //                         color="primary"
-    //                     />
-    //                 }
-    //                 label="I agree to the terms and conditions"
-    //             />
-    //             {errors.agreeToTerms && (
-    //                 <Typography color="error" variant="caption" display="block">
-    //                     {errors.agreeToTerms}
-    //                 </Typography>
-    //             )}
-    //         </Grid>
-    //         <Grid item xs={12}>
-    //             <Button
-    //                 type="submit"
-    //                 fullWidth
-    //                 variant="contained"
-    //                 sx={{ mt: 3, mb: 2 }}
-    //             >
-    //                 Register
-    //             </Button>
-    //         </Grid>
-    //         <Grid item xs={12}>
-    //             <Link component="button" variant="body2" onClick={}>
-    //                 Already have an account? Sign in
-    //             </Link>
-    //         </Grid>
-    //     </Grid>
-    // );
-
     return (
         <BackgroundContainer>
             <Container component="main" maxWidth="sm">
@@ -694,37 +401,6 @@ const LoginForm: React.FC = () => {
             </Backdrop>
         </BackgroundContainer>
     );
-
-    // return (
-    //     <BackgroundContainer>
-    //         <Container component="main" maxWidth="sm">
-    //             <StyledPaper elevation={6}>
-    //                 <InventoryIcon sx={{ fontSize: 50, color: 'primary.main', mb: 2 }} />
-    //                 <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-    //                     {view === 'login' && 'Welcome to SmartInventory Management System'}
-    //                     {view === 'forgotPassword' && 'Forgot Password'}
-    //                     {view === 'register' && 'Create an Account'}
-    //                 </Typography>
-    //                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
-    //                     {view === 'login' && renderLoginForm()}
-    //                     {view === 'forgotPassword' && renderForgotPasswordForm()}
-    //                     {view === 'register' && renderRegistrationForm() }
-    //                 </Box>
-    //                 {submitError && (
-    //                     <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
-    //                         {submitError}
-    //                     </Alert>
-    //                 )}
-    //             </StyledPaper>
-    //         </Container>
-    //         <Backdrop
-    //             sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}}
-    //             open={isLoading}
-    //             >
-    //             <CircularProgress color="inherit"/>
-    //         </Backdrop>
-    //     </BackgroundContainer>
-    // );
 };
 
 export default LoginForm;

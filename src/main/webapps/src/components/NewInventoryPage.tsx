@@ -4,9 +4,15 @@ import {
     Paper, Grid, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent,
     InputAdornment, styled
 } from '@mui/material';
-import { Save as SaveIcon } from '@mui/icons-material';
+import {
+    Assessment as AssessmentIcon, Business as BusinessIcon,
+    Category as CategoryIcon, People as PeopleIcon,
+    Save as SaveIcon, Settings as SettingsIcon,
+    Warehouse as WarehouseIcon
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import MainAppBar from './MainAppBar';
+import InventoryIcon from "@mui/icons-material/Inventory";
 
 interface NewInventoryItem {
     name: string;
@@ -119,9 +125,22 @@ const NewInventoryPage: React.FC = () => {
         setOpenSnackbar(false);
     };
 
+    const menuItems2 = [
+        { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
+        { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
+        { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
+        { text: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
+        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
+        { text: 'Departments', icon: <BusinessIcon />, path: '/departments' },
+        { text: 'Employees', icon: <PeopleIcon />, path: '/employees' },
+        { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    ];
+
     return (
         <BackgroundContainer>
-            <MainAppBar title="Add New Inventory Item" />
+            <MainAppBar title="Add New Inventory Item" drawerItems={menuItems2}/>
             <Container component="main" maxWidth="xl" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
                 <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
                     <Typography variant="h4" gutterBottom>

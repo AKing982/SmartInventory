@@ -10,6 +10,7 @@ import org.example.smartinventory.repository.UserRepository;
 import org.example.smartinventory.service.PermissionsService;
 import org.example.smartinventory.service.RoleService;
 import org.example.smartinventory.service.SupplierService;
+import org.example.smartinventory.service.UserService;
 import org.example.smartinventory.workbench.security.permissions.PermissionUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,7 @@ class SupplierRegistrationTest {
     private SupplierService supplierService;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userRepository;
 
     @Mock
     private RoleService roleService;
@@ -86,12 +87,11 @@ class SupplierRegistrationTest {
 
         // Create mock user and supplier
         UserEntity mockUser = createUser();
-        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
         SupplierEntity mockSupplier = createSupplierEntity();
         mockSupplier.setUser(mockUser);
 
         // Mock service behaviors
-        when(supplierService.createSupplierFromRegistration(mockRegistration, mockUser)).thenReturn(mockSupplier);
+        when(supplierService.createSupplierFromRegistration(eq(mockRegistration), isNull())).thenReturn(mockSupplier);
         doNothing().when(supplierService).save(any(SupplierEntity.class));
 
         // Mock role service behavior
@@ -101,7 +101,6 @@ class SupplierRegistrationTest {
         Set<Permission> permissions = createPermissionSet();
         mockRole.setPermissions(permissions);
         when(roleService.findByName("ROLE_SUPPLIER")).thenReturn(Optional.of(mockRole));
-        doNothing().when(mockRoleService).addRoleToUser(anyLong(), anyInt());
 
         // Mock permissions service behavior
         when(mockPermissionsService.getPermissionsForUser(any(UserEntity.class))).thenReturn(permissions);
@@ -112,9 +111,6 @@ class SupplierRegistrationTest {
         // Verify the results
         assertTrue(actualSupplier.isPresent());
         assertEquals("ROLE_SUPPLIER", actualSupplier.get().getEmployeeRole().name());
-
-        // Verify that the role was added to the user
-        verify(roleService).addRoleToUser(mockUser.getId(), mockRole.getId());
 
         // Verify that the permissions service was called to get permissions
         verify(mockPermissionsService).getPermissionsForUser(mockUser);

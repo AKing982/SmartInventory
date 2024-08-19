@@ -13,10 +13,15 @@ import {
     Search as SearchIcon,
     History as HistoryIcon,
     Comment as CommentIcon,
-    Sort as SortIcon
+    Sort as SortIcon,
+    Assessment as AssessmentIcon,
+    Category as CategoryIcon,
+    Warehouse as WarehouseIcon,
+    People as PeopleIcon, Business as BusinessIcon, Settings as SettingsIcon
 } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 import MainAppBar from './MainAppBar';
+import InventoryIcon from "@mui/icons-material/Inventory";
 
 interface InventoryItem {
     id: number;
@@ -123,9 +128,22 @@ const InventoryPage: React.FC = () => {
         setOpenHistoryDialog(true);
     };
 
+    const menuItems2 = [
+        { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
+        { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
+        { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
+        { text: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
+        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
+        { text: 'Departments', icon: <BusinessIcon />, path: '/departments' },
+        { text: 'Employees', icon: <PeopleIcon />, path: '/employees' },
+        { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    ];
+
     return (
         <BackgroundContainer>
-            <MainAppBar title="Inventory Management" />
+            <MainAppBar title="Inventory Management" drawerItems={menuItems2}/>
             <ContentContainer>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h4">

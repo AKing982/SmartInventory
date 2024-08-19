@@ -12,6 +12,13 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } f
 import DatePicker from 'react-datepicker';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MainAppBar from './MainAppBar';
+import {
+    Assessment as AssessmentIcon, Business as BusinessIcon,
+    Category as CategoryIcon,
+    People as PeopleIcon, Settings as SettingsIcon,
+    Warehouse as WarehouseIcon
+} from "@mui/icons-material";
+import InventoryIcon from "@mui/icons-material/Inventory";
 
 interface InventoryItem {
     id: number;
@@ -93,9 +100,22 @@ const StockHistory: React.FC = () => {
         return <Typography>Loading...</Typography>;
     }
 
+    const menuItems2 = [
+        { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
+        { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
+        { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
+        { text: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
+        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
+        { text: 'Departments', icon: <BusinessIcon />, path: '/departments' },
+        { text: 'Employees', icon: <PeopleIcon />, path: '/employees' },
+        { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    ];
+
     return (
         <BackgroundContainer>
-            <MainAppBar title={`Stock History - ${item.name}`} />
+            <MainAppBar title={`Stock History - ${item.name}`} drawerItems={menuItems2} />
             <ContentContainer>
                 <Button startIcon={<ArrowBackIcon />} onClick={handleBack} sx={{ mb: 2 }}>
                     Back to Stock Levels

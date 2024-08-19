@@ -32,7 +32,12 @@ import {
     useTheme, Collapse,
 } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import {ExitToApp as LogoutIcon} from  '@mui/icons-material';
+import {
+    Assessment as AssessmentIcon, Business as BusinessIcon,
+    Category as CategoryIcon,
+    ExitToApp as LogoutIcon, People as PeopleIcon, Settings as SettingsIcon,
+    Warehouse as WarehouseIcon
+} from '@mui/icons-material';
 import InventoryIcon from "@mui/icons-material/Inventory";
 import {FileCopy as FilyCopyIcon, Menu as MenuIcon} from '@mui/icons-material'
 import SearchIcon from '@mui/icons-material/Search';
@@ -391,9 +396,22 @@ const AddInventoryPage: React.FC = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const menuItems = [
+        { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
+        { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
+        { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
+        { text: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
+        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
+        { text: 'Departments', icon: <BusinessIcon />, path: '/departments' },
+        { text: 'Employees', icon: <PeopleIcon />, path: '/employees' },
+        { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    ];
+
     return (
         <BackgroundContainer>
-            <MainAppBar title="Add Inventory"/>
+            <MainAppBar title="Add Inventory" drawerItems={menuItems}/>
             <ContentContainer>
                 <Container maxWidth="lg">
                     {/* User Stats and Overview */}

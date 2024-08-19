@@ -146,40 +146,31 @@ const HomePage: React.FC = () => {
     }, []);
 
 
+    const menuItems2 = [
+        { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
+        { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
+        { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
+        { text: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
+        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
+        { text: 'Departments', icon: <BusinessIcon />, path: '/departments' },
+        { text: 'Employees', icon: <PeopleIcon />, path: '/employees' },
+        { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    ];
 
+    const menu = [
+        { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
+        { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
+        { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
+        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+    ]
 
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);
     };
 
-
-    const menuItems = [
-        { title: 'Dashboard', icon: <AssessmentIcon />, path: '/dashboard' },
-        { title: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
-        { title: 'Categories', icon: <CategoryIcon />, path: '/categories' },
-        { title: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
-        { title: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
-        { title: 'Departments', icon: <BusinessIcon />, path: '/departments' },
-        { title: 'Employees', icon: <PeopleIcon />, path: '/employees' },
-        { title: 'Customers', icon: <PeopleIcon />, path: '/customers' },
-        { title: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
-        { title: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-    ];
-
-    const drawerContent = (
-        <Box sx={{ width: 250 }} role="presentation" onClick={handleDrawerToggle}>
-            <List>
-                {menuItems.map((item) => (
-                    <ListItem key={item.title} disablePadding>
-                        <ListItemButton onClick={() => navigate(item.path)}>
-                            <ListItemIcon>{item.icon}</ListItemIcon>
-                            <ListItemText primary={item.title} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
-        </Box>
-    );
 
     const quickAccessItems = [
         { title: 'Add New Item', icon: <AddBoxIcon />, action: () => navigate('/addInventory') },
@@ -195,10 +186,7 @@ const HomePage: React.FC = () => {
 
     return (
         <BackgroundContainer>
-            <MainAppBar title="Home Dashboard"/>
-            <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
-                {drawerContent}
-            </Drawer>
+            <MainAppBar title="Home Dashboard" drawerItems={menu}/>
             <Box component="main" sx={{ flexGrow: 1, p: 3, mt: ['48px', '56px', '64px'] }}>
                 <Container maxWidth="lg">
                     <Grid container spacing={3}>

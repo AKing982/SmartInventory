@@ -1,13 +1,16 @@
 package org.example.smartinventory.workbench.registration.utilities;
 
 import org.example.smartinventory.dto.RegistrationDTO;
+import org.example.smartinventory.entities.DepartmentEntity;
 import org.example.smartinventory.entities.EmployeeEntity;
 import org.example.smartinventory.entities.UserEntity;
+import org.example.smartinventory.entities.WarehouseEntity;
 import org.example.smartinventory.model.Employee;
 import org.example.smartinventory.model.EmployeeRole;
 import org.example.smartinventory.model.Registration;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class EmployeeRegistrationUtil
@@ -30,10 +33,10 @@ public class EmployeeRegistrationUtil
         employeeEntity.setUser(user);
         employeeEntity.setSalary(BigDecimal.ZERO);
         employeeEntity.setRole(getEmployeeRoleFromValue(employee.getEmployeeRole()));
-        employeeEntity.setDepartment(null);
+        employeeEntity.setHireDate(LocalDate.now());
         employeeEntity.setJobTitle(employee.getTitle());
         employeeEntity.setCreatedAt(LocalDateTime.now());
-        employeeEntity.setWarehouse(null);
+        employeeEntity.setUpdatedAt(LocalDateTime.now());
         return employeeEntity;
     }
 

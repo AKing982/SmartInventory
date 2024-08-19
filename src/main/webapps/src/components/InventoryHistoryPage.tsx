@@ -4,8 +4,14 @@ import {
     Container, Box, Typography, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Button, Divider, Grid
 } from '@mui/material';
-import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import {
+    ArrowBack as ArrowBackIcon,
+    Assessment as AssessmentIcon, Business as BusinessIcon,
+    Category as CategoryIcon, People as PeopleIcon, Settings as SettingsIcon,
+    Warehouse as WarehouseIcon
+} from '@mui/icons-material';
 import MainAppBar from './MainAppBar';
+import InventoryIcon from "@mui/icons-material/Inventory";
 
 interface HistoryEvent {
     date: string;
@@ -53,10 +59,22 @@ const InventoryHistoryPage: React.FC = () => {
     if (!item) {
         return <Typography>Loading...</Typography>;
     }
+    const menuItems2 = [
+        { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
+        { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
+        { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
+        { text: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
+        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
+        { text: 'Departments', icon: <BusinessIcon />, path: '/departments' },
+        { text: 'Employees', icon: <PeopleIcon />, path: '/employees' },
+        { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    ];
 
     return (
         <Box sx={{ display: 'flex' }}>
-            <MainAppBar title={`Inventory History - ${item.name}`} />
+            <MainAppBar title={`Inventory History - ${item.name}`} drawerItems={menuItems2} />
             <Container component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
                 <Box sx={{ mb: 4 }}>
                     <Button component={Link} to="/inventory" startIcon={<ArrowBackIcon />}>

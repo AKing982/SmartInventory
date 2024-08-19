@@ -26,7 +26,7 @@ public class RegularUserRegistration extends AbstractRegistrationBase<UserEntity
     @Autowired
     public RegularUserRegistration(UserService userService, RoleService roleService)
     {
-        super(roleService);
+        super(roleService, userService);
         this.userService = userService;
         LOGGER.debug("RoleService: {}", roleService);
     }

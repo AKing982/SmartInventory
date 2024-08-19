@@ -5,8 +5,22 @@ import {
     DialogActions, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem,
     SelectChangeEvent, Tooltip, IconButton, Collapse, TablePagination, Switch, FormControlLabel
 } from '@mui/material';
-import { Add as AddIcon, Search as SearchIcon, Visibility as VisibilityIcon, Edit as EditIcon, Delete as DeleteIcon, ExpandMore as ExpandMoreIcon, ImportExport as ImportExportIcon } from '@mui/icons-material';
-import MainAppBar from './MainAppBar'; // Assuming you have this component
+import {
+    Add as AddIcon,
+    Search as SearchIcon,
+    Visibility as VisibilityIcon,
+    Edit as EditIcon,
+    Delete as DeleteIcon,
+    ExpandMore as ExpandMoreIcon,
+    ImportExport as ImportExportIcon,
+    Assessment as AssessmentIcon,
+    Category as CategoryIcon,
+    Warehouse as WarehouseIcon,
+    People as PeopleIcon,
+    Business as BusinessIcon, Settings as SettingsIcon
+} from '@mui/icons-material';
+import MainAppBar from './MainAppBar';
+import InventoryIcon from "@mui/icons-material/Inventory"; // Assuming you have this component
 
 interface Contact {
     id: number;
@@ -136,9 +150,22 @@ const ContactsPage: React.FC = () => {
         );
     }, [contacts, searchTerm, searchMethod, filters]);
 
+    const menuItems2 = [
+        { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
+        { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
+        { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
+        { text: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
+        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
+        { text: 'Departments', icon: <BusinessIcon />, path: '/departments' },
+        { text: 'Employees', icon: <PeopleIcon />, path: '/employees' },
+        { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    ];
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
-            <MainAppBar title="Contacts" />
+            <MainAppBar title="Contacts" drawerItems={menuItems2} />
             <Container maxWidth={false} sx={{ mt: 8, mb: 4 }}>
                 <Paper elevation={3} sx={{ p: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

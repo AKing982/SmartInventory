@@ -20,16 +20,23 @@ import {
 } from "@mui/material";
 import { Alert } from "@mui/material";
 import {Container, Snackbar} from "@mui/material";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {useNavigate} from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {TableCell} from "@mui/material";
-import {Logout as LogoutIcon,
+import {
+    Logout as LogoutIcon,
     Category as CategoryIcon,
-    Edit as EditIcon} from '@mui/icons-material'
+    Edit as EditIcon,
+    Assessment as AssessmentIcon,
+    Warehouse as WarehouseIcon,
+    People as PeopleIcon,
+    Business as BusinessIcon, Settings as SettingsIcon
+} from '@mui/icons-material'
 import MainAppBar from "./MainAppBar";
+import InventoryIcon from "@mui/icons-material/Inventory";
 
 
 interface ProductCategory
@@ -125,10 +132,23 @@ const CategoriesPage: React.FC = () => {
         // Add more menu items as needed
     ];
 
+    const menuItems2 = [
+        { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
+        { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
+        { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
+        { text: 'Warehouses', icon: <WarehouseIcon />, path: '/warehouses' },
+        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
+        { text: 'Departments', icon: <BusinessIcon />, path: '/departments' },
+        { text: 'Employees', icon: <PeopleIcon />, path: '/employees' },
+        { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    ];
+
 
     return (
         <BackgroundContainer>
-            <MainAppBar title="Product Categories"/>
+            <MainAppBar title="Product Categories" drawerItems={menuItems2}/>
             <Drawer
                 anchor="left"
                 open={drawerOpen}

@@ -21,11 +21,18 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
+interface DrawerItem {
+    text: string;
+    icon: React.ReactElement;
+    path: string;
+}
+
 interface SideDrawerProps {
     open: boolean;
     onClose: () => void;
     username: string | null;
     userTitle: string;
+    menuItems: DrawerItem[];
     // onMenuItemSelect: (selectedPage: string) => void;
 }
 
@@ -42,7 +49,11 @@ const menuItems = [
     { title: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 
-const SideDrawer: React.FC<SideDrawerProps> = ({ open, onClose, username, userTitle}) => {
+const SideDrawer: React.FC<SideDrawerProps> = ({ open,
+                                                   onClose, username
+                                                   ,
+                                                   userTitle,
+                                                   menuItems}) => {
     const navigate = useNavigate();
 
     const handleNavigation = (path: string, title: string) => {
@@ -71,9 +82,9 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ open, onClose, username, userTi
                 {/* Menu Items */}
                 <List>
                     {menuItems.map((item, index) => (
-                        <ListItem button key={item.title} onClick={() => handleNavigation(item.path, item.title)}>
+                        <ListItem button key={item.text} onClick={() => handleNavigation(item.path, item.text)}>
                             <ListItemIcon>{item.icon}</ListItemIcon>
-                            <ListItemText primary={item.title} />
+                            <ListItemText primary={item.text} />
                         </ListItem>
                     ))}
                 </List>

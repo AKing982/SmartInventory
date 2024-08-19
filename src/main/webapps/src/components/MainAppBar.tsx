@@ -1,5 +1,5 @@
 import {useLocation, useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SideDrawer from "./SideDrawer";
@@ -16,8 +16,15 @@ import {
 } from '@mui/icons-material';
 import DynamicTabs from "./DynamicTabs";
 
+interface DrawerItem {
+    text: string;
+    icon: React.ReactElement;
+    path: string;
+}
+
 interface MainAppBarProps {
     title: string;
+    drawerItems: DrawerItem[];
 }
 
 interface TabConfig {
@@ -26,7 +33,7 @@ interface TabConfig {
 }
 
 
-const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
+const MainAppBar: React.FC<MainAppBarProps> = ({ title, drawerItems }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -192,19 +199,6 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
                     </IconButton>
                 </Toolbar>
                 <Box sx={{ bgcolor: 'primary.dark' }}>
-                    {/*<Tabs*/}
-                    {/*    value={location.pathname}*/}
-                    {/*    onChange={handleTabChange}*/}
-                    {/*    indicatorColor="secondary"*/}
-                    {/*    textColor="inherit"*/}
-                    {/*    variant="scrollable"*/}
-                    {/*    scrollButtons="auto"*/}
-                    {/*    aria-label="main navigation tabs"*/}
-                    {/*>*/}
-                    {/*    {tabs.map((tab) => (*/}
-                    {/*        <Tab key={tab.label} label={tab.label} value={tab.value} />*/}
-                    {/*    ))}*/}
-                    {/*</Tabs>*/}
                     <DynamicTabs selectedMenuItem={selectedSection}/>
                 </Box>
             </AppBar>
@@ -233,6 +227,7 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title }) => {
                 open={drawerOpen}
                 onClose={handleDrawerToggle}
                 username={user}
+                menuItems={drawerItems}
                 userTitle="Manager"/>
             {/* Add a toolbar to push content below the AppBar */}
             <Toolbar />

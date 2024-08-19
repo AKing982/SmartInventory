@@ -1,7 +1,6 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import LoginForm from "./components/LoginForm";
 import RegistrationForm from "./components/RegistrationForm";
@@ -14,6 +13,19 @@ import InventoryPage from "./components/InventoryPage";
 import InventoryHistoryPage from "./components/InventoryHistoryPage";
 import NewInventoryPage from "./components/NewInventoryPage";
 import StockLevels from "./components/StockLevels";
+import LoadingScreen from "./components/LoadingScreen";
+import BasicUserHomePage from "./components/BasicUserHomePage";
+import {withPermission} from "./components/withPermission";
+import {Permissions} from "./PermissionUtils";
+import {RoleType} from "./items/Items";
+import {withRole} from "./components/withRole";
+import SupplierHomePage from "./components/SupplierHomePage";
+import OrderPlacementPage from "./components/OrderPlacementPage";
+import OrderHistoryPage from "./components/OrderHistoryPage";
+import ProductCatalogPage from "./components/ProductCatalogPage";
+import UserProfilePage from "./components/UserProfilePage";
+import SupplierDashboard from "./components/SupplierDashboard";
+import SettingsPage from "./components/SettingsPage";
 
 const theme = createTheme({
     palette: {
@@ -22,6 +34,9 @@ const theme = createTheme({
         },
     },
 });
+
+const ProtectedBasicUserHomePage = withRole([RoleType.ROLE_USER])(BasicUserHomePage);
+const ProtectedHomePage = withRole([RoleType.ROLE_EMPLOYEE])(HomePage);
 
 
 function App() {
@@ -47,6 +62,15 @@ function App() {
                           <Route path="/inventory-history" element={<InventoryHistoryPage />}/>
                           <Route path="/inventory/new" element={<NewInventoryPage />}/>
                           <Route path="/stocks" element={<StockLevels />}/>
+                          <Route path="/loading" element={<LoadingScreen />}/>
+                          <Route path="/userHome" element={<BasicUserHomePage />}/>
+                          <Route path="/supplier/home" element={<SupplierHomePage />} />
+                          <Route path="/order-placement" element={<OrderPlacementPage />}/>
+                          <Route path="/order-history" element={<OrderHistoryPage/>}/>
+                          <Route path="/catalog" element={<ProductCatalogPage />}/>
+                          <Route path="/profile" element={<UserProfilePage />}/>
+                          <Route path="/supplier/dashboard" element={<SupplierDashboard />}/>
+                          <Route path="/settings" element={<SettingsPage />}/>
                       </Routes>
                   </div>
               </Router>
