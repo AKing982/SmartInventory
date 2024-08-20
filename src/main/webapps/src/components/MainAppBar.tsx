@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SideDrawer from "./SideDrawer";
-import {Avatar, Badge, Box, InputBase, Menu, MenuItem, Tab, Tabs} from "@mui/material";
+import {Avatar, Badge, Box, InputBase, Menu, MenuItem, styled, Tab, Tabs} from "@mui/material";
 import {AppBar, IconButton, Toolbar,
     Typography,
   } from "@mui/material";
@@ -15,6 +15,7 @@ import {
     Logout as LogoutIcon
 } from '@mui/icons-material';
 import DynamicTabs from "./DynamicTabs";
+import {ThemeProvider, createTheme} from '@mui/material/styles';
 
 interface DrawerItem {
     text: string;
@@ -32,6 +33,33 @@ interface TabConfig {
     value: string;
 }
 
+
+const appBarTheme = createTheme({
+    palette: {
+        mode: 'dark',
+        primary: {
+            main: '#424242' // A mid-grey color
+        }
+    },
+    components: {
+        MuiAppBar: {
+            styleOverrides: {
+                root: {
+                    background: 'linear-gradient(45deg, #424242 30%, #212121 90%)',
+                    boxShadow: '0 3px 5px 2px rgba(33, 33, 33, .3)',
+                },
+            },
+        },
+    },
+});
+
+const StyledAppBar = styled(AppBar)(({ theme }) => {
+    const appBarStyle = (theme.components?.MuiAppBar?.styleOverrides?.root || {}) as Record<string, any>;
+    return {
+        background: appBarStyle.background || 'inherit',
+        boxShadow: appBarStyle.boxShadow || 'inherit',
+    };
+});
 
 const MainAppBar: React.FC<MainAppBarProps> = ({ title, drawerItems }) => {
     const navigate = useNavigate();
@@ -154,7 +182,8 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title, drawerItems }) => {
     // @ts-ignore
     return (
         <>
-            <AppBar position="fixed">
+            <ThemeProvider theme={appBarTheme}>
+            <StyledAppBar position="fixed">
                 <Toolbar>
                     <IconButton
                         aria-label="open drawer"
@@ -201,7 +230,7 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title, drawerItems }) => {
                 <Box sx={{ bgcolor: 'primary.dark' }}>
                     <DynamicTabs selectedMenuItem={selectedSection}/>
                 </Box>
-            </AppBar>
+            </StyledAppBar>
             <Menu
                 anchorEl={anchorEl}
                 anchorOrigin={{
@@ -232,6 +261,7 @@ const MainAppBar: React.FC<MainAppBarProps> = ({ title, drawerItems }) => {
             {/* Add a toolbar to push content below the AppBar */}
             <Toolbar />
             <Toolbar /> {/* Second Toolbar for the tabs */}
+            </ThemeProvider>
         </>
     );
 };

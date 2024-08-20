@@ -22,6 +22,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import MainAppBar from './MainAppBar';
 import InventoryIcon from "@mui/icons-material/Inventory";
+import GradientRoundButton from "./GradientRoundButton";
 
 interface InventoryItem {
     id: number;
@@ -148,14 +149,14 @@ const InventoryPage: React.FC = () => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h4">
                     </Typography>
-                    <Button
+                    <GradientRoundButton
                         variant="contained"
                         color="primary"
                         startIcon={<AddIcon />}
                         onClick={() => navigate('/inventory/new')}
                     >
                         Add New Item
-                    </Button>
+                    </GradientRoundButton>
                 </Box>
                 <Paper elevation={3} sx={{ p: 2, width: '100%' }}>
                     <Box sx={{ display: 'flex', mb: 2 }}>
