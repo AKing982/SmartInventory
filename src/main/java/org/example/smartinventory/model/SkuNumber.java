@@ -1,42 +1,59 @@
 package org.example.smartinventory.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.example.smartinventory.exceptions.InvalidCategorySegmentException;
+import org.example.smartinventory.exceptions.InvalidSkuNumberException;
 import org.example.smartinventory.exceptions.InvalidSkuNumberSegmentException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Getter
+@Setter
 public class SkuNumber
 {
-    private String categorySegment;
-    private String numSegment;
+    private String categoryCode;
+    private String supplierCode;
+    private String sequenceCode;
 
-    public SkuNumber(String seg1, String seg2){
-        initializeSkuNumber(seg1, seg2);
+    public SkuNumber(String categoryCode, String supplierCode, String sequenceCode){
+        initializeSkuNumber(categoryCode, supplierCode, sequenceCode);
     }
 
-    void initializeSkuNumber(String seg1, String seg2){
-        if(validateSegments(seg1, seg2)){
-            this.categorySegment = seg1;
-            this.numSegment = seg2;
+    void initializeSkuNumber(String categoryCode, String supplierCode, String sequenceCode){
+        if(validate(categoryCode, supplierCode, sequenceCode)){
+            this.categoryCode = categoryCode;
+            this.supplierCode = supplierCode;
+            this.sequenceCode = sequenceCode;
+        }else{
+            throw new InvalidSkuNumberException(categoryCode + "/" + supplierCode + "/" + sequenceCode);
         }
     }
 
-    public Boolean validateSegments(String catSegment, String numSegment){
-        int catLength = catSegment.length();
-        int numLength = numSegment.length();
-        boolean isSegmentsEmpty = catSegment.isEmpty() || numSegment.isEmpty();
-        if((catLength != 4 || numLength != 3) || isSegmentsEmpty){
+    public Boolean validate(String categoryCode, String supplierCode, String sequenceCode){
+        if(categoryCode.isEmpty() || supplierCode.isEmpty() || sequenceCode.isEmpty()){
+            return false;
+        }
+        int categoryCodeLength = getLength(categoryCode);
+        int supplierCodeLength = getLength(supplierCode);
+        int sequenceCodeLength = getLength(sequenceCode);
+        if(categoryCodeLength != 2 || supplierCodeLength != 3 || sequenceCodeLength != 4){
             return false;
         }else{
-            Pattern alphaNumPattern = Pattern.compile("^[a-zA-Z]*$");
-            Pattern numericPattern = Pattern.compile("^[0-9]*$");
-            Matcher alphaMatcher = alphaNumPattern.matcher(catSegment);
-            Matcher numericMatcher = numericPattern.matcher(numSegment);
-            if(!alphaMatcher.matches() || !numericMatcher.matches()){
+            Pattern characters = Pattern.compile("[a-zA-Z]*");
+            Pattern numbers = Pattern.compile("[0-9]*");
+            Matcher matcher = characters.matcher(categoryCode);
+            Matcher supplierMatcher = characters.matcher(supplierCode);
+            Matcher sequenceMatcher = numbers.matcher(sequenceCode);
+            if(!matcher.matches() || !supplierMatcher.matches() || !sequenceMatcher.matches()){
                 return false;
             }
         }
-        return catSegment.length() == 4 && numSegment.length() == 3;
+        return categoryCode.length() == 2 && supplierCode.length() == 3 && sequenceCode.length() == 4;
+    }
+
+    private int getLength(String strLength){
+        return strLength.length();
     }
 }
