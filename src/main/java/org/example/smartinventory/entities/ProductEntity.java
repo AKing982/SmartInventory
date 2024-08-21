@@ -51,25 +51,66 @@ public class ProductEntity implements Serializable {
     @Column(name="category")
     private String category;
 
+    @Column(name="productBrand")
+    private String productBrand;
+
+    @Column(name="costPrice")
+    private BigDecimal costPrice;
+
+    @Column(name="reorderPoint")
+    private int reorderPoint;
+
+    @Column(name="supplier")
+    private String supplier;
+
+    @Column(name="modelNumber")
+    private String modelNumber;
+
+    @Column(name="expirationDate")
+    private LocalDate expirationDate;
+
+    @Column(name="notes")
+    private String notes;
+
+    @Column(name="markupPercent")
+    private double markupPercentage;
+
 //    @ManyToOne(fetch = FetchType.EAGER)
 //    @JoinColumn(name="categoryId")
 //    @JsonBackReference
 //    private CategoryEntity productCategory;
 
     @JsonIgnore
-    @Column(name="date_added")
+    @Column(name="dateadded")
     private LocalDate dateAdded;
+
+    public ProductEntity(int id, String name, String description, String sku, BigDecimal price, int quantity, String category, LocalDate dateAdded) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.sku = sku;
+        this.price = price;
+        this.quantity = quantity;
+        this.category = category;
+        this.dateAdded = dateAdded;
+    }
 
     @Override
     public String toString() {
         return "ProductEntity{" +
-                "productId=" + id +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", sku='" + sku + '\'' +
                 ", price=" + price +
                 ", quantity=" + quantity +
                 ", category='" + category + '\'' +
+                ", productBrand='" + productBrand + '\'' +
+                ", costPrice=" + costPrice +
+                ", reorderPoint=" + reorderPoint +
+                ", supplier='" + supplier + '\'' +
+                ", modelNumber='" + modelNumber + '\'' +
+                ", markupPercentage=" + markupPercentage +
                 ", dateAdded=" + dateAdded +
                 '}';
     }

@@ -10,15 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @NoArgsConstructor
 @RequestScope
 public class SkuNumberGenerator
 {
-    private final Map<String, AtomicInteger> sequenceCache = new ConcurrentHashMap<>();
     private Logger LOGGER = LoggerFactory.getLogger(SkuNumberGenerator.class);
     private SkuHistoryService skuHistoryService;
 
@@ -34,9 +33,13 @@ public class SkuNumberGenerator
         }
         String parsedCategory = generateCategoryCode(category);
         String supplierCode = generateSupplierCode(5);
-        String key = parsedCategory + "-" + supplierCode;
-        int sequence = generateSequenceNumber(key);;
-        return new SkuNumber(parsedCategory, supplierCode);
+        if(validateGeneratedSku(parsedCategory, supplierCode)){
+            SkuNumber skuNumber = new SkuNumber(parsedCategory, supplierCode);
+            LOGGER.info("Sku Number: {}", skuNumber);
+            return skuNumber;
+        }else{
+            throw new IllegalArgumentException("Invalid sku code: " + parsedCategory + "-" + supplierCode);
+        }
     }
 
     public String generateSupplierCode(int length){
@@ -49,8 +52,31 @@ public class SkuNumberGenerator
         return sb.toString();
     }
 
+    public Boolean validateGeneratedSku(String categoryCode, String supplierCode){
+        LOGGER.info("Category Code: {}", categoryCode);
+        LOGGER.info("Supplier Code: {}", supplierCode);
+        if(categoryCode.isEmpty() || supplierCode.isEmpty()){
+            throw new IllegalArgumentException("Category cannot be empty");
+        }
+        if(categoryCode.length() != 2 || supplierCode.length() != 5){
+            LOGGER.info("Category Code or Supplier Code length not valid");
+            return false;
+        }else{
+            Pattern allLettersPattern = Pattern.compile("[A-Z]*");
+            Matcher allLettersMatcher = allLettersPattern.matcher(categoryCode);
+            if(!allLettersMatcher.matches()){
+                LOGGER.info("Category Code matcher failed");
+                return false;
+            }
+        }
+
+        return categoryCode.length() == 2 && supplierCode.length() == 5;
+    }
+
     public String generateCategoryCode(String category){
-        return switch (category) {
+        String lowerCaseCategory = convertToLower(category);
+        System.out.println(lowerCaseCategory);
+        return switch (lowerCaseCategory) {
             case "Electronics" -> "EL";
             case "Clothing" -> "CO";
             case "Books" -> "BK";
@@ -59,11 +85,7 @@ public class SkuNumberGenerator
         };
     }
 
-    public int generateSequenceNumber(String key){
-        if(key.isEmpty()){
-            throw new IllegalArgumentException("Key cannot be empty");
-        }
-        return sequenceCache.computeIfAbsent(key, k -> new AtomicInteger()).incrementAndGet();
+    public String convertToLower(String category){
+       return category.substring(0, 1).toUpperCase() + category.substring(1).toLowerCase();
     }
-    
 }

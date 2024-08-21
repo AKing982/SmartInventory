@@ -1,5 +1,6 @@
 import apiUrl from "../config/api";
 import axios from "axios";
+import NewInventoryPage from "../components/NewInventoryPage";
 
 export interface ProductData{
     productName: string;
@@ -8,7 +9,30 @@ export interface ProductData{
     productCategory: string;
     productQuantity: number;
     productPrice: number;
+    reorderPoint: number;
+    costPrice: number;
 }
+
+interface NewInventoryItem {
+    productName: string;
+    productSKU: string;
+    productBrand: string;
+    modelNumber: string;
+    productCategory: string;
+    productQuantity: number;
+    packageQuantity: number;
+    reorderPoint: number;
+    reorderQuantity: number;
+    productPrice: number;
+    costPrice: number;
+    markupPercentage: number;
+    supplier: string;
+    expirationDate: string;
+    productDescription: string;
+    notes: string;
+    images: string[]; // This will store image URLs
+}
+
 
 interface InventoryItem {
     productId: number;
@@ -72,9 +96,20 @@ export async function fetchAllProductsInInventory() {
     }
 }
 
-export async function addProductToInventory(product: ProductData) : Promise<any>
+export async function addProductToInventory(product: NewInventoryItem) : Promise<any>
 {
-    const {productName, productDescription, productSKU, productCategory, productQuantity, productPrice} = product;
+    const {productName,
+        productDescription,
+        productSKU,
+        productCategory,
+        productQuantity,
+        productPrice,
+        productBrand,
+        expirationDate,
+        costPrice,
+        notes,
+        supplier,
+        modelNumber} = product;
     console.log('Product to add: ', product);
     try
     {
@@ -85,6 +120,12 @@ export async function addProductToInventory(product: ProductData) : Promise<any>
             productCategory,
             productPrice,
             productQuantity,
+            productBrand,
+            expirationDate,
+            costPrice,
+            notes,
+            supplier,
+            modelNumber
         });
 
         console.log('Response Status: ', response.status);

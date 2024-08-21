@@ -13,12 +13,6 @@ import java.util.Optional;
 @Repository
 public interface SkuHistoryRepository extends JpaRepository<SkuHistoryEntity, Long>
 {
-    @Query("SELECT s.sequence FROM SkuHistoryEntity s WHERE s.id =:key")
-    Optional<Integer> findLastSequence(@Param("key") Long key);
-
-    @Modifying
-    @Query("UPDATE SkuHistoryEntity s SET s.sequence =:seq WHERE s.id =:id")
-    void updateSequence(@Param("id") Long id, @Param("seq") Integer seq);
 
     @Query("SELECT s FROM SkuHistoryEntity s WHERE s.categoryCode =:cat AND s.supplierCode =:sup")
     Optional<SkuHistoryEntity> findByCategoryCodeAndSupplierCode(@Param("cat") String cat, @Param("sup") String sup);

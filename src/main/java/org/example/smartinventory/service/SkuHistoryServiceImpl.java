@@ -1,6 +1,7 @@
 package org.example.smartinventory.service;
 
 import org.example.smartinventory.entities.SkuHistoryEntity;
+import org.example.smartinventory.entities.UserEntity;
 import org.example.smartinventory.repository.SkuHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,17 +47,10 @@ public class SkuHistoryServiceImpl implements SkuHistoryService
     }
 
     @Override
-    public Optional<Integer> findLastSkuSequenceByKey(String key) {
-        // Split the key
-        String[] split = key.split("-");
-        String categoryCode = split[0];
-        String supplierCode = split[1];
-
-        Optional<SkuHistoryEntity> skuHistoryEntity = skuHistoryRepository.findByCategoryCodeAndSupplierCode(categoryCode, supplierCode);
-        if(skuHistoryEntity.isEmpty()){
-            throw new NoSuchElementException();
-        }
-        Integer sequence = skuHistoryEntity.get().getSequence();
-        return Optional.of(sequence);
+    public SkuHistoryEntity createSkuHistory(String categoryCode, String supplierCode) {
+        SkuHistoryEntity skuHistoryEntity = new SkuHistoryEntity();
+        skuHistoryEntity.setCategoryCode(categoryCode);
+        skuHistoryEntity.setSupplierCode(supplierCode);
+        return skuHistoryRepository.save(skuHistoryEntity);
     }
 }

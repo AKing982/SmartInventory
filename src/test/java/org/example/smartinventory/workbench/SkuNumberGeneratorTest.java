@@ -35,12 +35,86 @@ class SkuNumberGeneratorTest {
     @Mock
     private SkuHistoryService skuHistoryService;
 
-    @Mock
-    private Map<String, AtomicInteger> sequenceCache = new ConcurrentHashMap<>();
-
     @BeforeEach
     void setUp() {
     }
+
+    @Test
+    void testGenerateSkuNumber_whenCategoryIsEmpty(){
+        String category = "";
+        assertThrows(IllegalArgumentException.class, () -> skuNumberGenerator.generateSkuNumber(category));
+    }
+
+    @Test
+    void testGenerateSkuNumber_whenCategoryIsUpperCase(){
+        String category = "ELECTRONICS";
+        SkuNumber expectedSkuNumber = new SkuNumber("EL", "CD532");
+        SkuNumber actual = skuNumberGenerator.generateSkuNumber(category);
+        assertNotEquals(expectedSkuNumber.toString(), actual.toString());
+        assertEquals("EL", actual.getCategoryCode());
+        assertNotEquals("CD532", actual.getSupplierCode());
+    }
+
+    @Test
+    void testGenerateSkuNumber_whenCategoryIsLowerCase(){
+        String category = "electronics";
+        SkuNumber expectedSkuNumber = new SkuNumber("EL", "CD532");
+        SkuNumber actual = skuNumberGenerator.generateSkuNumber(category);
+        assertNotEquals(expectedSkuNumber.toString(), actual.toString());
+        assertEquals("EL", actual.getCategoryCode());
+        assertNotEquals("CD532", actual.getSupplierCode());
+    }
+
+    @Test
+    void testValidateGeneratedSku_WhenCategoryCodeEmpty(){
+        String category = "";
+        String supplierCode = "CD532";
+        assertThrows(IllegalArgumentException.class, () -> skuNumberGenerator.validateGeneratedSku(category, supplierCode));
+    }
+
+    @Test
+    void testValidateGeneratedSku_WhenSupplierCodeEmpty(){
+        String category = "ELECTRONICS";
+        String supplierCode = "";
+        assertThrows(IllegalArgumentException.class, () -> skuNumberGenerator.validateGeneratedSku(category, supplierCode));
+    }
+
+    @Test
+    void testValidateGeneratedSku_CategoryCodeLengthNotTwo(){
+        String categoryCode = "CLOTHING";
+        String supplierCode = "CD532";
+        assertFalse(skuNumberGenerator.validateGeneratedSku(categoryCode, supplierCode));
+    }
+
+    @Test
+    void testValidateGeneratedSku_WhenSupplierCodeLengthNotFive(){
+        String categoryCode = "CL";
+        String supplierCode = "CD53220";
+        assertFalse(skuNumberGenerator.validateGeneratedSku(categoryCode, supplierCode));
+    }
+
+    @Test
+    void testValidateGeneratedSku_WhenSupplierCodeIsAllLetters(){
+        String categoryCode = "CL";
+        String supplierCode = "CDAAA";
+        assertFalse(skuNumberGenerator.validateGeneratedSku(categoryCode, supplierCode));
+    }
+
+    @Test
+    void testValidateGeneratedSku_WhenCategoryCodeAllDigits(){
+        String categoryCode = "53";
+        String supplierCode = "CD532";
+        assertFalse(skuNumberGenerator.validateGeneratedSku(categoryCode, supplierCode));
+    }
+
+    @Test
+    void testValidateGeneratedSku_whenCategoryCodeNotAlpabetic(){
+        String category = "1234542";
+        String supplierCode = "CD532";
+        assertFalse(skuNumberGenerator.validateGeneratedSku(category, supplierCode));
+    }
+
+
 
 
 

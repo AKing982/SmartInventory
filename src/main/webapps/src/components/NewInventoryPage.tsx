@@ -13,24 +13,24 @@ import {
 import { useNavigate } from 'react-router-dom';
 import MainAppBar from './MainAppBar';
 import InventoryIcon from "@mui/icons-material/Inventory";
-import {fetchSkuNumber} from "../api/InventoryApiService";
+import {addProductToInventory, fetchSkuNumber} from "../api/InventoryApiService";
 
 interface NewInventoryItem {
-    name: string;
-    sku: string;
-    brand: string;
+    productName: string;
+    productSKU: string;
+    productBrand: string;
     modelNumber: string;
-    category: string;
-    quantity: number;
+    productCategory: string;
+    productQuantity: number;
     packageQuantity: number;
     reorderPoint: number;
     reorderQuantity: number;
-    price: number;
+    productPrice: number;
     costPrice: number;
     markupPercentage: number;
     supplier: string;
     expirationDate: string;
-    description: string;
+    productDescription: string;
     notes: string;
     images: string[]; // This will store image URLs
 }
@@ -51,21 +51,21 @@ const ContentContainer = styled(Box)({
 const NewInventoryPage: React.FC = () => {
     const navigate = useNavigate();
     const [newItem, setNewItem] = useState<NewInventoryItem>({
-        name: '',
-        sku: '',
-        brand: '',
+        productName: '',
+        productSKU: '',
+        productBrand: '',
         modelNumber: '',
-        category: '',
-        quantity: 0,
+        productCategory: '',
+        productQuantity: 0,
         packageQuantity: 1,
         reorderPoint: 0,
         reorderQuantity: 0,
-        price: 0,
+        productPrice: 0,
         costPrice: 0,
         markupPercentage: 0,
         supplier: '',
         expirationDate: '',
-        description: '',
+        productDescription: '',
         notes: '',
         images: []
     });
@@ -78,12 +78,12 @@ const NewInventoryPage: React.FC = () => {
         const { name, value } = e.target;
         setNewItem(prev => ({
             ...prev,
-            [name]: ['quantity', 'packageQuantity', 'reorderPoint', 'reorderQuantity', 'price', 'costPrice', 'markupPercentage'].includes(name) ? Number(value) : value
+            [name]: ['productQuantity', 'packageQuantity', 'reorderPoint', 'reorderQuantity', 'productPrice', 'costPrice', 'markupPercentage'].includes(name) ? Number(value) : value
         }));
     };
 
     const generateModelNumber = () => {
-        const prefix = newItem.brand ? newItem.brand.substring(0, 2).toUpperCase() : 'XX';
+        const prefix = newItem.productBrand ? newItem.productBrand.substring(0, 2).toUpperCase() : 'XX';
         const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
         const newModelNumber = `${prefix}-${randomPart}`;
 
@@ -93,9 +93,28 @@ const NewInventoryPage: React.FC = () => {
         }));
     };
 
+    const createNewProductRequest = (newItem: NewInventoryItem) => {
+        return {
+            productName: newItem.productName,
+            productSKU: newItem.productSKU,
+            productQuantity: newItem.productQuantity,
+            productPrice: newItem.productPrice,
+            productDescription: newItem.productDescription,
+            productCategory: newItem.productCategory,
+            productBrand: newItem.productBrand,
+            costPrice: newItem.costPrice,
+            expirationDate: newItem.expirationDate,
+            notes: newItem.notes,
+            reorderPoint: newItem.reorderPoint,
+            supplier: newItem.supplier,
+            modelNumber: newItem.modelNumber,
+            markupPercentage: newItem.markupPercentage
+        }
+    }
+
     const generateSKU = async () => {
 
-        const selectedCategory = newItem.category;
+        const selectedCategory = newItem.productCategory;
         const generatedSku = await fetchSkuNumber(selectedCategory);
         const categoryCode = generatedSku.categoryCode;
         const supplierCode = generatedSku.supplierCode;
@@ -108,21 +127,28 @@ const NewInventoryPage: React.FC = () => {
 
         setNewItem(prevItem => ({
             ...prevItem,
-            sku:combined
+            productSKU:combined
         }));
     };
 
 
+
     const handleCategoryChange = (event: SelectChangeEvent<string>) => {
-        setNewItem(prev => ({ ...prev, category: event.target.value }));
+        setNewItem(prev => ({ ...prev, productCategory: event.target.value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         // Here you would typically send the data to your backend
         console.log('Submitting new item:', newItem);
-        setSnackbarMessage('Item added successfully!');
-        setOpenSnackbar(true);
+        const request = createNewProductRequest(newItem);
+        console.log('Request: ', request);
+        const response = await addProductToInventory(newItem);
+        console.log('Response: ', response);
+        if(response.status === 200){
+            setSnackbarMessage('Item added successfully!');
+            setOpenSnackbar(true);
+        }
         // Reset form or navigate back to inventory page after successful submission
         // navigate('/inventory');
     };
@@ -162,8 +188,8 @@ const NewInventoryPage: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     label="Item Name"
-                                    name="name"
-                                    value={newItem.name}
+                                    name="productName"
+                                    value={newItem.productName}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -172,8 +198,8 @@ const NewInventoryPage: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     label="SKU"
-                                    name="sku"
-                                    value={newItem.sku}
+                                    name="productSKU"
+                                    value={newItem.productSKU}
                                     onChange={handleInputChange}
                                     required
                                     InputProps={{
@@ -194,8 +220,8 @@ const NewInventoryPage: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     label="Brand"
-                                    name="brand"
-                                    value={newItem.brand}
+                                    name="productBrand"
+                                    value={newItem.productBrand}
                                     onChange={handleInputChange}
                                 />
                             </Grid>
@@ -226,9 +252,9 @@ const NewInventoryPage: React.FC = () => {
                                 <FormControl fullWidth>
                                     <InputLabel>Category</InputLabel>
                                     <Select
-                                        value={newItem.category}
+                                        value={newItem.productCategory}
                                         onChange={handleCategoryChange}
-                                        label="Category"
+                                        label="productCategory"
                                         required
                                     >
                                         {categories.map((category) => (
@@ -241,9 +267,9 @@ const NewInventoryPage: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     label="Quantity"
-                                    name="quantity"
+                                    name="productQuantity"
                                     type="number"
-                                    value={newItem.quantity}
+                                    value={newItem.productQuantity}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -285,9 +311,9 @@ const NewInventoryPage: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     label="Selling Price"
-                                    name="price"
+                                    name="productPrice"
                                     type="number"
-                                    value={newItem.price}
+                                    value={newItem.productPrice}
                                     onChange={handleInputChange}
                                     required
                                     InputProps={{
@@ -350,8 +376,8 @@ const NewInventoryPage: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     label="Description"
-                                    name="description"
-                                    value={newItem.description}
+                                    name="productDescription"
+                                    value={newItem.productDescription}
                                     onChange={handleInputChange}
                                     multiline
                                     rows={4}

@@ -4,6 +4,7 @@ import org.example.smartinventory.config.JpaConfig;
 import org.example.smartinventory.entities.CategoryEntity;
 import org.example.smartinventory.entities.ProductEntity;
 import org.example.smartinventory.service.ProductService;
+import org.example.smartinventory.service.SkuHistoryService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +49,9 @@ class ProductControllerTest {
 
     @MockBean
     private ProductService productService;
+
+    @MockBean
+    private SkuHistoryService skuHistoryService;
 
     private String testCategory = "Electronics";
 

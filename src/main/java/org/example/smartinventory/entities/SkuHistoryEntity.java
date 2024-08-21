@@ -16,18 +16,11 @@ public class SkuHistoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="userid")
-    private UserEntity user;
-
     @Column(name="categoryCode")
     private String categoryCode;
 
     @Column(name="supplierCode")
     private String supplierCode;
-
-    @Column(name="sequence")
-    private int sequence;
 
     @Column(name="dateAdded")
     @Temporal(TemporalType.TIMESTAMP)

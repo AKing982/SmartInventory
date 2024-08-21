@@ -26,6 +26,13 @@ public class ProductDTOConverter implements ModelToEntityConverter<ProductDTO, P
         productEntity.setQuantity(source.productQuantity());
         productEntity.setCategory(source.productCategory());
         productEntity.setDateAdded(LocalDate.now());
+        productEntity.setProductBrand(source.productBrand());
+        productEntity.setCostPrice(source.costPrice());
+        productEntity.setSupplier(source.supplier());
+        productEntity.setReorderPoint(source.reorderPoint());
+        productEntity.setNotes(source.notes());
+        productEntity.setExpirationDate(source.expirationDate());
+        productEntity.setMarkupPercentage(source.markupPercentage());
         LOGGER.info("ProductEntity: {}", productEntity);
         return productEntity;
     }

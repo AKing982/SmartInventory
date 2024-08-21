@@ -280,47 +280,47 @@ const AddInventoryPage: React.FC = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (validateForm()) {
-            setIsLoading(true);
-            try
-            {
-                const productData: ProductData = {
-                    productName: item.name,
-                    productDescription: item.description,
-                    productSKU: item.sku,
-                    productCategory: item.category,
-                    productQuantity: item.quantity,
-                    productPrice: item.price,
-                };
-                const response = await addProductToInventory(productData);
-                console.log('Product Added: ', response);
-                setItem({
-                    id: 0,
-                    name: '',
-                    sku: '',
-                    quantity: 0,
-                    price: 0,
-                    category: '',
-                    description: '',
-                });
-                setSnackbarMessage('Item added successfully');
-                setSnackbarSeverity('success');
-                setOpenSnackbar(true);
-                await fetchInventoryItems();
-
-            }catch(error)
-            {
-                console.error('Error adding item:', error);
-                setSnackbarMessage('Failed to add item');
-                setSnackbarSeverity('error');
-                setOpenSnackbar(true);
-            }finally{
-                setIsLoading(false);
-            }
-        }
-    };
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     if (validateForm()) {
+    //         setIsLoading(true);
+    //         try
+    //         {
+    //             const productData: ProductData = {
+    //                 productName: item.name,
+    //                 productDescription: item.description,
+    //                 productSKU: item.sku,
+    //                 productCategory: item.category,
+    //                 productQuantity: item.quantity,
+    //                 productPrice: item.price,
+    //             };
+    //             const response = await addProductToInventory(productData);
+    //             console.log('Product Added: ', response);
+    //             setItem({
+    //                 id: 0,
+    //                 name: '',
+    //                 sku: '',
+    //                 quantity: 0,
+    //                 price: 0,
+    //                 category: '',
+    //                 description: '',
+    //             });
+    //             setSnackbarMessage('Item added successfully');
+    //             setSnackbarSeverity('success');
+    //             setOpenSnackbar(true);
+    //             await fetchInventoryItems();
+    //
+    //         }catch(error)
+    //         {
+    //             console.error('Error adding item:', error);
+    //             setSnackbarMessage('Failed to add item');
+    //             setSnackbarSeverity('error');
+    //             setOpenSnackbar(true);
+    //         }finally{
+    //             setIsLoading(false);
+    //         }
+    //     }
+    // };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -461,7 +461,7 @@ const AddInventoryPage: React.FC = () => {
                         </Box>
                         <Collapse in={isAddInventoryOpen}>
                             <Box sx={{ p: 2 }}>
-                                <form onSubmit={handleSubmit}>
+                                <form>
                                     <Grid container spacing={3}>
                                         <Grid item xs={12} sm={6}>
                                             <TextField

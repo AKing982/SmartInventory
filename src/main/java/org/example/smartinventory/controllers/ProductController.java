@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.example.smartinventory.dto.ProductDTO;
 import org.example.smartinventory.entities.ProductEntity;
 import org.example.smartinventory.service.ProductService;
+import org.example.smartinventory.service.SkuHistoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +24,15 @@ import java.util.Optional;
 public class ProductController
 {
     private ProductService productService;
+    private SkuHistoryService skuHistoryService;
     private Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
     @Autowired
-    public ProductController(ProductService productService)
+    public ProductController(ProductService productService,
+                             SkuHistoryService skuHistoryService)
     {
         this.productService = productService;
+        this.skuHistoryService = skuHistoryService;
     }
 
     @GetMapping(value="/", produces= MediaType.APPLICATION_JSON_VALUE)
@@ -60,7 +64,6 @@ public class ProductController
         try
         {
             LOGGER.info("Adding ProductDTO: {}", product);
-
             productService.addProductDTO(product);
             LOGGER.info("Product has been added to the database.");
             return ResponseEntity.status(HttpStatus.CREATED).build();

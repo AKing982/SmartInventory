@@ -1,12 +1,15 @@
 package org.example.smartinventory.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Product {
 
     private int productId;
@@ -16,14 +19,13 @@ public class Product {
     private int productQuantity;
     private String productCategory;
     private String productSKU;
+    private String productBrand;
+    private BigDecimal costPrice;
+    private LocalDate expirationDate;
+    private Notes notes;
+    private int reorderPoint;
+    private String supplier;
+    private String modelNumber;
+    private double markupPercentage;
 
-    public Product(int productId, String productName, String productDescription, BigDecimal productPrice, int productQuantity, String productCategory, String productSKU) {
-        this.productId = productId;
-        this.productName = productName;
-        this.productDescription = productDescription;
-        this.productPrice = productPrice;
-        this.productQuantity = productQuantity;
-        this.productCategory = productCategory;
-        this.productSKU = productSKU;
-    }
 }
