@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Table(name="sku_histories")
 @Entity
 @Data
@@ -18,13 +20,16 @@ public class SkuHistoryEntity {
     @JoinColumn(name="userid")
     private UserEntity user;
 
+    @Column(name="categoryCode")
+    private String categoryCode;
+
+    @Column(name="supplierCode")
+    private String supplierCode;
+
     @Column(name="sequence")
     private int sequence;
 
-    @Column(name="sku")
-    private String sku;
-
-    @Column(name="supplier")
-    private String supplier;
-
+    @Column(name="dateAdded")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime dateAdded;
 }

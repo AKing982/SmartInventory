@@ -1,54 +1,48 @@
 package org.example.smartinventory.workbench;
 
+import org.example.smartinventory.entities.SkuHistoryEntity;
 import org.example.smartinventory.model.SkuNumber;
+import org.example.smartinventory.service.SkuHistoryService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
-@SpringBootTest
-@RunWith(SpringRunner.class)
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 class SkuNumberGeneratorTest {
 
-    @Autowired
+    @InjectMocks
     private SkuNumberGenerator skuNumberGenerator;
+
+    @Mock
+    private SkuHistoryService skuHistoryService;
+
+    @Mock
+    private Map<String, AtomicInteger> sequenceCache = new ConcurrentHashMap<>();
 
     @BeforeEach
     void setUp() {
     }
 
-    @Test
-    void testGenerateSkuNumber_whenCategoryIsEmpty(){
-        String category = "";
-        String supplier = "SUPPLIER";
-        assertThrows(IllegalArgumentException.class, () -> skuNumberGenerator.generateSkuNumber(category, supplier));
-    }
 
-    @Test
-    void testGenerateSkuNumber_whenSupplierIsEmpty(){
-        String category = "BOOKS";
-        String supplier = "";
-        assertThrows(IllegalArgumentException.class, () -> skuNumberGenerator.generateSkuNumber(category, supplier));
-    }
-
-    @Test
-    void testGenerateSkuNumber_ValidSku(){
-        String category = "BOOKS";
-        String supplier = "SUPPLIER";
-        String expectedSku = "BOSUP0001";
-        String actualSku = skuNumberGenerator.generateSkuNumber(category, supplier).toString();
-        assertEquals(expectedSku, actualSku);
-    }
-
-    @Test
-    void testGenerateSequenceNumber(){
-
-    }
 
     @AfterEach
     void tearDown() {

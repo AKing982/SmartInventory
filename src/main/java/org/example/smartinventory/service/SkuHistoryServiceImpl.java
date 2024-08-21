@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -42,5 +43,20 @@ public class SkuHistoryServiceImpl implements SkuHistoryService
     @Override
     public Collection<SkuHistoryEntity> findAllById(Iterable<Long> ids) {
         return skuHistoryRepository.findAllById(ids);
+    }
+
+    @Override
+    public Optional<Integer> findLastSkuSequenceByKey(String key) {
+        // Split the key
+        String[] split = key.split("-");
+        String categoryCode = split[0];
+        String supplierCode = split[1];
+
+        Optional<SkuHistoryEntity> skuHistoryEntity = skuHistoryRepository.findByCategoryCodeAndSupplierCode(categoryCode, supplierCode);
+        if(skuHistoryEntity.isEmpty()){
+            throw new NoSuchElementException();
+        }
+        Integer sequence = skuHistoryEntity.get().getSequence();
+        return Optional.of(sequence);
     }
 }
