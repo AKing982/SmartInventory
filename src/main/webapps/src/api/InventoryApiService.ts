@@ -20,7 +20,22 @@ interface InventoryItem {
     description: string;
 }
 
-
+export async function fetchSkuNumber(category: string) {
+    try
+    {
+        const response  = await axios.get(`${apiUrl}/api/skus/`, {
+            params:{
+                category: category
+            }
+        });
+        console.log('Sku Response: ', response.data);
+        if(response.status === 200){
+            return response.data;
+        }
+    }catch(error){
+        console.error('There was an error generating a sku number: ', error);
+    }
+}
 
 export async function deleteProductFromInventory(productId: number) : Promise<void> {
     if(productId === null)

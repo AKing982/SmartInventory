@@ -43,27 +43,20 @@ public class SkuNumberGenerator
         String alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder sb = new StringBuilder(length);
         Random random = new Random();
-
         for (int i = 0; i < length; i++) {
             sb.append(alphanumeric.charAt(random.nextInt(alphanumeric.length())));
         }
-
         return sb.toString();
     }
 
     public String generateCategoryCode(String category){
-        switch(category){
-            case "Electronics":
-                return "EL";
-            case "Clothing":
-                return "CO";
-            case "Books":
-                return "BK";
-            case "Food":
-                return "FD";
-            default:
-                throw new IllegalArgumentException("Invalid category");
-        }
+        return switch (category) {
+            case "Electronics" -> "EL";
+            case "Clothing" -> "CO";
+            case "Books" -> "BK";
+            case "Food" -> "FD";
+            default -> throw new IllegalArgumentException("Invalid category");
+        };
     }
 
     public int generateSequenceNumber(String key){

@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.example.smartinventory.exceptions.InvalidCategorySegmentException;
 import org.example.smartinventory.exceptions.InvalidSkuNumberException;
 import org.example.smartinventory.exceptions.InvalidSkuNumberSegmentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,12 +23,8 @@ public class SkuNumber
     }
 
     void initializeSkuNumber(String categoryCode, String supplierCode){
-        if(validate(categoryCode, supplierCode)){
-            this.categoryCode = categoryCode;
-            this.supplierCode = supplierCode;
-        }else{
-            throw new InvalidSkuNumberException(categoryCode + "-" + supplierCode);
-        }
+        this.categoryCode = categoryCode;
+        this.supplierCode = supplierCode;
     }
 
     public Boolean validate(String categoryCode, String supplierCode){
@@ -40,9 +38,9 @@ public class SkuNumber
         }else{
             Pattern characters = Pattern.compile("[a-zA-Z]*");
             Pattern numbers = Pattern.compile("[0-9]*");
-            Matcher matcher = characters.matcher(categoryCode);
+            Matcher Charmatcher = characters.matcher(categoryCode);
             Matcher supplierMatcher = characters.matcher(supplierCode);
-            if(!matcher.matches() || !supplierMatcher.matches()){
+            if(!Charmatcher.matches() || !supplierMatcher.matches()){
                 return false;
             }
         }

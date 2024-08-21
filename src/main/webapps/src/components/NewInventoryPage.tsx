@@ -13,6 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import MainAppBar from './MainAppBar';
 import InventoryIcon from "@mui/icons-material/Inventory";
+import {fetchSkuNumber} from "../api/InventoryApiService";
 
 interface NewInventoryItem {
     name: string;
@@ -92,14 +93,22 @@ const NewInventoryPage: React.FC = () => {
         }));
     };
 
-    const generateSKU = () => {
-        const prefix = newItem.category ? newItem.category.substring(0, 3).toUpperCase() : 'XXX';
-        const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
-        const newSKU = `${prefix}-${randomPart}`;
+    const generateSKU = async () => {
+
+        const selectedCategory = newItem.category;
+        const generatedSku = await fetchSkuNumber(selectedCategory);
+        const categoryCode = generatedSku.categoryCode;
+        const supplierCode = generatedSku.supplierCode;
+        if(categoryCode === undefined || supplierCode === undefined){
+            return "N/A";
+        }
+        const combined = `${generatedSku.categoryCode}-${generatedSku.supplierCode}`;
+        console.log('Combined: ', combined);
+        console.log('New Sku: ', generatedSku);
 
         setNewItem(prevItem => ({
             ...prevItem,
-            sku: newSKU
+            sku:combined
         }));
     };
 
