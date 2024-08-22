@@ -30,8 +30,6 @@ public class SkuNumber
         this.identifier = identifier;
     }
 
-
-
     private int getLength(String strLength){
         return strLength.length();
     }

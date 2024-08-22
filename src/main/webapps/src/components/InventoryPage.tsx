@@ -4,7 +4,7 @@ import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
     IconButton, Tooltip, Select, MenuItem, InputLabel, FormControl,
     SelectChangeEvent, Dialog, DialogTitle, DialogContent, DialogActions,
-    List, ListItem, ListItemText, styled, TablePagination, Chip
+    List, ListItem, ListItemText, styled, TablePagination, Chip, Collapse
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -17,12 +17,22 @@ import {
     Assessment as AssessmentIcon,
     Category as CategoryIcon,
     Warehouse as WarehouseIcon,
-    People as PeopleIcon, Business as BusinessIcon, Settings as SettingsIcon
+    People as PeopleIcon, Business as BusinessIcon, Settings as SettingsIcon,
+    KeyboardArrowDown as KeyboardArrowDownIcon,
+    KeyboardArrowUp as KeyboardArrowUpIcon, KeyboardArrowDown
 } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 import MainAppBar from './MainAppBar';
 import InventoryIcon from "@mui/icons-material/Inventory";
 import GradientRoundButton from "./GradientRoundButton";
+
+interface SubItem {
+    id: number;
+    serialNumber: string;
+    location: string;
+    condition: string;
+}
+
 
 interface InventoryItem {
     id: number;
@@ -35,6 +45,7 @@ interface InventoryItem {
     comments: string;
     history: { date: string; action: string }[];
     status: 'In Stock' | 'Low Stock' | 'Out of Stock';
+    subItems?: SubItem[];
 }
 
 const BackgroundContainer = styled('div')({
@@ -62,6 +73,7 @@ const InventoryPage: React.FC = () => {
     const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
     const navigate = useNavigate();
 
@@ -70,22 +82,116 @@ const InventoryPage: React.FC = () => {
     useEffect(() => {
         // In a real application, you'd fetch this data from an API
         const dummyData: InventoryItem[] = [
-            { id: 1, name: 'Laptop', sku: 'TECH001', category: 'Electronics', quantity: 50, price: 999.99, supplier: 'TechCorp', comments: 'High demand item', history: [{ date: '2023-01-01', action: 'Added to inventory' }], status: 'In Stock' },
-            { id: 2, name: 'T-Shirt', sku: 'CLOTH001', category: 'Clothing', quantity: 100, price: 19.99, supplier: 'FashionInc', comments: 'Popular sizes running low', history: [{ date: '2023-02-15', action: 'Restocked' }], status: 'In Stock' },
-            { id: 3, name: 'Novel', sku: 'BOOK001', category: 'Books', quantity: 75, price: 14.99, supplier: 'BookWorm Ltd', comments: 'New release', history: [{ date: '2023-03-10', action: 'Price updated' }], status: 'In Stock' },
-            { id: 4, name: 'Smartphone', sku: 'TECH002', category: 'Electronics', quantity: 30, price: 699.99, supplier: 'TechCorp', comments: 'Latest model', history: [{ date: '2023-04-01', action: 'Added to inventory' }], status: 'In Stock' },
-            { id: 5, name: 'Jeans', sku: 'CLOTH002', category: 'Clothing', quantity: 80, price: 49.99, supplier: 'FashionInc', comments: 'Best seller', history: [{ date: '2023-04-15', action: 'Restocked' }], status: 'In Stock' },
-            { id: 6, name: 'Cookbook', sku: 'BOOK002', category: 'Books', quantity: 5, price: 24.99, supplier: 'BookWorm Ltd', comments: 'Low stock', history: [{ date: '2023-05-01', action: 'Low stock alert' }], status: 'Low Stock' },
-            { id: 7, name: 'Tablet', sku: 'TECH003', category: 'Electronics', quantity: 0, price: 399.99, supplier: 'TechCorp', comments: 'Out of stock', history: [{ date: '2023-05-15', action: 'Out of stock' }], status: 'Out of Stock' },
-            { id: 8, name: 'Dress', sku: 'CLOTH003', category: 'Clothing', quantity: 60, price: 79.99, supplier: 'FashionInc', comments: 'New collection', history: [{ date: '2023-06-01', action: 'Added to inventory' }], status: 'In Stock' },
-            { id: 9, name: 'Science Fiction', sku: 'BOOK003', category: 'Books', quantity: 40, price: 12.99, supplier: 'BookWorm Ltd', comments: 'Bestseller', history: [{ date: '2023-06-15', action: 'Restocked' }], status: 'In Stock' },
-            { id: 10, name: 'Smartwatch', sku: 'TECH004', category: 'Electronics', quantity: 25, price: 199.99, supplier: 'TechCorp', comments: 'Popular item', history: [{ date: '2023-07-01', action: 'Price updated' }], status: 'In Stock' },
-            { id: 11, name: 'Sneakers', sku: 'CLOTH004', category: 'Clothing', quantity: 3, price: 89.99, supplier: 'FashionInc', comments: 'Low stock', history: [{ date: '2023-07-15', action: 'Low stock alert' }], status: 'Low Stock' },
-            { id: 12, name: 'Cookbook', sku: 'BOOK004', category: 'Books', quantity: 50, price: 29.99, supplier: 'BookWorm Ltd', comments: 'New edition', history: [{ date: '2023-08-01', action: 'Added to inventory' }], status: 'In Stock' },
-            { id: 13, name: 'Headphones', sku: 'TECH005', category: 'Electronics', quantity: 35, price: 149.99, supplier: 'TechCorp', comments: 'Noise-cancelling', history: [{ date: '2023-08-15', action: 'Restocked' }], status: 'In Stock' },
+            {
+                id: 1,
+                name: 'Laptop',
+                sku: 'TECH001',
+                category: 'Electronics',
+                quantity: 50,
+                price: 999.99,
+                supplier: 'TechCorp',
+                comments: 'High demand item',
+                history: [{ date: '2023-01-01', action: 'Added to inventory' }],
+                status: 'In Stock',
+                subItems: [
+                    { id: 101, serialNumber: 'LT001', location: 'Warehouse A', condition: 'New' },
+                    { id: 102, serialNumber: 'LT002', location: 'Warehouse B', condition: 'New' },
+                    { id: 103, serialNumber: 'LT003', location: 'Warehouse A', condition: 'Refurbished' },
+                    // ... (more sub-items)
+                ]
+            },
+            {
+                id: 2,
+                name: 'T-Shirt',
+                sku: 'CLOTH001',
+                category: 'Clothing',
+                quantity: 100,
+                price: 19.99,
+                supplier: 'FashionInc',
+                comments: 'Popular sizes running low',
+                history: [{ date: '2023-02-15', action: 'Restocked' }],
+                status: 'In Stock',
+                subItems: [
+                    { id: 201, serialNumber: 'TS001', location: 'Store Front', condition: 'New' },
+                    { id: 202, serialNumber: 'TS002', location: 'Warehouse C', condition: 'New' },
+                    // ... (more sub-items)
+                ]
+            },
+            {
+                id: 3,
+                name: 'Novel',
+                sku: 'BOOK001',
+                category: 'Books',
+                quantity: 75,
+                price: 14.99,
+                supplier: 'BookWorm Ltd',
+                comments: 'New release',
+                history: [{ date: '2023-03-10', action: 'Price updated' }],
+                status: 'In Stock',
+                subItems: [
+                    { id: 301, serialNumber: 'BK001', location: 'Bookstore', condition: 'New' },
+                    { id: 302, serialNumber: 'BK002', location: 'Warehouse D', condition: 'New' },
+                    // ... (more sub-items)
+                ]
+            },
+            // ... (other items with subItems for those with quantity > 1)
+            {
+                id: 6,
+                name: 'Cookbook',
+                sku: 'BOOK002',
+                category: 'Books',
+                quantity: 5,
+                price: 24.99,
+                supplier: 'BookWorm Ltd',
+                comments: 'Low stock',
+                history: [{ date: '2023-05-01', action: 'Low stock alert' }],
+                status: 'Low Stock',
+                subItems: [
+                    { id: 601, serialNumber: 'CB001', location: 'Bookstore', condition: 'New' },
+                    { id: 602, serialNumber: 'CB002', location: 'Warehouse D', condition: 'New' },
+                    { id: 603, serialNumber: 'CB003', location: 'Bookstore', condition: 'New' },
+                    { id: 604, serialNumber: 'CB004', location: 'Warehouse D', condition: 'New' },
+                    { id: 605, serialNumber: 'CB005', location: 'Bookstore', condition: 'New' },
+                ]
+            },
+            {
+                id: 7,
+                name: 'Tablet',
+                sku: 'TECH003',
+                category: 'Electronics',
+                quantity: 0,
+                price: 399.99,
+                supplier: 'TechCorp',
+                comments: 'Out of stock',
+                history: [{ date: '2023-05-15', action: 'Out of stock' }],
+                status: 'Out of Stock'
+            },
+            // ... (continue with other items, adding subItems where quantity > 1)
         ];
         setInventoryItems(dummyData);
     }, []);
+
+    // useEffect(() => {
+    //     // In a real application, you'd fetch this data from an API
+    //     const dummyData: InventoryItem[] = [
+    //         { id: 1, name: 'Laptop', sku: 'TECH001', category: 'Electronics', quantity: 50, price: 999.99, supplier: 'TechCorp', comments: 'High demand item', history: [{ date: '2023-01-01', action: 'Added to inventory' }], status: 'In Stock' },
+    //         { id: 2, name: 'T-Shirt', sku: 'CLOTH001', category: 'Clothing', quantity: 100, price: 19.99, supplier: 'FashionInc', comments: 'Popular sizes running low', history: [{ date: '2023-02-15', action: 'Restocked' }], status: 'In Stock' },
+    //         { id: 3, name: 'Novel', sku: 'BOOK001', category: 'Books', quantity: 75, price: 14.99, supplier: 'BookWorm Ltd', comments: 'New release', history: [{ date: '2023-03-10', action: 'Price updated' }], status: 'In Stock' },
+    //         { id: 4, name: 'Smartphone', sku: 'TECH002', category: 'Electronics', quantity: 30, price: 699.99, supplier: 'TechCorp', comments: 'Latest model', history: [{ date: '2023-04-01', action: 'Added to inventory' }], status: 'In Stock' },
+    //         { id: 5, name: 'Jeans', sku: 'CLOTH002', category: 'Clothing', quantity: 80, price: 49.99, supplier: 'FashionInc', comments: 'Best seller', history: [{ date: '2023-04-15', action: 'Restocked' }], status: 'In Stock' },
+    //         { id: 6, name: 'Cookbook', sku: 'BOOK002', category: 'Books', quantity: 5, price: 24.99, supplier: 'BookWorm Ltd', comments: 'Low stock', history: [{ date: '2023-05-01', action: 'Low stock alert' }], status: 'Low Stock' },
+    //         { id: 7, name: 'Tablet', sku: 'TECH003', category: 'Electronics', quantity: 0, price: 399.99, supplier: 'TechCorp', comments: 'Out of stock', history: [{ date: '2023-05-15', action: 'Out of stock' }], status: 'Out of Stock' },
+    //         { id: 8, name: 'Dress', sku: 'CLOTH003', category: 'Clothing', quantity: 60, price: 79.99, supplier: 'FashionInc', comments: 'New collection', history: [{ date: '2023-06-01', action: 'Added to inventory' }], status: 'In Stock' },
+    //         { id: 9, name: 'Science Fiction', sku: 'BOOK003', category: 'Books', quantity: 40, price: 12.99, supplier: 'BookWorm Ltd', comments: 'Bestseller', history: [{ date: '2023-06-15', action: 'Restocked' }], status: 'In Stock' },
+    //         { id: 10, name: 'Smartwatch', sku: 'TECH004', category: 'Electronics', quantity: 25, price: 199.99, supplier: 'TechCorp', comments: 'Popular item', history: [{ date: '2023-07-01', action: 'Price updated' }], status: 'In Stock' },
+    //         { id: 11, name: 'Sneakers', sku: 'CLOTH004', category: 'Clothing', quantity: 3, price: 89.99, supplier: 'FashionInc', comments: 'Low stock', history: [{ date: '2023-07-15', action: 'Low stock alert' }], status: 'Low Stock' },
+    //         { id: 12, name: 'Cookbook', sku: 'BOOK004', category: 'Books', quantity: 50, price: 29.99, supplier: 'BookWorm Ltd', comments: 'New edition', history: [{ date: '2023-08-01', action: 'Added to inventory' }], status: 'In Stock' },
+    //         { id: 13, name: 'Headphones', sku: 'TECH005', category: 'Electronics', quantity: 35, price: 149.99, supplier: 'TechCorp', comments: 'Noise-cancelling', history: [{ date: '2023-08-15', action: 'Restocked' }], status: 'In Stock' },
+    //     ];
+    //     setInventoryItems(dummyData);
+    // }, []);
+
+
 
     // ... (keep other handlers as they are)
 
@@ -97,7 +203,9 @@ const InventoryPage: React.FC = () => {
                     item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
             )
             .sort((a, b) => {
+                // @ts-ignore
                 if (a[sortBy] < b[sortBy]) return sortDirection === 'asc' ? -1 : 1;
+                // @ts-ignore
                 if (a[sortBy] > b[sortBy]) return sortDirection === 'asc' ? 1 : -1;
                 return 0;
             });
@@ -128,6 +236,11 @@ const InventoryPage: React.FC = () => {
         setSelectedItemId(id);
         setOpenHistoryDialog(true);
     };
+
+    const handleExpandRow = (id: number) => {
+        setExpandedRows(prev => ({...prev, [id]: !prev[id]}));
+    };
+
 
     const menuItems2 = [
         { text: 'Dashboard', icon: <AssessmentIcon />, path: '/home' },
@@ -186,6 +299,7 @@ const InventoryPage: React.FC = () => {
                         <Table>
                             <TableHead>
                                 <TableRow>
+                                    <TableCell padding="checkbox"></TableCell>
                                     {['name', 'sku', 'category', 'quantity', 'price', 'supplier', 'status'].map((column) => (
                                         <TableCell key={column}>
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -201,46 +315,91 @@ const InventoryPage: React.FC = () => {
                             </TableHead>
                             <TableBody>
                                 {filteredAndSortedItems.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell>{item.name}</TableCell>
-                                        <TableCell>{item.sku}</TableCell>
-                                        <TableCell>{item.category}</TableCell>
-                                        <TableCell>{item.quantity}</TableCell>
-                                        <TableCell>${item.price.toFixed(2)}</TableCell>
-                                        <TableCell>{item.supplier}</TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={item.status}
-                                                color={
-                                                    item.status === 'In Stock' ? 'success' :
-                                                        item.status === 'Low Stock' ? 'warning' :
-                                                            'error'
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Tooltip title="Edit">
-                                                <IconButton>
-                                                    <EditIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Delete">
-                                                <IconButton onClick={() => handleDeleteItem(item.id)}>
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="View History">
-                                                <IconButton onClick={() => handleViewHistory(item.history, item.id)}>
-                                                    <HistoryIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Comments">
-                                                <IconButton>
-                                                    <CommentIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TableCell>
-                                    </TableRow>
+                                    <React.Fragment key={item.id}>
+                                        <TableRow>
+                                            <TableCell padding="checkbox">
+                                                {item.quantity > 1 && (
+                                                    <IconButton
+                                                        aria-label="expand row"
+                                                        size="small"
+                                                        onClick={() => handleExpandRow(item.id)}
+                                                    >
+                                                        {expandedRows[item.id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                                                    </IconButton>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>{item.name}</TableCell>
+                                            <TableCell>{item.sku}</TableCell>
+                                            <TableCell>{item.category}</TableCell>
+                                            <TableCell>{item.quantity}</TableCell>
+                                            <TableCell>${item.price.toFixed(2)}</TableCell>
+                                            <TableCell>{item.supplier}</TableCell>
+                                            <TableCell>
+                                                <Chip
+                                                    label={item.status}
+                                                    color={
+                                                        item.status === 'In Stock' ? 'success' :
+                                                            item.status === 'Low Stock' ? 'warning' :
+                                                                'error'
+                                                    }
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Tooltip title="Edit">
+                                                    <IconButton>
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Delete">
+                                                    <IconButton onClick={() => handleDeleteItem(item.id)}>
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="View History">
+                                                    <IconButton onClick={() => handleViewHistory(item.history, item.id)}>
+                                                        <HistoryIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Comments">
+                                                    <IconButton>
+                                                        <CommentIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </TableCell>
+                                        </TableRow>
+                                        {item.quantity > 1 && (
+                                            <TableRow>
+                                                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
+                                                    <Collapse in={expandedRows[item.id]} timeout="auto" unmountOnExit>
+                                                        <Box sx={{ margin: 1 }}>
+                                                            <Typography variant="h6" gutterBottom component="div">
+                                                                Item Details
+                                                            </Typography>
+                                                            <Table size="small" aria-label="purchases">
+                                                                <TableHead>
+                                                                    <TableRow>
+                                                                        <TableCell>Serial Number</TableCell>
+                                                                        <TableCell>Location</TableCell>
+                                                                        <TableCell>Condition</TableCell>
+                                                                    </TableRow>
+                                                                </TableHead>
+                                                                <TableBody>
+                                                                    {/* Placeholder for individual item details */}
+                                                                    {[...Array(item.quantity)].map((_, index) => (
+                                                                        <TableRow key={index}>
+                                                                            <TableCell>{`${item.sku}-${index + 1}`}</TableCell>
+                                                                            <TableCell>Warehouse A</TableCell>
+                                                                            <TableCell>New</TableCell>
+                                                                        </TableRow>
+                                                                    ))}
+                                                                </TableBody>
+                                                            </Table>
+                                                        </Box>
+                                                    </Collapse>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </React.Fragment>
                                 ))}
                             </TableBody>
                         </Table>
@@ -259,6 +418,125 @@ const InventoryPage: React.FC = () => {
             </ContentContainer>
         </BackgroundContainer>
     );
+
+    //
+    // return (
+    //     <BackgroundContainer>
+    //         <MainAppBar title="Inventory Management" drawerItems={menuItems2}/>
+    //         <ContentContainer>
+    //             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    //                 <Typography variant="h4">
+    //                 </Typography>
+    //                 <GradientRoundButton
+    //                     variant="contained"
+    //                     color="primary"
+    //                     startIcon={<AddIcon />}
+    //                     onClick={() => navigate('/inventory/new')}
+    //                 >
+    //                     Add New Item
+    //                 </GradientRoundButton>
+    //             </Box>
+    //             <Paper elevation={3} sx={{ p: 2, width: '100%' }}>
+    //                 <Box sx={{ display: 'flex', mb: 2 }}>
+    //                     <TextField
+    //                         label="Search Items"
+    //                         variant="outlined"
+    //                         size="small"
+    //                         value={searchTerm}
+    //                         onChange={(e) => setSearchTerm(e.target.value)}
+    //                         sx={{ mr: 2 }}
+    //                     />
+    //                     <FormControl size="small" sx={{ minWidth: 120, mr: 2 }}>
+    //                         <InputLabel>Category</InputLabel>
+    //                         <Select
+    //                             value={searchCategory}
+    //                             onChange={(e) => setSearchCategory(e.target.value)}
+    //                             label="Category"
+    //                         >
+    //                             <MenuItem value="all">All</MenuItem>
+    //                             {categories.map((category) => (
+    //                                 <MenuItem key={category} value={category}>{category}</MenuItem>
+    //                             ))}
+    //                         </Select>
+    //                     </FormControl>
+    //                 </Box>
+    //                 <TableContainer>
+    //                     <Table>
+    //                         <TableHead>
+    //                             <TableRow>
+    //                                 {['name', 'sku', 'category', 'quantity', 'price', 'supplier', 'status'].map((column) => (
+    //                                     <TableCell key={column}>
+    //                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+    //                                             {column.charAt(0).toUpperCase() + column.slice(1)}
+    //                                             <IconButton size="small" onClick={() => handleSort(column as keyof InventoryItem)}>
+    //                                                 <SortIcon />
+    //                                             </IconButton>
+    //                                         </Box>
+    //                                     </TableCell>
+    //                                 ))}
+    //                                 <TableCell>Actions</TableCell>
+    //                             </TableRow>
+    //                         </TableHead>
+    //                         <TableBody>
+    //                             {filteredAndSortedItems.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
+    //                                 <TableRow key={item.id}>
+    //                                     <TableCell>{item.name}</TableCell>
+    //                                     <TableCell>{item.sku}</TableCell>
+    //                                     <TableCell>{item.category}</TableCell>
+    //                                     <TableCell>{item.quantity}</TableCell>
+    //                                     <TableCell>${item.price.toFixed(2)}</TableCell>
+    //                                     <TableCell>{item.supplier}</TableCell>
+    //                                     <TableCell>
+    //                                         <Chip
+    //                                             label={item.status}
+    //                                             color={
+    //                                                 item.status === 'In Stock' ? 'success' :
+    //                                                     item.status === 'Low Stock' ? 'warning' :
+    //                                                         'error'
+    //                                             }
+    //                                         />
+    //                                     </TableCell>
+    //                                     <TableCell>
+    //                                         <Tooltip title="Edit">
+    //                                             <IconButton>
+    //                                                 <EditIcon />
+    //                                             </IconButton>
+    //                                         </Tooltip>
+    //                                         <Tooltip title="Delete">
+    //                                             <IconButton onClick={() => handleDeleteItem(item.id)}>
+    //                                                 <DeleteIcon />
+    //                                             </IconButton>
+    //                                         </Tooltip>
+    //                                         <Tooltip title="View History">
+    //                                             <IconButton onClick={() => handleViewHistory(item.history, item.id)}>
+    //                                                 <HistoryIcon />
+    //                                             </IconButton>
+    //                                         </Tooltip>
+    //                                         <Tooltip title="Comments">
+    //                                             <IconButton>
+    //                                                 <CommentIcon />
+    //                                             </IconButton>
+    //                                         </Tooltip>
+    //                                     </TableCell>
+    //                                 </TableRow>
+    //                             ))}
+    //                         </TableBody>
+    //                     </Table>
+    //                 </TableContainer>
+    //                 <TablePagination
+    //                     rowsPerPageOptions={[5, 10, 25]}
+    //                     component="div"
+    //                     count={filteredAndSortedItems.length}
+    //                     rowsPerPage={rowsPerPage}
+    //                     page={page}
+    //                     onPageChange={handleChangePage}
+    //                     onRowsPerPageChange={handleChangeRowsPerPage}
+    //                 />
+    //             </Paper>
+    //             {/* Keep Snackbar and Dialog components as they are */}
+    //         </ContentContainer>
+    //     </BackgroundContainer>
+    // );
 };
 
 export default InventoryPage;

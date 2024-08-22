@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {ChangeEvent, useEffect, useState} from 'react';
 import {
     AppBar,
     Toolbar,
@@ -58,6 +58,12 @@ const ContentContainer = styled(Box)({
     flexGrow: 1,
     padding: '24px 0',
 });
+const StyledListItem = styled(ListItem)(({ theme }) => ({
+    '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+    },
+    cursor: 'pointer',
+}));
 
 
 interface Task {
@@ -103,6 +109,7 @@ const HomePage: React.FC = () => {
     const [upcomingDeliveries, setUpcomingDeliveries] = useState<Delivery[]>([]);
 
     const [inventoryNotifications, setInventoryNotifications] = useState<string[]>([]);
+    const [weeklyGoalProgress, setWeeklyGoalProgress] = useState<number>(0);
 
     const user = localStorage.getItem('user');
 
@@ -121,7 +128,7 @@ const HomePage: React.FC = () => {
         ]);
         setTasks([
             { id: 1, title: 'Review inventory levels', completed: false },
-            { id: 2, title: 'Approve new supplier contract', completed: true },
+            { id: 2, title: 'Approve new supplier contract', completed: false },
             { id: 3, title: 'Update product descriptions', completed: false }
         ]);
         setUpcomingDeliveries([
@@ -171,6 +178,16 @@ const HomePage: React.FC = () => {
         setDrawerOpen(!drawerOpen);
     };
 
+    const handleWeeklyGoalProgressChange = (taskId: number) => {
+        const updatedTasks = tasks.map(task =>
+            task.id === task.id ? {...task, completed: !task.completed} : task);
+
+        setTasks(updatedTasks);
+
+        const completedTasks = updatedTasks.filter(task => task.completed).length;
+        const newProgress = (completedTasks / updatedTasks.length) * 100;
+        setWeeklyGoalProgress(newProgress);
+    }
 
     const quickAccessItems = [
         { title: 'Add New Item', icon: <AddBoxIcon />, action: () => navigate('/addInventory') },
@@ -183,6 +200,29 @@ const HomePage: React.FC = () => {
         localStorage.clear();
         navigate('/');
     };
+
+    const handleTaskToggle = (taskId: number) => {
+        const updatedTasks = tasks.map(task =>
+            task.id === taskId ? { ...task, completed: !task.completed } : task
+        );
+
+        setTasks(updatedTasks);
+
+        const completedTasks = updatedTasks.filter(task => task.completed).length;
+        const newProgress = (completedTasks / updatedTasks.length) * 100;
+        setWeeklyGoalProgress(newProgress);
+    };
+
+    const handleListItemClick = (taskId: number) => (event: ChangeEvent<HTMLInputElement>) => {
+        handleTaskToggle(taskId);
+    };
+
+    const handleCheckboxChange = (taskId: number) => (event: ChangeEvent<HTMLInputElement>) => {
+        event.stopPropagation();
+        handleTaskToggle(taskId);
+    };
+
+
 
     return (
         <BackgroundContainer>
@@ -251,18 +291,24 @@ const HomePage: React.FC = () => {
                                 <Typography variant="h6" gutterBottom>Tasks & Goals</Typography>
                                 <List>
                                     {tasks.map((task) => (
-                                        <ListItem key={task.id}>
+                                        <StyledListItem
+                                            key={task.id}
+                                        >
                                             <Checkbox
                                                 checked={task.completed}
-                                                onChange={() => {/* Handle task completion */}}
+                                                onChange={handleCheckboxChange(task.id)}
+                                                color="primary"
                                             />
-                                            <ListItemText primary={task.title} />
-                                        </ListItem>
+                                            <ListItemText
+                                                primary={task.title}
+                                                style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
+                                            />
+                                        </StyledListItem>
                                     ))}
                                 </List>
                                 <Box sx={{ mt: 2 }}>
                                     <Typography variant="subtitle2" gutterBottom>Weekly Goal Progress</Typography>
-                                    <LinearProgress variant="determinate" value={70} />
+                                    <LinearProgress variant="determinate" value={weeklyGoalProgress} />
                                 </Box>
                             </Paper>
                         </Grid>

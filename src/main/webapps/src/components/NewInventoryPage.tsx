@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     Container, Box, Typography, TextField, Button, Snackbar, Alert,
     Paper, Grid, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent,
-    InputAdornment, styled
+    InputAdornment, styled, IconButton
 } from '@mui/material';
 import {
     Assessment as AssessmentIcon, Business as BusinessIcon,
@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import MainAppBar from './MainAppBar';
 import InventoryIcon from "@mui/icons-material/Inventory";
 import {addProductToInventory, fetchSkuNumber} from "../api/InventoryApiService";
+import AddIcon from '@mui/icons-material/Add'
 
 interface NewInventoryItem {
     productName: string;
@@ -35,6 +36,65 @@ interface NewInventoryItem {
     images: string[]; // This will store image URLs
 }
 
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(4),
+    width: '100%',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+    borderRadius: '12px',
+    transition: 'box-shadow 0.3s ease-in-out',
+    '&:hover': {
+        boxShadow: '0 6px 25px rgba(0,0,0,0.15)',
+    },
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+    '& .MuiOutlinedInput-root': {
+        '&:hover fieldset': {
+            borderColor: theme.palette.primary.main,
+        },
+    },
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+    textTransform: 'none',
+    fontWeight: 600,
+    padding: '8px 16px',
+    borderRadius: '4px',
+    boxShadow: 'none',
+    transition: 'all 0.3s ease-in-out',
+    '&:hover': {
+        boxShadow: 'none',
+        backgroundColor: theme.palette.primary.dark,
+    },
+    '&:active': {
+        boxShadow: 'none',
+        backgroundColor: theme.palette.primary.main,
+    },
+}));
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+    padding: '8px',
+    borderRadius: '4px',
+    color: theme.palette.secondary.main,
+    '&:hover': {
+        backgroundColor: theme.palette.secondary.light,
+    },
+    '&:active': {
+        backgroundColor: theme.palette.secondary.main,
+        color: theme.palette.common.white,
+    },
+}));
+
+const StyledFormControl = styled(FormControl)(({ theme }) => ({
+    '& .MuiOutlinedInput-root': {
+        '&:hover fieldset': {
+            borderColor: theme.palette.primary.main,
+        },
+    },
+}));
+
+
 const BackgroundContainer = styled('div')({
     minHeight: '120vh',
     display: 'flex',
@@ -42,11 +102,16 @@ const BackgroundContainer = styled('div')({
     background: 'linear-gradient(120deg, #f6f7f9 0%, #e3e6ec 100%)',
 });
 
-// Styled component for the content area
-const ContentContainer = styled(Box)({
+const ContentContainer = styled(Box)(({ theme }) => ({
     flexGrow: 1,
-    padding: '24px 0',
-});
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: theme.spacing(3),
+    paddingTop: theme.spacing(10), // Increased top padding to account for AppBar
+    paddingBottom: theme.spacing(3),
+    minHeight: 'calc(100vh - 64px)', // Subtract AppBar height
+}));
 
 const NewInventoryPage: React.FC = () => {
     const navigate = useNavigate();
@@ -145,7 +210,7 @@ const NewInventoryPage: React.FC = () => {
         console.log('Request: ', request);
         const response = await addProductToInventory(newItem);
         console.log('Response: ', response);
-        if(response.status === 200){
+        if(response.status === 200 || response.status === 201){
             setSnackbarMessage('Item added successfully!');
             setOpenSnackbar(true);
         }
@@ -176,8 +241,8 @@ const NewInventoryPage: React.FC = () => {
     return (
         <BackgroundContainer>
             <MainAppBar title="Add New Inventory Item" drawerItems={menuItems2}/>
-            <Container component="main" maxWidth="xl" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-                <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
+            <ContentContainer>
+                <StyledPaper elevation={3} sx={{ p: 4, width: '100%' }}>
                     <Typography variant="h4" gutterBottom>
                         Add New Inventory Item
                     </Typography>
@@ -204,14 +269,13 @@ const NewInventoryPage: React.FC = () => {
                                     required
                                     InputProps={{
                                         endAdornment: (
-                                            <Button
+                                            <StyledIconButton
                                                 onClick={generateSKU}
-                                                variant="contained"
                                                 color="secondary"
                                                 size="small"
                                                 >
-                                                Generate
-                                            </Button>
+                                                <AddIcon />
+                                            </StyledIconButton>
                                         ),
                                     }}
                                 />
@@ -234,14 +298,13 @@ const NewInventoryPage: React.FC = () => {
                                     onChange={handleInputChange}
                                     InputProps={{
                                         endAdornment: (
-                                            <Button
+                                            <StyledIconButton
                                                 onClick={generateModelNumber}
-                                                variant="contained"
                                                 color="secondary"
                                                 size="small"
                                             >
-                                                Generate
-                                            </Button>
+                                                <AddIcon />
+                                            </StyledIconButton>
                                         ),
                                     }}
                                 />
@@ -322,7 +385,7 @@ const NewInventoryPage: React.FC = () => {
                                 />
                             </Grid>
                             <Grid item xs={12} md={3}>
-                                <TextField
+                                <StyledTextField
                                     fullWidth
                                     label="Cost Price"
                                     name="costPrice"
@@ -335,7 +398,7 @@ const NewInventoryPage: React.FC = () => {
                                 />
                             </Grid>
                             <Grid item xs={12} md={3}>
-                                <TextField
+                                <StyledTextField
                                     fullWidth
                                     label="Markup Percentage"
                                     name="markupPercentage"
@@ -350,7 +413,7 @@ const NewInventoryPage: React.FC = () => {
 
                             {/* Fourth row */}
                             <Grid item xs={12} md={6}>
-                                <TextField
+                                <StyledTextField
                                     fullWidth
                                     label="Supplier"
                                     name="supplier"
@@ -360,7 +423,7 @@ const NewInventoryPage: React.FC = () => {
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <TextField
+                                <StyledTextField
                                     fullWidth
                                     label="Expiration Date"
                                     name="expirationDate"
@@ -419,7 +482,7 @@ const NewInventoryPage: React.FC = () => {
 
                             {/* Submit button */}
                             <Grid item xs={12}>
-                                <Button
+                                <StyledButton
                                     type="submit"
                                     variant="contained"
                                     color="primary"
@@ -427,17 +490,17 @@ const NewInventoryPage: React.FC = () => {
                                     startIcon={<SaveIcon />}
                                 >
                                     Save New Item
-                                </Button>
+                                </StyledButton>
                             </Grid>
                         </Grid>
                     </form>
-                </Paper>
+                </StyledPaper>
                 <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
                     <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
                         {snackbarMessage}
                     </Alert>
                 </Snackbar>
-            </Container>
+            </ContentContainer>
         </BackgroundContainer>
     );
 };

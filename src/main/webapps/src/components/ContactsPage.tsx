@@ -204,7 +204,7 @@ const ContactsPage: React.FC = () => {
                                         ))}
                                     </Select>
                                 </FormControl>
-                                <TextField label="Notes" name="notes" value={newContact.notes} onChange={handleInputChange} multiline rows={2} />
+                                {/*<TextField label="Notes" name="notes" value={newContact.notes} onChange={handleInputChange} multiline rows={2} />*/}
                                 <Switch checked={newContact.active} onChange={(e) => setNewContact(prev => ({ ...prev, active: e.target.checked }))} name="active" />
                             </Box>
                             <Button type="submit" variant="contained" color="primary" startIcon={<AddIcon />}>
