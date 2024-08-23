@@ -25,11 +25,11 @@ public class StockEntity {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "stock_product",
-            joinColumns = @JoinColumn(name = "stock_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id"))
+            joinColumns = @JoinColumn(name = "stockid"),
+            inverseJoinColumns = @JoinColumn(name = "productid"))
     private Set<ProductEntity> products;
 
-    @Column(name="lastUpdated")
+    @Column(name="last_updated")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime lastUpdated;
 

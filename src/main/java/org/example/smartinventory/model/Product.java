@@ -22,7 +22,7 @@ public class Product {
     private String productBrand;
     private BigDecimal costPrice;
     private LocalDate expirationDate;
-    private Notes notes;
+    private String notes;
     private int reorderPoint;
     private String supplier;
     private String modelNumber;

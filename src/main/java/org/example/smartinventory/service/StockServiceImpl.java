@@ -56,6 +56,6 @@ public class StockServiceImpl implements StockService
 
     @Override
     public StockEntity updateStock(StockEntity stock) {
-        return null;
+        return stockRepository.updateStock(stock);
     }
 }

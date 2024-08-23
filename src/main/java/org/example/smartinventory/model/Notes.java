@@ -1,7 +1,10 @@
 package org.example.smartinventory.model;
 
+import lombok.Data;
+
 import java.time.LocalDate;
 
+@Data
 public class Notes
 {
     private int noteId;

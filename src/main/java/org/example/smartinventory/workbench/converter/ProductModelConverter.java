@@ -1,17 +1,20 @@
 package org.example.smartinventory.workbench.converter;
 
 import org.example.smartinventory.entities.ProductEntity;
+import org.example.smartinventory.model.Notes;
 import org.example.smartinventory.model.Product;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Component
+
 public class ProductModelConverter implements ModelToEntityConverter<Product, ProductEntity>
 {
+
     @Override
     public ProductEntity convert(Product source) {
         ProductEntity entity = new ProductEntity();
@@ -25,11 +28,13 @@ public class ProductModelConverter implements ModelToEntityConverter<Product, Pr
         entity.setCategory(source.getProductCategory());
         entity.setPrice(source.getProductPrice());
         entity.setDescription(source.getProductDescription());
+        entity.setName(source.getProductName());
         entity.setSku(source.getProductSKU());
         entity.setQuantity(source.getProductQuantity());
         entity.setModelNumber(source.getModelNumber());
         return entity;
     }
+
 
     public Set<ProductEntity> convert(List<Product> source) {
         Set<ProductEntity> result = new HashSet<>();
