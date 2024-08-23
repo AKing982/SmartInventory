@@ -21,4 +21,10 @@ public class Notes
         this.updatedAt = updatedAt;
         this.noteType = noteType;
     }
+
+    public Notes(){
+
+    }
 }
+
+
